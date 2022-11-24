@@ -5,7 +5,9 @@
 
 int main()
 {
-    std::cout << "Bye Bye World!\n";
+    std::cout << "Bye Bye World!" << std::endl;
+
+    std::cout << "Git is hard :(" << std::endl;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
