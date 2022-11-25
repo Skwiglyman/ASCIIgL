@@ -42,3 +42,9 @@ void Screen::OutputBuffer()
 	// outputs the buffer to the console the fastest way
 	WriteConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion);
 }
+
+void Screen::PlotPixel(glm::vec2 p)
+{
+	// this function takes in a 2d point and plots it on the pixelBuffer
+	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = (CHAR) 35; // setting the point in the screen buffer to a hashtag also reversing the x and y else the image would be flipped
+}

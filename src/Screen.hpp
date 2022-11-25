@@ -31,5 +31,6 @@ class Screen
 	void ClearScreen(); // clears screen (does not clear buffer)
 	void ClearBuffer(); // clears buffer
 	void OutputBuffer(); // draws to screen
+	void PlotPixel(glm::vec2 p); // plotting pixel onto screen buffer
 
 };

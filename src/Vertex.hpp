@@ -2,5 +2,10 @@
 
 typedef struct Vertex
 {
-	float x, y, z;
+	union
+	{
+		glm::vec3 pos;
+		glm::vec3 Position;
+	};
+	
 } VERTEX;
