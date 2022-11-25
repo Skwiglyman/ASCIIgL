@@ -34,7 +34,10 @@ void Screen::ClearScreen()
 void Screen::ClearBuffer()
 {
 	// clears the buffer by setting the entire buffer to spaces (ascii code 32)
-	std::fill_n(pixelBuffer, SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{ 32 });
+	for (int i = 0; i < SCR_WIDTH * SCR_HEIGHT; i++)
+	{
+		pixelBuffer[i].Char.AsciiChar = (CHAR) 32;
+	}
 }
 
 void Screen::OutputBuffer()
@@ -46,5 +49,6 @@ void Screen::OutputBuffer()
 void Screen::PlotPixel(glm::vec2 p)
 {
 	// this function takes in a 2d point and plots it on the pixelBuffer
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = (CHAR) 35; // setting the point in the screen buffer to a hashtag also reversing the x and y else the image would be flipped
+	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = (CHAR) 35; // setting the point in the screen buffer to a hashtag 
+	// also reversing the x and y else the image would be flipped (35 = ascii code for #)
 }

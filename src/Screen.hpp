@@ -16,12 +16,15 @@
 
 class Screen
 {
-	CHAR_INFO* pixelBuffer; // pixel output buffer
+private:
 	HANDLE hOutput = (HANDLE)GetStdHandle(STD_OUTPUT_HANDLE); // handle thing (I got no idea what this is)
 
 	COORD dwBufferSize; // size of buffer
 	COORD dwBufferCoord; // starting coord of buffer
 	SMALL_RECT rcRegion; // rectangle of coords of buffer { 0, 0, width - 1, height - 1 }
+
+public:
+	CHAR_INFO* pixelBuffer; // pixel output buffer
 
 	int SCR_WIDTH, SCR_HEIGHT; // defining the width and height of the screen
 
