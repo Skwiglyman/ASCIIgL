@@ -133,10 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera2D.cpp" />
+    <ClCompile Include="src\Camera3D.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Screen.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera2D.hpp" />
+    <ClInclude Include="src\Camera3D.hpp" />
     <ClInclude Include="src\Screen.hpp" />
     <ClInclude Include="src\Vertex.hpp" />
   </ItemGroup>
