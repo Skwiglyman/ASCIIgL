@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="src\projectCode\Camera2D.cpp" />
     <ClCompile Include="src\projectCode\Camera3D.cpp" />
+    <ClCompile Include="src\projectCode\LineAlgo.cpp" />
     <ClCompile Include="src\userCode\main.cpp" />
     <ClCompile Include="src\projectCode\Screen.cpp" />
   </ItemGroup>
