@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Settings.hpp"
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -30,7 +28,6 @@ public:
 	glm::vec3 getCamRight();
 	glm::vec3 getCamLeft();
 	
-	glm::vec3 getChunkCoords();
 
 	void setCamPos(glm::vec3 Pposition);
 	void setCamDir(float yaw, float pitch);

@@ -1,6 +1,4 @@
 #include "Camera3D.hpp"
-#include "Settings.hpp"
-#include "Mouse.hpp"
 #include <math.h>
 
 Camera3D::Camera3D(glm::vec3 Pposition, float Pfov, float Paspect, glm::vec2 yawPitch, float PzNear, float PzFar)
@@ -63,15 +61,4 @@ void Camera3D::setCamDir(float Pyaw, float Ppitch)
 void Camera3D::recalculateViewMat()
 {
 	view = glm::lookAt(position, position + getCamFront(), glm::vec3(0.0, 1.0, 0.0));
-}
-
-void Camera3D::mouseRotation()
-{
-	glm::vec2 offset = Mouse::getMouseOffset();
-	setCamDir(yaw + offset.x, pitch + offset.y);
-}
-
-glm::vec3 Camera3D::getChunkCoords()
-{
-	return glm::vec3(floor(position.x / chunkDim), floor(position.y / chunkDim), floor(position.z / chunkDim));
 }
