@@ -1,7 +1,6 @@
 #include "Camera2D.hpp"
-#include "Settings.hpp"
 
-Camera2D::Camera2D(glm::vec2 Pposition)
+Camera2D::Camera2D(glm::vec2 Pposition, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 	: position(Pposition)
 {
 	proj = glm::ortho(0.0f, (float)SCR_WIDTH, 0.0f, (float)SCR_HEIGHT, -100.0f, 100.0f);

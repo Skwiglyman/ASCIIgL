@@ -12,7 +12,7 @@ public:
 	glm::mat4 view;
 	glm::mat4 proj;
 
-	Camera2D(glm::vec2 Pposition);
+	Camera2D(glm::vec2 Pposition, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 	~Camera2D();
 
 	void setCamPos(glm::vec2 Pposition);
