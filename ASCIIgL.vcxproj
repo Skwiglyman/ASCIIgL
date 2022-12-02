@@ -133,16 +133,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Camera2D.cpp" />
-    <ClCompile Include="src\Camera3D.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Screen.cpp" />
+    <ClCompile Include="src\projectCode\Camera2D.cpp" />
+    <ClCompile Include="src\projectCode\Camera3D.cpp" />
+    <ClCompile Include="src\projectCode\LineAlgo.cpp" />
+    <ClCompile Include="src\userCode\main.cpp" />
+    <ClCompile Include="src\projectCode\Screen.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Camera2D.hpp" />
-    <ClInclude Include="src\Camera3D.hpp" />
-    <ClInclude Include="src\Screen.hpp" />
-    <ClInclude Include="src\Vertex.hpp" />
+    <ClInclude Include="src\projectCode\Camera2D.hpp" />
+    <ClInclude Include="src\projectCode\Camera3D.hpp" />
+    <ClInclude Include="src\projectCode\LineAlgo.hpp" />
+    <ClInclude Include="src\projectCode\Screen.hpp" />
+    <ClInclude Include="src\userCode\Vertex.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

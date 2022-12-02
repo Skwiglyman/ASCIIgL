@@ -4,9 +4,6 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-// includes from project
-#include "Vertex.hpp"
-
 // includes from default c++ libraries
 #include <Windows.h>
 
