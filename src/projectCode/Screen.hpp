@@ -6,6 +6,9 @@
 
 // includes from default c++ libraries
 #include <Windows.h>
+#include <functional>
+#include <algorithm>
+#include <vector>
 
 // I don't even know what this does black magic screen shit
 #define WIN32_LEAN_AND_MEAN
@@ -33,4 +36,22 @@ public:
 	void OutputBuffer(); // draws to screen
 	void PlotPixel(glm::vec2 p); // plotting pixel onto screen buffer
 
+	void DrawLine(int x1, int y1, int x2, int y2);
+	
+	template<typename T> 
+	void RenderTriangles(T& VERTEX_SHADER, std::vector<float*> vertices); // rendering triangles function that lets user bind their own custom vertex shader structs
+
+	typedef struct Def_Vertex_Shader
+	{
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+
+		glm::vec4 Use(float* vertice)
+		{
+			glm::vec4 pos = glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
+
+			return proj * view * model * pos;
+		}
+	} DEF_VERTEX_SHADER;
 };
