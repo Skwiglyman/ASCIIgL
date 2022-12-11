@@ -1,5 +1,6 @@
 #include "../projectCode/Screen.hpp"
 #include "../projectCode/Camera3D.hpp"
+#include "../projectCode/Camera2D.hpp"
 
 void tempFpsMovement(Camera3D& camera3D)
 {
@@ -7,23 +8,27 @@ void tempFpsMovement(Camera3D& camera3D)
 	if (GetKeyState('S') & 0x8000) { camera3D.setCamPos(camera3D.position + camera3D.getCamBack()); }
 	if (GetKeyState('A') & 0x8000) { camera3D.setCamPos(camera3D.position + camera3D.getCamLeft()); }
 	if (GetKeyState('D') & 0x8000) { camera3D.setCamPos(camera3D.position + camera3D.getCamRight()); }
+	
+	if (GetKeyState(VK_SPACE) & 0x8000) { camera3D.setCamPos(camera3D.position + glm::vec3(0, -1, 0)); }
+	if (GetKeyState(VK_SHIFT) & 0x8000) { camera3D.setCamPos(camera3D.position + glm::vec3(0, 1, 0)); }
 
-	if (GetKeyState(VK_UP) & 0x8000) { camera3D.setCamDir(camera3D.yaw, camera3D.pitch - 5); }
-	if (GetKeyState(VK_BACK) & 0x8000) { camera3D.setCamDir(camera3D.yaw, camera3D.pitch + 5); }
-	if (GetKeyState(VK_LEFT) & 0x8000) { camera3D.setCamDir(camera3D.yaw - 5, camera3D.pitch); }
-	if (GetKeyState(VK_RIGHT) & 0x8000) { camera3D.setCamDir(camera3D.yaw + 5, camera3D.pitch); }
+	if (GetKeyState(VK_UP) & 0x8000) { camera3D.setCamDir(camera3D.yaw, camera3D.pitch - 1); }
+	if (GetKeyState(VK_DOWN) & 0x8000) { camera3D.setCamDir(camera3D.yaw, camera3D.pitch + 1); }
+	if (GetKeyState(VK_LEFT) & 0x8000) { camera3D.setCamDir(camera3D.yaw - 1, camera3D.pitch); }
+	if (GetKeyState(VK_RIGHT) & 0x8000) { camera3D.setCamDir(camera3D.yaw + 1, camera3D.pitch); }
 }
 
 int main()
 {
-	Screen screen(200, 200);
+	Screen screen(960, 540); // 960x540 is the biggest resolution for my monitor
 	Screen::DEF_VERTEX_SHADER vertexShader;
 
-	Camera3D camera(glm::vec3(0.0f, 10.0f, 0.0f), 80, screen.SCR_WIDTH / screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 0.01f,  1280);
+	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 0.01f,  1280);
+	//Camera2D camera(glm::vec2(0, 0), screen.SCR_WIDTH, screen.SCR_HEIGHT);
 
 	glm::vec3 position(10, 10, 10);
-	glm::vec3 size(5, 5, 5);
-	glm::vec2 rotation(45, 45);
+	glm::vec3 size(100, 100, 100);
+	glm::vec2 rotation(0, 0);
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 	model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, -0.5f * size.z));
@@ -32,7 +37,7 @@ int main()
 	model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z));
 	model = glm::scale(model, size);
 
-	std::vector<float*> vertices = {
+	std::vector<std::vector<float>> vertices {
 		{ 0.0f, 0.0f, 0.0f },
 		{ 1.0f, 0.0f, 0.0f },
 		{ 1.0f, 1.0f, 0.0f },
@@ -67,7 +72,7 @@ int main()
 		{ 1.0f, 0.0f, 1.0f },
 		{ 0.0f, 0.0f, 1.0f },
 		{ 0.0f, 0.0f, 0.0f },
-		 				   
+
 		{ 0.0f, 1.0f, 0.0f },
 		{ 1.0f, 1.0f, 0.0f },
 		{ 1.0f, 1.0f, 1.0f },
@@ -75,7 +80,7 @@ int main()
 		{ 0.0f, 1.0f, 1.0f },
 		{ 0.0f, 1.0f, 0.0f }
 	};
-
+	
 	bool running = true;
 	while (running)
 	{
