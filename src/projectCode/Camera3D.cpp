@@ -2,7 +2,7 @@
 #include <math.h>
 
 Camera3D::Camera3D(glm::vec3 Pposition, float Pfov, float Paspect, glm::vec2 yawPitch, float PzNear, float PzFar)
-	: position(Pposition), fov(Pfov), pitch(yawPitch.y), yaw(yawPitch.x), aspect(Paspect), zNear(PzNear), zFar(PzFar)
+	: pos(Pposition), fov(Pfov), pitch(yawPitch.y), yaw(yawPitch.x), aspect(Paspect), zNear(PzNear), zFar(PzFar)
 {
 	recalculateViewMat(); // this function uses all all class attributes
 	proj = glm::perspective(glm::radians(Pfov), aspect, zNear, zFar); // calculating the perspective projection
@@ -48,7 +48,7 @@ glm::vec3 Camera3D::getCamLeft()
 void Camera3D::setCamPos(glm::vec3 Pposition)
 {
 	// this function takes in a new position for the camera, and sets the cameras position to it, then it recalculates the view mat
-	position = Pposition;
+	pos = Pposition;
 	recalculateViewMat();
 }
 
@@ -69,5 +69,5 @@ void Camera3D::setCamDir(float Pyaw, float Ppitch)
 void Camera3D::recalculateViewMat()
 {
 	// sets the cameras view mat to a glm::look at matrix using the place the camera is facing as the position matrix + the direction of the camera
-	view = glm::lookAt(position, position + getCamFront(), glm::vec3(0.0, 1.0, 0.0));
+	view = glm::lookAt(pos, pos + getCamFront(), glm::vec3(0.0, 1.0, 0.0));
 }

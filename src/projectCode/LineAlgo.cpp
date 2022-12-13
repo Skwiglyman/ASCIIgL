@@ -1,6 +1,6 @@
 #include "LineAlgo.hpp"
 
-std::vector<glm::vec2> DrawLineBrensenham(int x1, int b, int x2, int y2) // I ripped this striaght off github idk how it works
+std::vector<glm::vec2> DrawLineBrensenham(int x1, int b, int x2, int y2) // I ripped this straight off github idk how it works
 {
 	std::vector<glm::vec2> points;
 

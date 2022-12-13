@@ -66,8 +66,52 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2)
 	}
 }
 
-glm::vec3 Screen::clipToScreen(glm::vec4 p)
+std::vector<float> Screen::clipToScreen(std::vector<float> p)
 {
-	glm::vec3 p2 = glm::vec3(((p.x + 1.0f) / 2.0f)*SCR_WIDTH, ((p.y + 1.0f) / 2.0f) * SCR_HEIGHT, p.z);
-	return p2;
+	std::vector<float> newVert;
+	glm::vec4 newPos = glm::vec4(((p[0] + 1.0f) / 2.0f) * SCR_WIDTH, ((p[1] + 1.0f) / 2.0f) * SCR_HEIGHT, p[2], p[3]);
+	vec4ToVert(newPos, &newVert);
+
+	if (p.size() > 3)
+	{
+		for (size_t i = 3; i < p.size(); i++)
+		{
+			newVert.push_back(p[i]);
+		}
+	}
+	
+
+	return newVert;
+}
+
+void Screen::vec4ToVert(glm::vec4 p, std::vector<float>* vert)
+{
+	vert->push_back(p.x);
+	vert->push_back(p.y);
+	vert->push_back(p.z);
+	vert->push_back(p.w);
+}
+
+void Screen::vec3ToVert(glm::vec3 p, std::vector<float>* vert)
+{
+	vert->push_back(p.x);
+	vert->push_back(p.y);
+	vert->push_back(p.z);
+}
+
+void Screen::vec2ToVert(glm::vec2 p, std::vector<float>* vert)
+{
+	vert->push_back(p.x);
+	vert->push_back(p.y);
+}
+
+glm::vec3 Screen::calcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+{
+	glm::vec3 normal;
+
+	glm::vec3 U = p2 - p1;
+	glm::vec3 V = p3 - p1;
+
+	normal = glm::cross(V, U);
+	return glm::normalize(normal);
 }

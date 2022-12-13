@@ -8,7 +8,7 @@ class Camera3D // This is an inbuilt camera 3d class that primarily holds a view
 private:
 
 public:
-	glm::vec3 position;
+	glm::vec3 pos;
 	glm::mat4 view; // this holds the view matrix (the view matrix is a glm::lookat matrix which is used for cameras)
 	glm::mat4 proj; // this holds the perspective projection matrix
 
