@@ -42,10 +42,6 @@ typedef struct Vertex_Shader
 			newPos = GLproj * glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
 		vec4ToVert(newPos, &newVert);
 
-		// std::cout << newPos.w << std::endl;
-		// std::cout << newPos.x << " " << newPos.y << " " << newPos.z << " " << newPos.w << std::endl;
-		//std::cout << newVert[0] << " " << newVert[1] << " " << newVert[2] << " " << newVert[3] << std::endl;
-
 		return newVert;
 	}
 } VERTEX_SHADER;

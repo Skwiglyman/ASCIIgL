@@ -33,7 +33,7 @@ private:
 	void clipTriangleAgainstPlane(glm::vec3 planeP, glm::vec3 planeN, std::vector<std::vector<float>>& vertices, std::vector<std::vector<float>>& clipped, int i);
 	float BackFaceCull(std::vector<float> v1, std::vector<float> v2, std::vector<float> v3);
 
-	void DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>> screenCoords, std::vector<std::vector<float>> viewCoords);
+	void DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>> screenCoords);
 
 	void localToWorld(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& localCoords, std::vector<std::vector<float>>& worldCoords);
 	void worldToView(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& worldCoords, std::vector<std::vector<float>>& viewCoords);
@@ -42,6 +42,7 @@ private:
 	void NDCToScreen(std::vector<std::vector<float>>& ndcCoords, std::vector<std::vector<float>>& screenCoords);
 
 	void depthClipping(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar);
+	void backFaceCulling(std::vector<std::vector<float>>& clippedViewCoords, std::vector<std::vector<float>>& backClippedCoords);
 	
 
 
@@ -66,8 +67,6 @@ public:
 			return;
 		else if (localCoords[0].size() < 3)
 			return;
-		
-		std::vector<std::vector<float>> screenCoords;
 
 		// LOCAL TO WORLD
 		std::vector<std::vector<float>> worldCoords;
@@ -81,18 +80,22 @@ public:
 		std::vector<std::vector<float>> clippedViewCoords;
 		depthClipping(VSHADER, viewCoords, clippedViewCoords, zNear, zFar);
 
+		std::vector<std::vector<float>> backClippedCoords;
+		backFaceCulling(clippedViewCoords, backClippedCoords);
+
 		// VIEW TO CLIP
 		std::vector<std::vector<float>> clipCoords;
-		viewToClip(VSHADER, clippedViewCoords, clipCoords);
+		viewToClip(VSHADER, backClippedCoords, clipCoords);
 
 		// PERSPECTIVE DIVISION
 		perspectiveDivision(clipCoords);
 
 		// NDC TO SCREEN
+		std::vector<std::vector<float>> screenCoords;
 		NDCToScreen(clipCoords, screenCoords);
 
 		// DRAWING TRIANGLES
-		DrawTriangles(VSHADER, screenCoords, clippedViewCoords);
+		DrawTriangles(VSHADER, screenCoords);
 
 		// DRAWING BORDERS
 		DrawLine(0, 0, SCR_WIDTH - 1, 0);

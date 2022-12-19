@@ -23,17 +23,18 @@ void tempFpsMovement(Camera3D& camera3D)
 
 int main()
 {
-	Screen screen(300, 300); // 900x540 is the biggest resolution for my monitor
+	Screen screen(900, 540); // 900x540 is the biggest resolution for my monitor
 	VERTEX_SHADER vertexShader;
 
 	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 20.0f,  200);
-	//Camera2D camera(glm::vec2(0, 0), screen.SCR_WIDTH, screen.SCR_HEIGHT);
 
 	glm::vec3 position(100, 10, 50);
 	glm::vec3 size(50, 10, 50);
 	glm::vec2 rotation(0, 0);
 
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+	glm::mat4 model;
+	
+	model = glm::translate(glm::mat4(1.0f), position);
 	model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, -0.5f * size.z));
 	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 0.0f, 1.0f));

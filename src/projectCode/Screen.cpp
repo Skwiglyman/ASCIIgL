@@ -204,6 +204,19 @@ void Screen::depthClipping(VERTEX_SHADER VSHADER, std::vector<std::vector<float>
 	}
 }
 
+void Screen::backFaceCulling(std::vector<std::vector<float>>& clippedViewCoords, std::vector<std::vector<float>>& backClippedCoords)
+{
+	for (int i = 0; i < clippedViewCoords.size(); i += 3)
+	{
+		if (BackFaceCull(clippedViewCoords[i], clippedViewCoords[i + 1], clippedViewCoords[i + 2]))
+		{
+			backClippedCoords.push_back(clippedViewCoords[i]);
+			backClippedCoords.push_back(clippedViewCoords[i + 1]);
+			backClippedCoords.push_back(clippedViewCoords[i + 2]);
+		}
+	}
+}
+
 void Screen::viewToClip(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clipCoords)
 {
 	for (int i = 0; i < viewCoords.size(); i++)
@@ -235,7 +248,7 @@ void Screen::NDCToScreen(std::vector<std::vector<float>>& ndcCoords, std::vector
 	}
 }
 
-void Screen::DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>> screenCoords, std::vector<std::vector<float>> viewCoords)
+void Screen::DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>> screenCoords)
 {
 	/*clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), viewCoords, clippedViewCoords, k);
 	clipTriangleAgainstPlane(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), viewCoords, clippedViewCoords, k);
@@ -244,14 +257,10 @@ void Screen::DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>
 
 	for (int i = 0; i < screenCoords.size(); i += 3)
 	{
-		// CULLING BACK FACES
-		if (BackFaceCull(viewCoords[i], viewCoords[i + 1], viewCoords[i + 2]))
-		{
-			// RENDERING LINES BETWEEN VERTICES
-			DrawLine(screenCoords[i][0], screenCoords[i][1], screenCoords[i + 1][0], screenCoords[i + 1][1]);
-			DrawLine(screenCoords[i + 1][0], screenCoords[i + 1][1], screenCoords[i + 2][0], screenCoords[i + 2][1]);
-			DrawLine(screenCoords[i + 2][0], screenCoords[i + 2][1], screenCoords[i][0], screenCoords[i][1]);
-		}
+		// RENDERING LINES BETWEEN VERTICES
+		DrawLine(screenCoords[i][0], screenCoords[i][1], screenCoords[i + 1][0], screenCoords[i + 1][1]);
+		DrawLine(screenCoords[i + 1][0], screenCoords[i + 1][1], screenCoords[i + 2][0], screenCoords[i + 2][1]);
+		DrawLine(screenCoords[i + 2][0], screenCoords[i + 2][1], screenCoords[i][0], screenCoords[i][1]);
 	}
 }
 
