@@ -1,6 +1,9 @@
 #include "../projectCode/Screen.hpp"
 #include "../projectCode/Camera3D.hpp"
 #include "../projectCode/Camera2D.hpp"
+#include "../projectCode/VertexShader.hpp"
+
+#include <random>
 
 void tempFpsMovement(Camera3D& camera3D)
 {
@@ -20,14 +23,14 @@ void tempFpsMovement(Camera3D& camera3D)
 
 int main()
 {
-	Screen screen(900, 540); // 900x540 is the biggest resolution for my monitor
-	Screen::DEF_VERTEX_SHADER vertexShader;
+	Screen screen(300, 300); // 900x540 is the biggest resolution for my monitor
+	VERTEX_SHADER vertexShader;
 
-	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 0.01f,  1280);
+	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 20.0f,  200);
 	//Camera2D camera(glm::vec2(0, 0), screen.SCR_WIDTH, screen.SCR_HEIGHT);
 
-	glm::vec3 position(80, 50, 80);
-	glm::vec3 size(50, 50, 50);
+	glm::vec3 position(100, 10, 50);
+	glm::vec3 size(50, 10, 50);
 	glm::vec2 rotation(0, 0);
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
@@ -35,7 +38,7 @@ int main()
 	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z));
-	model = glm::scale(model, size);
+	model = glm::scale(model, size); 
 
 	std::vector<std::vector<float>> vertices {
 		{ -1.0f, -1.0f, -1.0f}, // Bottom-left
@@ -72,7 +75,7 @@ int main()
 		{  1.0f, -1.0f,  1.0f}, // bottom-left
 		{ -1.0f, -1.0f,  1.0f}, // bottom-right
 		{ -1.0f, -1.0f, -1.0f}, // top-right
-		// Top f1.0
+		// Top
 		{ -1.0f,  1.0f, -1.0f}, // top-left
 		{  1.0f,  1.0f,  1.0f}, // bottom-right
 		{  1.0f,  1.0f, -1.0f}, // top-right     
@@ -80,10 +83,6 @@ int main()
 		{ -1.0f,  1.0f, -1.0f}, // top-left
 		{ -1.0f,  1.0f,  1.0f}, // bottom-left     
 	};
-
-
-
-	vertexShader.camera = &camera;
 	
 	bool running = true;
 	while (running)
@@ -95,12 +94,13 @@ int main()
 		// do game logic here
 		tempFpsMovement(camera);
 
-		vertexShader.model = model;
-		vertexShader.view = camera.view;
-		vertexShader.proj = camera.proj;
+		vertexShader.GLmodel = model;
+		vertexShader.GLview = camera.view;
+		vertexShader.GLproj = camera.proj;
 
 		// Rendering
-		screen.RenderTriangles(vertexShader, vertices);
+		//std::cout << rand() % 1000 << std::endl;
+		screen.RenderTriangles(vertexShader, vertices, camera.zNear, camera.zFar);
 		
 		// drawing
 		screen.OutputBuffer();

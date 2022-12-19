@@ -30,6 +30,9 @@
     <ClCompile Include="src\projectCode\LineAlgo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\projectCode\ASCII_Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\projectCode\Screen.hpp">
@@ -45,6 +48,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\projectCode\LineAlgo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\projectCode\ASCII_Math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\projectCode\VertexShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

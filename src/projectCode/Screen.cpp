@@ -1,5 +1,8 @@
 #include "Screen.hpp"
 #include "LineAlgo.hpp"
+#include "ASCII_Math.hpp"
+
+#include <array>
 
 
 Screen::Screen(int width, int height)
@@ -69,8 +72,8 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2)
 std::vector<float> Screen::clipToScreen(std::vector<float> p)
 {
 	std::vector<float> newVert;
-	glm::vec4 newPos = glm::vec4(((p[0] + 1.0f) / 2.0f) * SCR_WIDTH, ((p[1] + 1.0f) / 2.0f) * SCR_HEIGHT, p[2], p[3]);
-	vec4ToVert(newPos, &newVert);
+	glm::vec3 newPos = glm::vec3(((p[0] + 1.0f) / 2.0f) * SCR_WIDTH, ((p[1] + 1.0f) / 2.0f) * SCR_HEIGHT, p[2]);
+	vec3ToVert(newPos, &newVert);
 
 	if (p.size() > 3)
 	{
@@ -84,34 +87,184 @@ std::vector<float> Screen::clipToScreen(std::vector<float> p)
 	return newVert;
 }
 
-void Screen::vec4ToVert(glm::vec4 p, std::vector<float>* vert)
+void Screen::clipTriangleAgainstPlane(glm::vec3 planeP, glm::vec3 planeN, std::vector<std::vector<float>>& vertices, std::vector<std::vector<float>>& clipped, int i)
 {
-	vert->push_back(p.x);
-	vert->push_back(p.y);
-	vert->push_back(p.z);
-	vert->push_back(p.w);
+	int i1 = i;
+	int i2 = i + 1;
+	int i3 = i + 2;
+
+	std::vector<int> inside;
+	std::vector<int> outside;
+
+	std::vector<float> temp[6];
+	int newTri = 0;
+
+	auto dist = [&](glm::vec3 p)
+	{
+		return (planeN.x * p.x + planeN.y * p.y + planeN.z * p.z - glm::dot(planeN, planeP));
+	};
+
+	auto index = [&](int i)
+	{
+		if (i == i1)
+			return 0;
+		else if (i == i2)
+			return 1;
+		else if (i == i3)
+			return 2;
+	};
+
+	if (dist(glm::vec3(vertices[i1][0], vertices[i1][1], vertices[i1][2])) <= 0)
+		inside.push_back(i1);
+	else
+		outside.push_back(i1);
+
+	if (dist(glm::vec3(vertices[i2][0], vertices[i2][1], vertices[i2][2])) <= 0)
+		inside.push_back(i2);
+	else
+		outside.push_back(i2);
+
+	if (dist(glm::vec3(vertices[i3][0], vertices[i3][1], vertices[i3][2])) <= 0)
+		inside.push_back(i3);
+	else
+		outside.push_back(i3);
+
+	if (inside.size() == 3)
+	{
+		clipped.push_back(vertices[inside[0]]);
+		clipped.push_back(vertices[inside[1]]);
+		clipped.push_back(vertices[inside[2]]);
+	}
+
+	else if (inside.size() == 1)
+	{
+		glm::vec3 newPos1 = lineMeetsPlane(planeN, planeP, getPos(vertices[outside[0]]), getPos(vertices[inside[0]]));
+		glm::vec3 newPos2 = lineMeetsPlane(planeN, planeP, getPos(vertices[outside[1]]), getPos(vertices[inside[0]]));
+
+		temp[index(outside[0])] = {newPos1.x, newPos1.y, newPos1.z};
+		temp[index(outside[1])] = { newPos2.x, newPos2.y, newPos2.z };
+		temp[index(inside[0])] = vertices[inside[0]];
+		newTri = 3;
+	}
+
+	else if (inside.size() == 2)
+	{
+		glm::vec3 newPos1 = lineMeetsPlane(planeN, planeP, getPos(vertices[outside[0]]), getPos(vertices[inside[0]]));
+		glm::vec3 newPos2 = lineMeetsPlane(planeN, planeP, getPos(vertices[outside[0]]), getPos(vertices[inside[1]]));
+
+		// triangle 1
+		temp[index(inside[0])] = vertices[inside[0]];
+		temp[index(inside[1])] = vertices[inside[1]];
+		temp[index(outside[0])] = { newPos1.x, newPos1.y, newPos1.z };
+
+		// triangle 2
+		temp[index(outside[0]) + 3] = { newPos2.x, newPos2.y, newPos2.z };
+		temp[index(inside[0]) + 3] = { newPos1.x, newPos1.y, newPos1.z };
+		temp[index(inside[1]) + 3] = (vertices[inside[1]]);
+		newTri = 6;
+	}
+
+	for (int i = 0; i < newTri; i++)
+		clipped.push_back(temp[i]);
 }
 
-void Screen::vec3ToVert(glm::vec3 p, std::vector<float>* vert)
+void Screen::localToWorld(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& localCoords, std::vector<std::vector<float>>& worldCoords)
 {
-	vert->push_back(p.x);
-	vert->push_back(p.y);
-	vert->push_back(p.z);
+	for (int i = 0; i < localCoords.size(); i++)
+	{
+		//transforming vertices using vertex shader
+		std::vector<float> newVert = VSHADER.GLlocalToWorld(localCoords[i]);
+		worldCoords.push_back(newVert);
+	}
 }
 
-void Screen::vec2ToVert(glm::vec2 p, std::vector<float>* vert)
+void Screen::worldToView(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& worldCoords, std::vector<std::vector<float>>& viewCoords)
 {
-	vert->push_back(p.x);
-	vert->push_back(p.y);
+	for (int i = 0; i < worldCoords.size(); i++)
+	{
+		//transforming vertices using vertex shader
+		std::vector<float> newVert = VSHADER.GLworldToView(worldCoords[i]);
+		viewCoords.push_back(newVert);
+	}
 }
 
-glm::vec3 Screen::calcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+void Screen::depthClipping(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar)
 {
-	glm::vec3 normal;
+	// NEAR CLIPPING
+	std::vector<std::vector<float>> newCoords1;
+	for (int k = 0; k < viewCoords.size(); k += 3)
+	{
+		clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, -zNear), glm::vec3(0.0f, 0.0f, 1.0f), viewCoords, newCoords1, k);
+	}
 
-	glm::vec3 U = p2 - p1;
-	glm::vec3 V = p3 - p1;
+	// FAR CLIPPING
+	for (int k = 0; k < newCoords1.size(); k += 3)
+	{
+		clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, -zFar), glm::vec3(0.0f, 0.0f, -1.0f), newCoords1, clippedViewCoords, k);
+	}
+}
 
-	normal = glm::cross(V, U);
-	return glm::normalize(normal);
+void Screen::viewToClip(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clipCoords)
+{
+	for (int i = 0; i < viewCoords.size(); i++)
+	{
+		//transforming vertices using vertex shader
+		std::vector<float> newVert = VSHADER.GLviewToClip(viewCoords[i]);
+		clipCoords.push_back(newVert);
+	}
+}
+
+void Screen::perspectiveDivision(std::vector<std::vector<float>>& clipCoords)
+{
+	for (int i = 0; i < clipCoords.size(); i++)
+	{
+		clipCoords[i][0] /= clipCoords[i][3];
+		clipCoords[i][1] /= clipCoords[i][3];
+		clipCoords[i][2] /= clipCoords[i][3];
+		clipCoords[i][3] = 1.0f;
+	}
+}
+
+void Screen::NDCToScreen(std::vector<std::vector<float>>& ndcCoords, std::vector<std::vector<float>>& screenCoords)
+{
+	for (int i = 0; i < ndcCoords.size(); i++)
+	{
+		// CHANGING FROM NDC SPCE TO SCREEN SPACE
+		std::vector<float> screenCoord = clipToScreen(ndcCoords[i]);
+		screenCoords.push_back(screenCoord);
+	}
+}
+
+void Screen::DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>> screenCoords, std::vector<std::vector<float>> viewCoords)
+{
+	/*clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), viewCoords, clippedViewCoords, k);
+	clipTriangleAgainstPlane(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), viewCoords, clippedViewCoords, k);
+	clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), viewCoords, clippedViewCoords, k);
+	clipTriangleAgainstPlane(glm::vec3((float)SCR_WIDTH - 1, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), viewCoords, clippedViewCoords, k);*/
+
+	for (int i = 0; i < screenCoords.size(); i += 3)
+	{
+		// CULLING BACK FACES
+		if (BackFaceCull(viewCoords[i], viewCoords[i + 1], viewCoords[i + 2]))
+		{
+			// RENDERING LINES BETWEEN VERTICES
+			DrawLine(screenCoords[i][0], screenCoords[i][1], screenCoords[i + 1][0], screenCoords[i + 1][1]);
+			DrawLine(screenCoords[i + 1][0], screenCoords[i + 1][1], screenCoords[i + 2][0], screenCoords[i + 2][1]);
+			DrawLine(screenCoords[i + 2][0], screenCoords[i + 2][1], screenCoords[i][0], screenCoords[i][1]);
+		}
+	}
+}
+
+float Screen::BackFaceCull(std::vector<float> v1, std::vector<float> v2, std::vector<float> v3) // function that returns a negative if face is not culled
+{
+	// BACKFACE CULLING (counter clockwise)
+	// calculate normals using vertices in VIEW SPACE
+
+	glm::vec3 p1 = glm::vec3(glm::vec4(v1[0], v1[1], v1[2], 1.0f));
+	glm::vec3 p2 = glm::vec3(glm::vec4(v2[0], v2[1], v2[2], 1.0f));
+	glm::vec3 p3 = glm::vec3(glm::vec4(v3[0], v3[1], v3[2], 1.0f));
+
+	glm::vec3 normal = calcNormal(p1, p2, p3, true); // Getting normal of surface triangle
+
+	return glm::dot(normal, p1) < 0.0f;
 }
