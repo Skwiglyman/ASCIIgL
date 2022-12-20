@@ -38,9 +38,9 @@ private:
 	void localToWorld(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& localCoords, std::vector<std::vector<float>>& worldCoords);
 	void worldToView(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& worldCoords, std::vector<std::vector<float>>& viewCoords);
 	void viewToClip(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clipCoords);
-	void perspectiveDivision(std::vector<std::vector<float>>& clipCoords);
 	void NDCToScreen(std::vector<std::vector<float>>& ndcCoords, std::vector<std::vector<float>>& screenCoords);
 
+	void perspectiveDivision(std::vector<std::vector<float>>& clipCoords);
 	void depthClipping(std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar);
 	void backFaceCulling(std::vector<std::vector<float>>& clippedViewCoords, std::vector<std::vector<float>>& backClippedCoords);
 	void viewClipping(std::vector<std::vector<float>>& screenCoords, std::vector<std::vector<float>>& toDrawCoords);
