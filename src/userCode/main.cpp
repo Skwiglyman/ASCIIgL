@@ -23,7 +23,7 @@ void tempFpsMovement(Camera3D& camera3D)
 
 int main()
 {
-	Screen screen(900, 540); // 900x540 is the biggest resolution for my monitor
+	Screen screen(200, 200); // 900x540 is the biggest resolution for my monitor
 	VERTEX_SHADER vertexShader;
 
 	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 20.0f,  200);
@@ -100,7 +100,6 @@ int main()
 		vertexShader.GLproj = camera.proj;
 
 		// Rendering
-		//std::cout << rand() % 1000 << std::endl;
 		screen.RenderTriangles(vertexShader, vertices, camera.zNear, camera.zFar);
 		
 		// drawing

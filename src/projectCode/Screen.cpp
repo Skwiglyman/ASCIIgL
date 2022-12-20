@@ -188,7 +188,7 @@ void Screen::worldToView(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>&
 	}
 }
 
-void Screen::depthClipping(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar)
+void Screen::depthClipping(std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar)
 {
 	// NEAR CLIPPING
 	std::vector<std::vector<float>> newCoords1;
@@ -214,6 +214,33 @@ void Screen::backFaceCulling(std::vector<std::vector<float>>& clippedViewCoords,
 			backClippedCoords.push_back(clippedViewCoords[i + 1]);
 			backClippedCoords.push_back(clippedViewCoords[i + 2]);
 		}
+	}
+}
+
+void Screen::viewClipping(std::vector<std::vector<float>>& screenCoords, std::vector<std::vector<float>>& toDrawCoords)
+{
+	std::vector<std::vector<float>> c1;
+	std::vector<std::vector<float>> c2;
+	std::vector<std::vector<float>> c3;
+
+	for (int k = 0; k < screenCoords.size(); k += 3)
+	{
+		clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), screenCoords, c1, k);
+	}
+
+	for (int k = 0; k < c1.size(); k += 3)
+	{
+		clipTriangleAgainstPlane(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), c1, c2, k);
+	}
+
+	for (int k = 0; k < c2.size(); k += 3)
+	{
+		clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), c2, c3, k);
+	}
+
+	for (int k = 0; k < c3.size(); k += 3)
+	{
+		clipTriangleAgainstPlane(glm::vec3((float)SCR_WIDTH - 1, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), c3, toDrawCoords, k);
 	}
 }
 
@@ -250,10 +277,6 @@ void Screen::NDCToScreen(std::vector<std::vector<float>>& ndcCoords, std::vector
 
 void Screen::DrawTriangles(VERTEX_SHADER VSHADER, std::vector<std::vector<float>> screenCoords)
 {
-	/*clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), viewCoords, clippedViewCoords, k);
-	clipTriangleAgainstPlane(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), viewCoords, clippedViewCoords, k);
-	clipTriangleAgainstPlane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), viewCoords, clippedViewCoords, k);
-	clipTriangleAgainstPlane(glm::vec3((float)SCR_WIDTH - 1, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), viewCoords, clippedViewCoords, k);*/
 
 	for (int i = 0; i < screenCoords.size(); i += 3)
 	{

@@ -41,8 +41,9 @@ private:
 	void perspectiveDivision(std::vector<std::vector<float>>& clipCoords);
 	void NDCToScreen(std::vector<std::vector<float>>& ndcCoords, std::vector<std::vector<float>>& screenCoords);
 
-	void depthClipping(VERTEX_SHADER VSHADER, std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar);
+	void depthClipping(std::vector<std::vector<float>>& viewCoords, std::vector<std::vector<float>>& clippedViewCoords, float zNear, float zFar);
 	void backFaceCulling(std::vector<std::vector<float>>& clippedViewCoords, std::vector<std::vector<float>>& backClippedCoords);
+	void viewClipping(std::vector<std::vector<float>>& screenCoords, std::vector<std::vector<float>>& toDrawCoords);
 	
 
 
@@ -78,7 +79,7 @@ public:
 
 		// CLIPPING
 		std::vector<std::vector<float>> clippedViewCoords;
-		depthClipping(VSHADER, viewCoords, clippedViewCoords, zNear, zFar);
+		depthClipping(viewCoords, clippedViewCoords, zNear, zFar);
 
 		std::vector<std::vector<float>> backClippedCoords;
 		backFaceCulling(clippedViewCoords, backClippedCoords);
@@ -94,8 +95,12 @@ public:
 		std::vector<std::vector<float>> screenCoords;
 		NDCToScreen(clipCoords, screenCoords);
 
+		// FINAL VIEW CLIPPING
+		std::vector<std::vector<float>> toDrawCoords;
+		viewClipping(screenCoords, toDrawCoords);
+
 		// DRAWING TRIANGLES
-		DrawTriangles(VSHADER, screenCoords);
+		DrawTriangles(VSHADER, toDrawCoords);
 
 		// DRAWING BORDERS
 		DrawLine(0, 0, SCR_WIDTH - 1, 0);

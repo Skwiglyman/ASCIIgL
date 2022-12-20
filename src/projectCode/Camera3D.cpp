@@ -58,10 +58,10 @@ void Camera3D::setCamDir(float Pyaw, float Ppitch)
 	yaw = Pyaw;
 	pitch = Ppitch;
 
-	//if (pitch > 89.0f) // pitch limiting
-	//	pitch = 89.0f;
-	//if (pitch < -89.0f)
-	//	pitch = -89.0f;
+	if (pitch > 89.0f) // pitch limiting
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
 
 	recalculateViewMat();
 }
