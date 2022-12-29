@@ -36,10 +36,7 @@ typedef struct Vertex_Shader
 		std::vector<float> newVert;
 		glm::vec4 newPos;
 
-		if (vertice[2] == 0)
-			newPos = GLproj * glm::vec4(vertice[0], vertice[1], vertice[2] + 0.01, 1.0f);
-		else
-			newPos = GLproj * glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
+		newPos = GLproj * glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
 		vec4ToVert(newPos, &newVert);
 
 		return newVert;

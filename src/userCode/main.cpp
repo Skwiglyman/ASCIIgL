@@ -23,10 +23,10 @@ void tempFpsMovement(Camera3D& camera3D)
 
 int main()
 {
-	Screen screen(200, 200); // 900x540 is the biggest resolution for my monitor
+	Screen screen(900, 540); // 900x540 is the biggest resolution for my monitor
 	VERTEX_SHADER vertexShader;
 
-	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 20.0f,  200);
+	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 10.0f,  200);
 
 	glm::vec3 position(100, 10, 50);
 	glm::vec3 size(50, 10, 50);
@@ -45,45 +45,49 @@ int main()
 		{ -1.0f, -1.0f, -1.0f}, // Bottom-left
 		{  1.0f,  1.0f, -1.0f}, // top-right
 		{  1.0f, -1.0f, -1.0f}, // bottom-right         
-		{  1.0f,  1.0f, -1.0f}, // top-right
-		{ -1.0f, -1.0f, -1.0f}, // bottom-left
-		{ -1.0f,  1.0f, -1.0f}, // top-left
-		// Front
-		{ -1.0f, -1.0f,  1.0f}, // bottom-left
-		{  1.0f, -1.0f,  1.0f}, // bottom-right
-		{  1.0f,  1.0f,  1.0f}, // top-right
-		{  1.0f,  1.0f,  1.0f}, // top-right
-		{ -1.0f,  1.0f,  1.0f}, // top-left
-		{ -1.0f, -1.0f,  1.0f}, // bottom-left
-		// Left
-		{ -1.0f,  1.0f,  1.0f}, // top-right
-		{ -1.0f,  1.0f, -1.0f}, // top-left
-		{ -1.0f, -1.0f, -1.0f}, // bottom-left
-		{ -1.0f, -1.0f, -1.0f}, // bottom-left
-		{ -1.0f, -1.0f,  1.0f}, // bottom-right
-		{ -1.0f,  1.0f,  1.0f}, // top-right
-		// Right
-		{  1.0f,  1.0f,  1.0f}, // top-left
-		{  1.0f, -1.0f, -1.0f}, // bottom-right
-		{  1.0f,  1.0f, -1.0f}, // top-right         
-		{  1.0f, -1.0f, -1.0f}, // bottom-right
-		{  1.0f,  1.0f,  1.0f}, // top-left
-		{  1.0f, -1.0f,  1.0f}, // bottom-left     
-		// Bottom
-		{ -1.0f, -1.0f, -1.0f}, // top-right
-		{  1.0f, -1.0f, -1.0f}, // top-left
-		{  1.0f, -1.0f,  1.0f}, // bottom-left
-		{  1.0f, -1.0f,  1.0f}, // bottom-left
-		{ -1.0f, -1.0f,  1.0f}, // bottom-right
-		{ -1.0f, -1.0f, -1.0f}, // top-right
-		// Top
-		{ -1.0f,  1.0f, -1.0f}, // top-left
-		{  1.0f,  1.0f,  1.0f}, // bottom-right
-		{  1.0f,  1.0f, -1.0f}, // top-right     
-		{  1.0f,  1.0f,  1.0f}, // bottom-right
-		{ -1.0f,  1.0f, -1.0f}, // top-left
-		{ -1.0f,  1.0f,  1.0f}, // bottom-left     
+		//{  1.0f,  1.0f, -1.0f}, // top-right
+		//{ -1.0f, -1.0f, -1.0f}, // bottom-left
+		//{ -1.0f,  1.0f, -1.0f}, // top-left
+		//// Front
+		//{ -1.0f, -1.0f,  1.0f}, // bottom-left
+		//{  1.0f, -1.0f,  1.0f}, // bottom-right
+		//{  1.0f,  1.0f,  1.0f}, // top-right
+		//{  1.0f,  1.0f,  1.0f}, // top-right
+		//{ -1.0f,  1.0f,  1.0f}, // top-left
+		//{ -1.0f, -1.0f,  1.0f}, // bottom-left
+		//// Left
+		//{ -1.0f,  1.0f,  1.0f}, // top-right
+		//{ -1.0f,  1.0f, -1.0f}, // top-left
+		//{ -1.0f, -1.0f, -1.0f}, // bottom-left
+		//{ -1.0f, -1.0f, -1.0f}, // bottom-left
+		//{ -1.0f, -1.0f,  1.0f}, // bottom-right
+		//{ -1.0f,  1.0f,  1.0f}, // top-right
+		//// Right
+		//{  1.0f,  1.0f,  1.0f}, // top-left
+		//{  1.0f, -1.0f, -1.0f}, // bottom-right
+		//{  1.0f,  1.0f, -1.0f}, // top-right         
+		//{  1.0f, -1.0f, -1.0f}, // bottom-right
+		//{  1.0f,  1.0f,  1.0f}, // top-left
+		//{  1.0f, -1.0f,  1.0f}, // bottom-left     
+		//// Bottom
+		//{ -1.0f, -1.0f, -1.0f}, // top-right
+		//{  1.0f, -1.0f, -1.0f}, // top-left
+		//{  1.0f, -1.0f,  1.0f}, // bottom-left
+		//{  1.0f, -1.0f,  1.0f}, // bottom-left
+		//{ -1.0f, -1.0f,  1.0f}, // bottom-right
+		//{ -1.0f, -1.0f, -1.0f}, // top-right
+		//// Top
+		//{ -1.0f,  1.0f, -1.0f}, // top-left
+		//{  1.0f,  1.0f,  1.0f}, // bottom-right
+		//{  1.0f,  1.0f, -1.0f}, // top-right     
+		//{  1.0f,  1.0f,  1.0f}, // bottom-right
+		//{ -1.0f,  1.0f, -1.0f}, // top-left
+		//{ -1.0f,  1.0f,  1.0f}, // bottom-left     
 	};
+
+	screen.WIREFRAME = true;
+	screen.BACKFACECULLING = false;
+	screen.CCW = true;
 	
 	bool running = true;
 	while (running)
@@ -103,6 +107,6 @@ int main()
 		screen.RenderTriangles(vertexShader, vertices, camera.zNear, camera.zFar);
 		
 		// drawing
-		screen.OutputBuffer();
+		//screen.OutputBuffer();
 	}
 }

@@ -14,4 +14,5 @@ void vec2ToVert(glm::vec2 p, std::vector<float>* vert);
 
 glm::vec3 getPos(std::vector<float> vert);
 
-glm::vec3 lineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
+std::vector<float> lineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
+std::vector<float> lineMeetsClippingBoundary(std::vector<float> v1, std::vector<float> v2);
