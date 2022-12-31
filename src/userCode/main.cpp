@@ -41,50 +41,49 @@ int main()
 	model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z));
 	model = glm::scale(model, size); 
 
-	std::vector<std::vector<float>> vertices {
-		{ -1.0f, -1.0f, -1.0f}, // Bottom-left
-		{  1.0f,  1.0f, -1.0f}, // top-right
-		{  1.0f, -1.0f, -1.0f}, // bottom-right         
-		//{  1.0f,  1.0f, -1.0f}, // top-right
-		//{ -1.0f, -1.0f, -1.0f}, // bottom-left
-		//{ -1.0f,  1.0f, -1.0f}, // top-left
-		//// Front
-		//{ -1.0f, -1.0f,  1.0f}, // bottom-left
-		//{  1.0f, -1.0f,  1.0f}, // bottom-right
-		//{  1.0f,  1.0f,  1.0f}, // top-right
-		//{  1.0f,  1.0f,  1.0f}, // top-right
-		//{ -1.0f,  1.0f,  1.0f}, // top-left
-		//{ -1.0f, -1.0f,  1.0f}, // bottom-left
-		//// Left
-		//{ -1.0f,  1.0f,  1.0f}, // top-right
-		//{ -1.0f,  1.0f, -1.0f}, // top-left
-		//{ -1.0f, -1.0f, -1.0f}, // bottom-left
-		//{ -1.0f, -1.0f, -1.0f}, // bottom-left
-		//{ -1.0f, -1.0f,  1.0f}, // bottom-right
-		//{ -1.0f,  1.0f,  1.0f}, // top-right
-		//// Right
-		//{  1.0f,  1.0f,  1.0f}, // top-left
-		//{  1.0f, -1.0f, -1.0f}, // bottom-right
-		//{  1.0f,  1.0f, -1.0f}, // top-right         
-		//{  1.0f, -1.0f, -1.0f}, // bottom-right
-		//{  1.0f,  1.0f,  1.0f}, // top-left
-		//{  1.0f, -1.0f,  1.0f}, // bottom-left     
-		//// Bottom
-		//{ -1.0f, -1.0f, -1.0f}, // top-right
-		//{  1.0f, -1.0f, -1.0f}, // top-left
-		//{  1.0f, -1.0f,  1.0f}, // bottom-left
-		//{  1.0f, -1.0f,  1.0f}, // bottom-left
-		//{ -1.0f, -1.0f,  1.0f}, // bottom-right
-		//{ -1.0f, -1.0f, -1.0f}, // top-right
-		//// Top
-		//{ -1.0f,  1.0f, -1.0f}, // top-left
-		//{  1.0f,  1.0f,  1.0f}, // bottom-right
-		//{  1.0f,  1.0f, -1.0f}, // top-right     
-		//{  1.0f,  1.0f,  1.0f}, // bottom-right
-		//{ -1.0f,  1.0f, -1.0f}, // top-left
-		//{ -1.0f,  1.0f,  1.0f}, // bottom-left     
+	std::vector<VERTEX> vertices {
+		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // Bottom-left
+		VERTEX({  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+		VERTEX({  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right         
+		VERTEX({  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+													 
+		VERTEX({ -1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+		VERTEX({  1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({  1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+		VERTEX({  1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({ -1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+			 										 
+		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+		VERTEX({ -1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+	 												 
+		VERTEX({  1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right         
+		VERTEX({  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({  1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({  1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left     
+													 
+		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+		VERTEX({  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({  1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+		VERTEX({  1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
+		VERTEX({ -1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right
+													 
+		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({  1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right     
+		VERTEX({  1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
+		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
+		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left     
 	};
-
 	screen.WIREFRAME = true;
 	screen.BACKFACECULLING = false;
 	screen.CCW = true;
@@ -104,9 +103,9 @@ int main()
 		vertexShader.GLproj = camera.proj;
 
 		// Rendering
-		screen.RenderTriangles(vertexShader, vertices, camera.zNear, camera.zFar);
-		
+		screen.RenderTriangles(vertexShader, vertices);
+
 		// drawing
-		//screen.OutputBuffer();
+		screen.OutputBuffer();
 	}
 }

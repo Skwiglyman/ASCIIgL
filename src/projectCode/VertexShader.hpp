@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ASCII_Math.hpp"
+#include "Vertex.hpp"
 
 typedef struct Vertex_Shader
 {
@@ -13,32 +14,11 @@ typedef struct Vertex_Shader
 	glm::mat4 GLview;
 	glm::mat4 GLproj;
 
-	std::vector<float> GLlocalToWorld(std::vector<float> vertice)
+	VERTEX GLUse(VERTEX vertice)
 	{
-		std::vector<float> newVert;
-		glm::vec4 newPos = GLmodel * glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
-		vec4ToVert(newPos, &newVert);
-
-		return newVert;
-	}
-
-	std::vector<float> GLworldToView(std::vector<float> vertice)
-	{
-		std::vector<float> newVert;
-		glm::vec4 newPos = GLview * glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
-		vec4ToVert(newPos, &newVert);
-
-		return newVert;
-	}
-
-	std::vector<float> GLviewToClip(std::vector<float> vertice)
-	{
-		std::vector<float> newVert;
-		glm::vec4 newPos;
-
-		newPos = GLproj * glm::vec4(vertice[0], vertice[1], vertice[2], 1.0f);
-		vec4ToVert(newPos, &newVert);
-
+		VERTEX newVert = vertice;
+		glm::vec4 newPos = GLproj * GLview * GLmodel * vertice.GetXYZW();
+		newVert.SetXYZW(newPos);
 		return newVert;
 	}
 } VERTEX_SHADER;

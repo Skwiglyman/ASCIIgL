@@ -4,15 +4,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include <vector>
+#include "Vertex.hpp"
 
 glm::vec3 calcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, bool out); // calculates normals given 3 points
 
-// fast ways to add glm::vec to vector<float>
-void vec4ToVert(glm::vec4 p, std::vector<float>* vert);
-void vec3ToVert(glm::vec3 p, std::vector<float>* vert);
-void vec2ToVert(glm::vec2 p, std::vector<float>* vert);
-
-glm::vec3 getPos(std::vector<float> vert);
-
-std::vector<float> lineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
-std::vector<float> lineMeetsClippingBoundary(std::vector<float> v1, std::vector<float> v2);
+VERTEX lineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
+VERTEX homogenousPlaneIntersect(VERTEX v1, VERTEX v2, int component, bool Near);
