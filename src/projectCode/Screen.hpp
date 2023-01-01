@@ -25,6 +25,10 @@
 class Screen
 {
 private:
+	// Unused Functions
+	//void ViewClippingHelper(std::vector<VERTEX>& screenCoords, std::vector<VERTEX>& toDrawCoords);
+	//void ViewClipping(glm::vec3 planeP, glm::vec3 planeN, std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
+
 	HANDLE hOutput = (HANDLE)GetStdHandle(STD_OUTPUT_HANDLE); // handle thing (I got no idea what this is)
 
 	COORD dwBufferSize; // size of buffer
@@ -32,7 +36,6 @@ private:
 	SMALL_RECT rcRegion; // rectangle of coords of buffer { 0, 0, width - 1, height - 1 }
 	
 	VERTEX ClipToScreen(VERTEX vertice); // changes clip space to screen space coords
-	//void ViewClipping(glm::vec3 planeP, glm::vec3 planeN, std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
 	void Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int component, bool Near);
 	bool BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3);
 
@@ -45,6 +48,7 @@ private:
 	void PerspectiveDivision(std::vector<VERTEX>& clipCoords);
 	void BackFaceCulling(std::vector<VERTEX>& clippedViewCoords, std::vector<VERTEX>& backClippedCoords);
 
+	void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
 
 public:
 	CHAR_INFO* pixelBuffer; // pixel output buffer
@@ -80,15 +84,8 @@ public:
 		VertexTransform(VSHADER, localCoords, CS_COORDS);
 
 		// CLIPPING
-		std::vector<VERTEX> c1, c2, c3, c4, c5, CLIPPED_CS_COORDS;
-		Clipping(CS_COORDS, c1, 2, true);
-		Clipping(c1, c2, 2, false);
-
-		Clipping(c2, c3, 1, true);
-		Clipping(c3, c4, 1, false);
-
-		Clipping(c4, c5, 0, true);
-		Clipping(c5, CLIPPED_CS_COORDS, 0, false);
+		std::vector<VERTEX> CLIPPED_CS_COORDS;
+		ClippingHelper(CS_COORDS, CLIPPED_CS_COORDS);
 
 		// PERSPECTIVE DIVISION
 		PerspectiveDivision(CLIPPED_CS_COORDS);

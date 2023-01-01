@@ -274,6 +274,20 @@ void Screen::BackFaceCulling(std::vector<VERTEX>& clippedViewCoords, std::vector
 	}
 }
 
+void Screen::ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped)
+{
+	std::vector<VERTEX> c1, c2, c3, c4, c5;
+
+	Clipping(vertices, c1, 2, true);
+	Clipping(c1, c2, 2, false);
+
+	Clipping(c2, c3, 1, true);
+	Clipping(c3, c4, 1, false);
+
+	Clipping(c4, c5, 0, true);
+	Clipping(c5, clipped, 0, false);
+}
+
 VERTEX Screen::ClipToScreen(VERTEX vertice)
 {
 	VERTEX newVert = vertice;
@@ -293,16 +307,16 @@ void Screen::NDCToScreen(std::vector<VERTEX>& ndcCoords, std::vector<VERTEX>& sc
 	}
 }
 
-void Screen::ViewClippingHelper(std::vector<VERTEX>& screenCoords, std::vector<VERTEX>& toDrawCoords)
-{
-	std::vector<VERTEX> c1, c2, c3, c4;
-
-	ViewClipping(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), screenCoords, c1); 
-	ViewClipping(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), c1, c2); 
-	ViewClipping(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), c2, c3); 
-	ViewClipping(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), c3, c4); 
-	ViewClipping(glm::vec3((float)SCR_WIDTH - 1, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), c4, toDrawCoords); 
-}
+//void Screen::ViewClippingHelper(std::vector<VERTEX>& screenCoords, std::vector<VERTEX>& toDrawCoords)
+//{
+//	std::vector<VERTEX> c1, c2, c3, c4;
+//
+//	ViewClipping(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), screenCoords, c1); 
+//	ViewClipping(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), c1, c2); 
+//	ViewClipping(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), c2, c3); 
+//	ViewClipping(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), c3, c4); 
+//	ViewClipping(glm::vec3((float)SCR_WIDTH - 1, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), c4, toDrawCoords); 
+//}
 
 bool Screen::BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3) // function that returns a negative if face is not culled
 {

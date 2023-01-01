@@ -85,7 +85,7 @@ int main()
 		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left     
 	};
 	screen.WIREFRAME = true;
-	screen.BACKFACECULLING = false;
+	screen.BACKFACECULLING = true;
 	screen.CCW = true;
 	
 	bool running = true;
