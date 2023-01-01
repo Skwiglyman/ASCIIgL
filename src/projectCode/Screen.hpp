@@ -25,10 +25,6 @@
 class Screen
 {
 private:
-	// Unused Functions
-	//void ViewClippingHelper(std::vector<VERTEX>& screenCoords, std::vector<VERTEX>& toDrawCoords);
-	//void ViewClipping(glm::vec3 planeP, glm::vec3 planeN, std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
-
 	HANDLE hOutput = (HANDLE)GetStdHandle(STD_OUTPUT_HANDLE); // handle thing (I got no idea what this is)
 
 	COORD dwBufferSize; // size of buffer
@@ -50,12 +46,17 @@ private:
 
 	void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
 
+	Screen();
+	static inline Screen* Instance = nullptr;
+	
 public:
 	CHAR_INFO* pixelBuffer; // pixel output buffer
-
 	int SCR_WIDTH, SCR_HEIGHT; // defining the width and height of the screen
 
-	Screen(int width, int height); 
+	static Screen* getInstance();
+	void InitializeScreen(int width, int height);
+
+	Screen(const Screen& obj) = delete;
 	~Screen();
 
 	void ClearScreen(); // clears screen (does not clear buffer)
@@ -108,9 +109,9 @@ public:
 			DrawTrianglesFill(BACKCULLED_SS_COORDS);
 
 		// DRAWING BORDERS
-		DrawLine(0, 0, SCR_WIDTH - 1, 0, PIXEL_SOLID, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-		DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		DrawLine(0, 0, SCR_WIDTH - 1, 0, PIXEL_SOLID, FG_WHITE);
+		DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
+		DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
+		DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
 	}
 };

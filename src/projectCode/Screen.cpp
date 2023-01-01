@@ -3,17 +3,29 @@
 #include "ASCII_Math.hpp"
 
 
-Screen::Screen(int width, int height)
-	: dwBufferSize(COORD{ (SHORT) width, (SHORT) height }),  dwBufferCoord(COORD{ 0, 0 }), 
-	 rcRegion(SMALL_RECT{ 0, 0, SHORT(width - 1), SHORT(height - 1) }), SCR_WIDTH(width), SCR_HEIGHT(height)
+void Screen::InitializeScreen(int width, int height)
+	
 {
+	// innitializing all of the variables
+	dwBufferSize = COORD{ (SHORT)width, (SHORT)height };
+	dwBufferCoord = COORD{ 0, 0 };
+	rcRegion = SMALL_RECT{ 0, 0, SHORT(width - 1), SHORT(height - 1) };
+	SCR_WIDTH = width; 
+	SCR_HEIGHT = height;
+
 	// the pixel buffer that is used to output to the screen is a 1d array (cus 2d arrays are cancer and I hate them)
 	// it uses the char_info thing since thats what windows uses to input
 
+	delete pixelBuffer;
 	pixelBuffer = new CHAR_INFO[width * height];
 
 	ReadConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion); // this puts a image of the console in the buffer 
 	// (clears garbage memory from other programs)
+}
+
+Screen::Screen()
+{
+
 }
 
 Screen::~Screen()
@@ -21,6 +33,18 @@ Screen::~Screen()
 
 }
 
+Screen* Screen::getInstance()
+{
+	if (Instance == nullptr)
+	{
+		Instance = new Screen();
+		return Instance;
+	}
+	else
+	{
+		return Instance;
+	}
+}
 
 void Screen::ClearScreen()
 {
@@ -186,71 +210,6 @@ void Screen::Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clippe
 	}
 }
 
-
-//void Screen::ViewClipping(glm::vec3 planeP, glm::vec3 planeN, std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped)
-//{
-//	for (int i = 0; i < vertices.size(); i += 3)
-//	{
-//		std::vector<int> inside;
-//		std::vector<int> outside;
-//
-//		VERTEX temp[6];
-//		int newTri = 0;
-//
-//		auto dist = [&](glm::vec3 p)
-//		{
-//			return (planeN.x * p.x + planeN.y * p.y + planeN.z * p.z - glm::dot(planeN, planeP));
-//		};
-//
-//		if (dist(vertices[i].GetXYZ()) <= 0) { inside.push_back(i); }
-//		else { outside.push_back(i); }
-//
-//		if (dist(vertices[i + 1].GetXYZ()) <= 0) { inside.push_back(i + 1); }
-//		else { outside.push_back(i + 1); }
-//
-//		if (dist(vertices[i + 2].GetXYZ()) <= 0) { inside.push_back(i + 2); }
-//		else { outside.push_back(i + 2); }
-//
-//		if (inside.size() == 3)
-//		{
-//			clipped.push_back(vertices[inside[0]]);
-//			clipped.push_back(vertices[inside[1]]);
-//			clipped.push_back(vertices[inside[2]]);
-//			continue;
-//		}
-//
-//		else if (inside.size() == 1)
-//		{
-//			VERTEX newPos1 = lineMeetsPlane(planeN, planeP, vertices[outside[0]].GetXYZ(), vertices[inside[0]].GetXYZ());
-//			VERTEX newPos2 = lineMeetsPlane(planeN, planeP, vertices[outside[1]].GetXYZ(), vertices[inside[0]].GetXYZ());
-//
-//			temp[outside[0] - i] = newPos1;
-//			temp[outside[1] - i] = newPos2;
-//			temp[inside[0] - i] = vertices[inside[0]];
-//			newTri = 3;
-//		}
-//
-//		else if (inside.size() == 2)
-//		{
-//			VERTEX newPos1 = lineMeetsPlane(planeN, planeP, vertices[outside[0]].GetXYZ(), vertices[inside[0]].GetXYZ());
-//			VERTEX newPos2 = lineMeetsPlane(planeN, planeP, vertices[outside[0]].GetXYZ(), vertices[inside[1]].GetXYZ());
-//
-//			// triangle 1
-//			temp[inside[0] - i] = vertices[inside[0]];
-//			temp[inside[1] - i] = vertices[inside[1]];
-//			temp[outside[0] - i] = newPos1;
-//
-//			// triangle 2
-//			temp[outside[0] - i + 3] = newPos2;
-//			temp[inside[0] - i + 3] = newPos1;
-//			temp[inside[1] - i + 3] = (vertices[inside[1]]);
-//			newTri = 6;
-//		}
-//		for (int k = 0; k < newTri; k++)
-//			clipped.push_back(temp[k]);
-//	}
-//}
-
 void Screen::VertexTransform(VERTEX_SHADER VSHADER, std::vector<VERTEX>& localCoords, std::vector<VERTEX>& clipCoords)
 {
 	for (int i = 0; i < localCoords.size(); i++)
@@ -306,17 +265,6 @@ void Screen::NDCToScreen(std::vector<VERTEX>& ndcCoords, std::vector<VERTEX>& sc
 		screenCoords.push_back(newVert);
 	}
 }
-
-//void Screen::ViewClippingHelper(std::vector<VERTEX>& screenCoords, std::vector<VERTEX>& toDrawCoords)
-//{
-//	std::vector<VERTEX> c1, c2, c3, c4;
-//
-//	ViewClipping(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), screenCoords, c1); 
-//	ViewClipping(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), c1, c2); 
-//	ViewClipping(glm::vec3(0.0f, (float)SCR_HEIGHT - 1, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), c2, c3); 
-//	ViewClipping(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), c3, c4); 
-//	ViewClipping(glm::vec3((float)SCR_WIDTH - 1, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), c4, toDrawCoords); 
-//}
 
 bool Screen::BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3) // function that returns a negative if face is not culled
 {

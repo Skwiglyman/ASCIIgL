@@ -23,10 +23,11 @@ void tempFpsMovement(Camera3D& camera3D)
 
 int main()
 {
-	Screen screen(900, 540); // 900x540 is the biggest resolution for my monitor
+	Screen* screen = Screen::getInstance();
+	screen->InitializeScreen(900, 540); // 900x540 is the biggest resolution for my monitor
 	VERTEX_SHADER vertexShader;
 
-	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen.SCR_WIDTH / (float) screen.SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 10.0f,  200);
+	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen->SCR_WIDTH / (float) screen->SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 10.0f,  200);
 
 	glm::vec3 position(100, 10, 50);
 	glm::vec3 size(50, 10, 50);
@@ -84,16 +85,16 @@ int main()
 		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
 		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left     
 	};
-	screen.WIREFRAME = true;
-	screen.BACKFACECULLING = true;
-	screen.CCW = true;
+	screen->WIREFRAME = true;
+	screen->BACKFACECULLING = true;
+	screen->CCW = true;
 	
 	bool running = true;
 	while (running)
 	{
 		// resetting screen and buffer
-		screen.ClearScreen();
-		screen.ClearBuffer();
+		screen->ClearScreen();
+		screen->ClearBuffer();
 
 		// do game logic here
 		tempFpsMovement(camera);
@@ -103,9 +104,9 @@ int main()
 		vertexShader.GLproj = camera.proj;
 
 		// Rendering
-		screen.RenderTriangles(vertexShader, vertices);
+		screen->RenderTriangles(vertexShader, vertices);
 
 		// drawing
-		screen.OutputBuffer();
+		screen->OutputBuffer();
 	}
 }
