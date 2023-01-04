@@ -5,7 +5,6 @@
 
 #include <vector>
 
-#include "ASCII_Math.hpp"
 #include "Vertex.hpp"
 
 typedef struct Vertex_Shader

@@ -23,8 +23,8 @@ void tempFpsMovement(Camera3D& camera3D)
 
 int main()
 {
-	Screen* screen = Screen::getInstance();
-	screen->InitializeScreen(900, 540); // 900x540 is the biggest resolution for my monitor
+	Screen* screen = Screen::GetInstance();
+	screen->InitializeScreen(900, 540, L"I Don't Wanna Run For Christmas - ft Mariah Carey"); // 900x540 is the biggest resolution for my monitor
 	VERTEX_SHADER vertexShader;
 
 	Camera3D camera(glm::vec3(0.0f, 0.0f, 0.0f), 80, (float) screen->SCR_WIDTH / (float) screen->SCR_HEIGHT, glm::vec2(0.0f, 0.0f), 10.0f,  200);
@@ -45,7 +45,7 @@ int main()
 	std::vector<VERTEX> vertices {
 		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // Bottom-left
 		VERTEX({  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right
-		VERTEX({  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right         
+		VERTEX({  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-right
 		VERTEX({  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-right
 		VERTEX({ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left
 		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
@@ -108,5 +108,6 @@ int main()
 
 		// drawing
 		screen->OutputBuffer();
+
 	}
 }
