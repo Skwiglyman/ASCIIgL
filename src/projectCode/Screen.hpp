@@ -21,6 +21,7 @@
 #include "VertexShader.hpp"
 #include "Vertex.hpp"
 #include "ASCIIgLEngine.h"	
+#include "Texture.hpp"
 
 class Screen
 {
@@ -31,17 +32,18 @@ private:
 	COORD dwBufferCoord; // starting coord of buffer
 	SMALL_RECT rcRegion; // rectangle of coords of buffer { 0, 0, width - 1, height - 1 }
 
-	void SetTitle();
-
 	Screen();
 	static inline Screen* Instance = nullptr;
+
+	inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
+	inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
+	float elapsedTime;
 	
 public:
 	CHAR_INFO* pixelBuffer; // pixel output buffer
 	int SCR_WIDTH;
 	int SCR_HEIGHT; // defining the width and height of the screen
 	std::wstring SCR_TITLE;
-	float fElapsedTime;
 
 	static Screen* GetInstance();
 	void InitializeScreen(int width, int height, std::wstring title);
@@ -51,14 +53,19 @@ public:
 
 	VERTEX ViewPortTransform(VERTEX vertice); // changes clip space to screen space coords
 
+	void SetTitle();
+	void StartFPSClock();
+	void EndFPSClock();
+
 	void ClearScreen(); // clears screen (does not clear buffer)
 	void ClearBuffer(); // clears buffer
 	void OutputBuffer(); // draws to screen
 	void PlotPixel(glm::vec2 p, CHAR character, short Colour); // plotting pixel onto screen buffer
 
 	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
-	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3);
-	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3);
+	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
+	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
+	void DrawTriangleTextured(VERTEX v1, VERTEX v2, VERTEX v3, Texture tex);
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done
@@ -80,7 +87,7 @@ public:
 
 		
 			// CLIPPING
-			ClippingHelper(vertices, CLIPPED_COORDS, i);
+			ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS, i);
 		}
 
 		for (int i = 0; i < CLIPPED_COORDS.size(); i += 3)
@@ -89,30 +96,29 @@ public:
 			for (int k = 0; k < 3; k++)
 			{
 				// PERSPECTIVE DIVISION
-				PerspectiveDivision(CLIPPED_COORDS, i + k);
+				ASCIIgLEngine::PerspectiveDivision(CLIPPED_COORDS, i + k);
 				CLIPPED_COORDS[i + k] = ViewPortTransform(CLIPPED_COORDS[i + k]);
 			}	
 
 			if (BACKFACECULLING == true)
 			{
-				if (BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true))
+				if (ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true))
 				{
 					if (WIREFRAME == true)
-						DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2]);
+						DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
 					else
 						// DRAWING TRIANGLES
-						DrawTriangleFill(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2]);
+						DrawTriangleFill(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
 				}
 			}
 			else
 			{
 				if (WIREFRAME == true)
-					DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2]);
+					DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
 				else
 					// DRAWING TRIANGLES
-					DrawTriangleFill(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2]);
+					DrawTriangleFill(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
 			}
-
 		}
 
 		// DRAWING BORDERS

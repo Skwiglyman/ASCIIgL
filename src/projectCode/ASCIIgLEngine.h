@@ -8,19 +8,29 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-void Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int component, bool Near, int i);
-bool BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3, bool CCW);
+#include <Windows.h>
+#include <iostream>
 
-void PerspectiveDivision(std::vector<VERTEX>& clipCoords, int i);
-void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int i);
+class ASCIIgLEngine
+{
+private:
 
-glm::vec3 CalcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, bool out); // calculates normals given 3 points
+public:
+	static glm::vec3 CalcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, bool out); // calculates normals given 3 points
 
-VERTEX LineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
-VERTEX HomogenousPlaneIntersect(VERTEX v1, VERTEX v2, int component, bool Near);
+	static VERTEX LineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
+	static VERTEX HomogenousPlaneIntersect(VERTEX v1, VERTEX v2, int component, bool Near);
 
-std::vector<glm::vec2> DrawLineBrensenham(int x1, int b, int x2, int y2);
-std::vector<glm::vec2> FillTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+	static void Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int component, bool Near, int i);
+	static bool BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3, bool CCW);
+
+	static void PerspectiveDivision(std::vector<VERTEX>& clipCoords, int i);
+	static void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int i);
+};
+
+
+
+
 
 enum COLOUR
 {

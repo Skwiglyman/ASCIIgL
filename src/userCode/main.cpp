@@ -85,13 +85,16 @@ int main()
 		VERTEX({ -1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f}), // top-left
 		VERTEX({ -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f}), // bottom-left     
 	};
-	screen->WIREFRAME = true;
-	screen->BACKFACECULLING = true;
+	screen->WIREFRAME = false;
+	screen->BACKFACECULLING = false;
 	screen->CCW = true;
 	
 	bool running = true;
 	while (running)
 	{
+		// starting fps timer
+		screen->StartFPSClock();
+
 		// resetting screen and buffer
 		screen->ClearScreen();
 		screen->ClearBuffer();
@@ -109,5 +112,8 @@ int main()
 		// drawing
 		screen->OutputBuffer();
 
+		// fps stuff and title of console
+		screen->EndFPSClock();
+		screen->SetTitle();
 	}
 }
