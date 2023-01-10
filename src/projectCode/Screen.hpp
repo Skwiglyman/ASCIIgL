@@ -41,6 +41,8 @@ private:
 	
 public:
 	CHAR_INFO* pixelBuffer; // pixel output buffer
+	glm::vec3* colourBuffer; // stores the rgb colour of every pixel on the screen
+
 	int SCR_WIDTH;
 	int SCR_HEIGHT; // defining the width and height of the screen
 	std::wstring SCR_TITLE;
@@ -65,59 +67,46 @@ public:
 	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
 	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
 	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
-	void DrawTriangleTextured(VERTEX v1, VERTEX v2, VERTEX v3, Texture tex);
+	void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done
 	bool CCW = true; // counter clockwise vertice winding order
 
-	void RenderTriangles(VERTEX_SHADER VSHADER, std::vector<VERTEX> vertices)
+	void RenderTriangles(VERTEX_SHADER VSHADER, std::vector<VERTEX> vertices, Texture* tex)
 	{
 		// check if there are enough vertices to make a triangle or enough vertice data (at least xyz)
 		if (vertices.size() < 3 || vertices.size() % 3 != 0)
 			return;
 
+		for (int k = 0; k < vertices.size(); k++) 
+		{ 
+			vertices[k] = VSHADER.GLUse(vertices[k]); 
+			vertices[k].refactorPtrs(); // I have to do this for some dumb fucking reason I can't say (idk if the ptrs are messed up when I return the vertex)
+		} // VERTEX TRANSFORMING
+
+		// CLIPPING
 		std::vector<VERTEX> CLIPPED_COORDS;
-
-		for (int i = 0; i < vertices.size(); i += 3)
-		{
-			// VERTEX TRANSFORMING
-			for (int k = 0; k < 3; k++)
-				vertices[k + i] = VSHADER.GLUse(vertices[k + i]);
-
+		ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS);
 		
-			// CLIPPING
-			ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS, i);
-		}
 
 		for (int i = 0; i < CLIPPED_COORDS.size(); i += 3)
 		{
-			
 			for (int k = 0; k < 3; k++)
 			{
 				// PERSPECTIVE DIVISION
 				ASCIIgLEngine::PerspectiveDivision(CLIPPED_COORDS, i + k);
 				CLIPPED_COORDS[i + k] = ViewPortTransform(CLIPPED_COORDS[i + k]);
+				CLIPPED_COORDS[i + k].refactorPtrs();
 			}	
 
-			if (BACKFACECULLING == true)
+			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true) : true))
 			{
-				if (ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true))
-				{
-					if (WIREFRAME == true)
-						DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
-					else
-						// DRAWING TRIANGLES
-						DrawTriangleFill(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
+				if (WIREFRAME == true) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
+				else 
+				{ 
+					DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); 
 				}
-			}
-			else
-			{
-				if (WIREFRAME == true)
-					DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
-				else
-					// DRAWING TRIANGLES
-					DrawTriangleFill(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
 			}
 		}
 

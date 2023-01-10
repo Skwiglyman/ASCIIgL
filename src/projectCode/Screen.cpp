@@ -14,8 +14,11 @@ void Screen::InitializeScreen(int width, int height, std::wstring title)
 	// the pixel buffer that is used to output to the screen is a 1d array (cus 2d arrays are cancer and I hate them)
 	// it uses the char_info thing since thats what windows uses to input
 
-	delete pixelBuffer;
+	delete pixelBuffer, colourBuffer;
 	pixelBuffer = new CHAR_INFO[width * height];
+	colourBuffer = new glm::vec3[width * height];
+
+	for (int i = 0; i < width * height; i++) { colourBuffer[i] = glm::vec3(0, 0, 0); }
 	ReadConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion); // this puts a image of the console in the buffer 
 	// (clears garbage memory from other programs)
 
@@ -55,6 +58,16 @@ void Screen::SetTitle()
 	SetConsoleTitle(s);
 }
 
+void Screen::StartFPSClock()
+{
+	startTimeFps = std::chrono::system_clock::now();
+}
+
+void Screen::EndFPSClock()
+{
+	endTimeFps = std::chrono::system_clock::now();
+}
+
 void Screen::ClearScreen()
 {
 	// I think this function scrolls the console past the outputted text and sort of pseudo clears the console (I just ctrl c ctrl v off cus fuck learning windows api)
@@ -69,11 +82,8 @@ void Screen::ClearScreen()
 void Screen::ClearBuffer()
 {
 	// clears the buffer by setting the entire buffer to spaces (ascii code 32)
-	for (int i = 0; i < SCR_WIDTH * SCR_HEIGHT; i++)
-	{
-		pixelBuffer[i].Char.AsciiChar = ' ';
-		pixelBuffer[i].Attributes = 0x0000;
-	}
+	std::fill(pixelBuffer, pixelBuffer + SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{' ', 0x0000});
+	std::fill(colourBuffer, colourBuffer + SCR_WIDTH * SCR_HEIGHT, glm::vec3(0, 0, 0));
 }
 
 void Screen::OutputBuffer()
@@ -85,8 +95,12 @@ void Screen::OutputBuffer()
 void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour)
 {
 	// this function takes in a 2d point and plots it on the pixelBuffer
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = character; // setting the point in the screen buffer to a hashtag 
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Attributes = Colour;
+
+	if (p.x >= 0 && p.x < SCR_WIDTH && p.y >= 0 && p.y < SCR_HEIGHT)
+	{
+		pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = character; // setting the point in the screen buffer to a hashtag 
+		pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Attributes = Colour;
+	}
 	// also reversing the x and y else the image would be flipped (35 = ascii code for #)
 }
 
@@ -309,6 +323,175 @@ next:
 	// Shade Characters is #x/- in order of luminescence
 }
 
+void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex)
+{
+	int x1 = *vert1.x; int x2 = *vert2.x; int x3 = *vert3.x;
+	int y1 = *vert1.y; int y2 = *vert2.y; int y3 = *vert3.y;
+	int z1 = *vert1.z; int z2 = *vert2.z; int z3 = *vert3.z;
+	float w1 = *vert1.uvw; float w2 = *vert2.uvw; float w3 = *vert3.uvw;
+	float u1 = *vert1.u; float u2 = *vert2.u; float u3 = *vert3.u;
+	float v1 = *vert1.v; float v2 = *vert2.v; float v3 = *vert3.v;
+
+	if (y2 < y1)
+	{
+		std::swap(y1, y2);
+		std::swap(x1, x2);
+		std::swap(u1, u2);
+		std::swap(v1, v2);
+		std::swap(w1, w2);
+	}
+
+	if (y3 < y1)
+	{
+		std::swap(y1, y3);
+		std::swap(x1, x3);
+		std::swap(u1, u3);
+		std::swap(v1, v3);
+		std::swap(w1, w3);
+	}
+
+	if (y3 < y2)
+	{
+		std::swap(y2, y3);
+		std::swap(x2, x3);
+		std::swap(u2, u3);
+		std::swap(v2, v3);
+		std::swap(w2, w3);
+	}
+
+	int dy1 = y2 - y1;
+	int dx1 = x2 - x1;
+	float dv1 = v2 - v1;
+	float du1 = u2 - u1;
+	float dw1 = w2 - w1;
+
+	int dy2 = y3 - y1;
+	int dx2 = x3 - x1;
+	float dv2 = v3 - v1;
+	float du2 = u3 - u1;
+	float dw2 = w3 - w1;
+
+	float tex_u, tex_v, tex_w;
+
+	float dax_step = 0, dbx_step = 0,
+		du1_step = 0, dv1_step = 0,
+		du2_step = 0, dv2_step = 0,
+		dw1_step = 0, dw2_step = 0;
+
+	if (dy1) dax_step = dx1 / (float)abs(dy1);
+	if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+	if (dy1) du1_step = du1 / (float)abs(dy1);
+	if (dy1) dv1_step = dv1 / (float)abs(dy1);
+	if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+	if (dy2) du2_step = du2 / (float)abs(dy2);
+	if (dy2) dv2_step = dv2 / (float)abs(dy2);
+	if (dy2) dw2_step = dw2 / (float)abs(dy2);
+
+	if (dy1)
+	{
+		for (int i = y1; i <= y2; i++)
+		{
+			int ax = x1 + (float)(i - y1) * dax_step;
+			int bx = x1 + (float)(i - y1) * dbx_step;
+
+			float tex_su = u1 + (float)(i - y1) * du1_step;
+			float tex_sv = v1 + (float)(i - y1) * dv1_step;
+			float tex_sw = w1 + (float)(i - y1) * dw1_step;
+
+			float tex_eu = u1 + (float)(i - y1) * du2_step;
+			float tex_ev = v1 + (float)(i - y1) * dv2_step;
+			float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+			if (ax > bx)
+			{
+				std::swap(ax, bx);
+				std::swap(tex_su, tex_eu);
+				std::swap(tex_sv, tex_ev);
+				std::swap(tex_sw, tex_ew);
+			}
+
+			tex_u = tex_su;
+			tex_v = tex_sv;
+			tex_w = tex_sw;
+
+			float tstep = 1.0f / ((float)(bx - ax));
+			float t = 0.0f;
+
+			for (int j = ax; j < bx; j++)
+			{
+				tex_u = (1.0f - t) * tex_su + t * tex_eu;
+				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+
+				PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w)*tex->GetHeight())))),
+					ASCIIgLEngine::GetColour(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w)*tex->GetHeight())))));
+				t += tstep;
+			}
+
+		}
+	}
+
+	dy1 = y3 - y2;
+	dx1 = x3 - x2;
+	dv1 = v3 - v2;
+	du1 = u3 - u2;
+	dw1 = w3 - w2;
+
+	if (dy1) dax_step = dx1 / (float)abs(dy1);
+	if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+	du1_step = 0, dv1_step = 0;
+	if (dy1) du1_step = du1 / (float)abs(dy1);
+	if (dy1) dv1_step = dv1 / (float)abs(dy1);
+	if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+	if (dy1)
+	{
+		for (int i = y2; i <= y3; i++)
+		{
+			int ax = x2 + (float)(i - y2) * dax_step;
+			int bx = x1 + (float)(i - y1) * dbx_step;
+	
+			float tex_su = u2 + (float)(i - y2) * du1_step;
+			float tex_sv = v2 + (float)(i - y2) * dv1_step;
+			float tex_sw = w2 + (float)(i - y2) * dw1_step;
+	
+			float tex_eu = u1 + (float)(i - y1) * du2_step;
+			float tex_ev = v1 + (float)(i - y1) * dv2_step;
+			float tex_ew = w1 + (float)(i - y1) * dw2_step;
+	
+			if (ax > bx)
+			{
+				std::swap(ax, bx);
+				std::swap(tex_su, tex_eu);
+				std::swap(tex_sv, tex_ev);
+				std::swap(tex_sw, tex_ew);
+			}
+	
+			tex_u = tex_su;
+			tex_v = tex_sv;
+			tex_w = tex_sw;
+	
+			float tstep = 1.0f / ((float)(bx - ax));
+			float t = 0.0f;
+	
+			for (int j = ax; j < bx; j++)
+			{
+				tex_u = (1.0f - t) * tex_su + t * tex_eu;
+				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+	
+	
+				PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight())))),
+					ASCIIgLEngine::GetColour(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w)*tex->GetHeight())))));
+				t += tstep;
+			}
+		}
+	}
+}
+
 void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col)
 {
 	// RENDERING LINES BETWEEN VERTICES
@@ -326,12 +509,3 @@ VERTEX Screen::ViewPortTransform(VERTEX vertice)
 	return newVert;
 }
 
-void Screen::StartFPSClock()
-{
-	startTimeFps = std::chrono::system_clock::now();
-}
-
-void Screen::EndFPSClock()
-{
-	endTimeFps = std::chrono::system_clock::now();
-}

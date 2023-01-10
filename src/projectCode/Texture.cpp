@@ -12,13 +12,13 @@ Texture::~Texture()
 	stbi_image_free(m_LocalBuffer);
 }
 
-glm::vec4 Texture::GetPixel(glm::vec2 coord)
+glm::vec4 Texture::GetPixelCol(glm::vec2 coord)
 {
 	const stbi_uc* pixelOffset = m_LocalBuffer + (4 * (size_t(coord.y) * size_t(m_Width) + size_t(coord.x)));
-	stbi_uc  r = pixelOffset[0];
-	stbi_uc  g = pixelOffset[1];
-	stbi_uc  b = pixelOffset[2];
-	stbi_uc  a = m_BPP >= 4 ? pixelOffset[3] : 0xff;
+	float  r = pixelOffset[0];
+	float  g = pixelOffset[1];
+	float  b = pixelOffset[2];
+	float  a = m_BPP >= 4 ? pixelOffset[3] : 0xff;
 
 	return glm::vec4(r, g, b, a);
 }

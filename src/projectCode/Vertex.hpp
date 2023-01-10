@@ -8,6 +8,8 @@
 typedef struct Vertex
 {
 private:
+
+public:
 	void refactorPtrs()
 	{
 		x = &data.at(0);
@@ -16,24 +18,25 @@ private:
 		w = &data.at(3);
 		u = &data.at(4);
 		v = &data.at(5);
-		nx = &data.at(6);
-		ny = &data.at(7);
-		nz = &data.at(8);
+		uvw = &data.at(6);
+		nx = &data.at(7);
+		ny = &data.at(8);
+		nz = &data.at(9);
 	}
 
-public:
-	std::array<float, 9> data = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+	std::array<float, 10> data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float* x = &data.at(0);
 	float* y = &data.at(1);
 	float* z = &data.at(2);
 	float* w = &data.at(3);
 	float* u = &data.at(4);
 	float* v = &data.at(5);
-	float* nx = &data.at(6);
-	float* ny = &data.at(7);
-	float* nz = &data.at(8);
+	float* uvw = &data.at(6);
+	float* nx = &data.at(7);
+	float* ny = &data.at(8);
+	float* nz = &data.at(9);
 
-	Vertex(std::array<float, 9> indata)
+	Vertex(std::array<float, 10> indata)
 		: data(indata)
 	{
 		refactorPtrs();
@@ -50,7 +53,7 @@ public:
 
 	glm::vec3 GetXYZ() { return glm::vec3(*x, *y, *z); }
 	glm::vec4 GetXYZW() { return glm::vec4(*x, *y, *z, *w); }
-	glm::vec2 GetUV() { return glm::vec2(*u, *v); }
+	glm::vec2 GetUVW() { return glm::vec3(*u, *v, *uvw); }
 	glm::vec3 GetNXYZ() { return glm::vec3(*nx, *ny, *nz); }
 
 	void SetXYZ(glm::vec3 inXYZ)
@@ -68,10 +71,11 @@ public:
 		*w = inXYZW.w;
 	}
 
-	void SetUV(glm::vec2 inUV)
+	void SetUVW(glm::vec3 inUVW)
 	{
-		*u = inUV.x;
-		*v = inUV.y;
+		*u = inUVW.x;
+		*v = inUVW.y;
+		*uvw = inUVW.z;
 	}
 
 	void SetNXYZ(glm::vec3 inNXYZ)

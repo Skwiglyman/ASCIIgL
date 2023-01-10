@@ -21,15 +21,17 @@ public:
 	static VERTEX LineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
 	static VERTEX HomogenousPlaneIntersect(VERTEX v1, VERTEX v2, int component, bool Near);
 
-	static void Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int component, bool Near, int i);
+	static void Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int component, bool Near);
 	static bool BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3, bool CCW);
 
 	static void PerspectiveDivision(std::vector<VERTEX>& clipCoords, int i);
-	static void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int i);
+	static void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
+
+	static CHAR GetGlyph(glm::vec3 rgb);
+	static short GetColour(glm::vec3 rgb);
+	static float GrayScaleRGB(glm::vec3 rgb);
+	static glm::vec3 BlendRGB(glm::vec4 inRGB, glm::vec3* colourBuffer[], glm::vec2 pixelPos);
 };
-
-
-
 
 
 enum COLOUR

@@ -17,6 +17,7 @@ typedef struct Vertex_Shader
 	{
 		VERTEX newVert = vertice;
 		glm::vec4 newPos = GLproj * GLview * GLmodel * vertice.GetXYZW();
+
 		newVert.SetXYZW(newPos);
 		return newVert;
 	}

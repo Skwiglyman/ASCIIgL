@@ -158,6 +158,10 @@
     <ClInclude Include="src\projectCode\Vertex.hpp" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\cherno.png" />
+    <Image Include="res\textures\Crate.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

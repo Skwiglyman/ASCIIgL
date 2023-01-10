@@ -7,6 +7,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include <iostream>
+
 class Texture
 {
 private:
@@ -22,5 +24,5 @@ public:
 	inline int GetWidth() const { return m_Width; }
 	inline int GetHeight() const { return m_Height; }
 
-	glm::vec4 GetPixel(glm::vec2 xy);
+	glm::vec4 GetPixelCol(glm::vec2 xy);
 };
