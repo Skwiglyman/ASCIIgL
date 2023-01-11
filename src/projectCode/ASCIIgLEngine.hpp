@@ -30,7 +30,6 @@ public:
 	static CHAR GetGlyph(glm::vec3 rgb);
 	static short GetColour(glm::vec3 rgb);
 	static float GrayScaleRGB(glm::vec3 rgb);
-	static glm::vec3 BlendRGB(glm::vec4 inRGB, glm::vec3* colourBuffer[], glm::vec2 pixelPos);
 };
 
 

@@ -1,4 +1,4 @@
-#include "ASCIIgLEngine.h"
+#include "ASCIIgLEngine.hpp"
 
 glm::vec3 ASCIIgLEngine::CalcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, bool out)
 {
@@ -217,15 +217,7 @@ short ASCIIgLEngine::GetColour(glm::vec3 rgb)
 
 float ASCIIgLEngine::GrayScaleRGB(glm::vec3 rgb)
 {
-	return ((0.299 * rgb.x + 0.587 * rgb.y + 0.114 * rgb.z) / 256);
-}
-
-glm::vec3 ASCIIgLEngine::BlendRGB(glm::vec4 inRGB, glm::vec3* colourBuffer[], glm::vec2 pixelPos)
-{
-	glm::vec3 destRGB = colourBuffer[(int)pixelPos.x][(int)pixelPos.y];
-	glm::vec3 tempRGB;
-
-	return tempRGB;
+	return (0.299 * rgb.x + 0.587 * rgb.y + 0.114 * rgb.z) + 0.1;
 }
 
 bool ASCIIgLEngine::BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3, bool CCW) // function that returns a negative if face is not culled

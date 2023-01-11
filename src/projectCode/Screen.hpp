@@ -20,7 +20,7 @@
 #include "Camera3D.hpp"
 #include "VertexShader.hpp"
 #include "Vertex.hpp"
-#include "ASCIIgLEngine.h"	
+#include "ASCIIgLEngine.hpp"	
 #include "Texture.hpp"
 
 class Screen
@@ -42,6 +42,7 @@ private:
 public:
 	CHAR_INFO* pixelBuffer; // pixel output buffer
 	glm::vec3* colourBuffer; // stores the rgb colour of every pixel on the screen
+	float* depthBuffer;
 
 	int SCR_WIDTH;
 	int SCR_HEIGHT; // defining the width and height of the screen
@@ -54,6 +55,7 @@ public:
 	~Screen();
 
 	VERTEX ViewPortTransform(VERTEX vertice); // changes clip space to screen space coords
+	glm::vec3 BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos);
 
 	void SetTitle();
 	void StartFPSClock();
@@ -72,6 +74,7 @@ public:
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done
 	bool CCW = true; // counter clockwise vertice winding order
+	bool BLEND = false;
 
 	void RenderTriangles(VERTEX_SHADER VSHADER, std::vector<VERTEX> vertices, Texture* tex)
 	{

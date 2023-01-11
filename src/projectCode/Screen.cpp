@@ -14,13 +14,15 @@ void Screen::InitializeScreen(int width, int height, std::wstring title)
 	// the pixel buffer that is used to output to the screen is a 1d array (cus 2d arrays are cancer and I hate them)
 	// it uses the char_info thing since thats what windows uses to input
 
-	delete pixelBuffer, colourBuffer;
+	delete pixelBuffer, colourBuffer, depthBuffer;
 	pixelBuffer = new CHAR_INFO[width * height];
 	colourBuffer = new glm::vec3[width * height];
+	depthBuffer = new float[width * height];
 
-	for (int i = 0; i < width * height; i++) { colourBuffer[i] = glm::vec3(0, 0, 0); }
-	ReadConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion); // this puts a image of the console in the buffer 
-	// (clears garbage memory from other programs)
+	ReadConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion); // this puts a image of the console in the buffer (clears garbage memory from other programs)
+	std::fill(colourBuffer, colourBuffer + SCR_WIDTH * SCR_HEIGHT, glm::vec3(0, 0, 0));
+	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
+	
 
 	SetTitle();
 }
@@ -84,6 +86,7 @@ void Screen::ClearBuffer()
 	// clears the buffer by setting the entire buffer to spaces (ascii code 32)
 	std::fill(pixelBuffer, pixelBuffer + SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{' ', 0x0000});
 	std::fill(colourBuffer, colourBuffer + SCR_WIDTH * SCR_HEIGHT, glm::vec3(0, 0, 0));
+	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
 }
 
 void Screen::OutputBuffer()
@@ -425,8 +428,15 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-				PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w)*tex->GetHeight())))),
-					ASCIIgLEngine::GetColour(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w)*tex->GetHeight())))));
+				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j])
+				{
+					glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
+					glm::vec2 pixPos = glm::vec2(j, i);
+					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(BlendRGB(tex->GetPixelCol(texCoords), pixPos)),
+						ASCIIgLEngine::GetColour(BlendRGB(tex->GetPixelCol(texCoords), pixPos)));
+					depthBuffer[i * SCR_WIDTH + j] = tex_w;
+				}
+
 				t += tstep;
 			}
 
@@ -482,10 +492,15 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				tex_u = (1.0f - t) * tex_su + t * tex_eu;
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
-	
-	
-				PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight())))),
-					ASCIIgLEngine::GetColour(glm::vec3(tex->GetPixelCol(glm::vec2((tex_u / tex_w)*tex->GetWidth(), (tex_v / tex_w)*tex->GetHeight())))));
+				
+				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j])
+				{
+					glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
+					glm::vec2 pixPos = glm::vec2(j, i);
+					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(BlendRGB(tex->GetPixelCol(texCoords), pixPos)),
+						ASCIIgLEngine::GetColour(BlendRGB(tex->GetPixelCol(texCoords), pixPos)));
+					depthBuffer[i * SCR_WIDTH + j] = tex_w;
+				}
 				t += tstep;
 			}
 		}
@@ -509,3 +524,18 @@ VERTEX Screen::ViewPortTransform(VERTEX vertice)
 	return newVert;
 }
 
+glm::vec3 Screen::BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos)
+{
+	glm::vec3 destRGB = colourBuffer[int(pixelPos.y) * SCR_WIDTH + int(pixelPos.x)];
+	glm::vec3 tempRGB = glm::vec3(0, 0, 0);
+
+
+	tempRGB.x = (inRGB.x * inRGB.w) + (destRGB.x * (1 - inRGB.w));
+	tempRGB.y = (inRGB.y * inRGB.w) + (destRGB.y * (1 - inRGB.w));
+	tempRGB.z = (inRGB.z * inRGB.w) + (destRGB.z * (1 - inRGB.w));
+
+	colourBuffer[int(pixelPos.y) * SCR_WIDTH + int(pixelPos.x)] = tempRGB;
+	if (BLEND == false)
+		return inRGB;
+	return tempRGB;
+}

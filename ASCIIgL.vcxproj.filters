@@ -36,6 +36,9 @@
     <ClCompile Include="src\projectCode\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\projectCode\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\projectCode\Screen.hpp">
@@ -56,7 +59,7 @@
     <ClInclude Include="src\projectCode\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\ASCIIgLEngine.h">
+    <ClInclude Include="src\projectCode\ASCIIgLEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\stb_image\stb_image.h">
@@ -65,12 +68,21 @@
     <ClInclude Include="src\projectCode\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\projectCode\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\projectCode\Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Crate.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\textures\cherno.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\OhNo.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
