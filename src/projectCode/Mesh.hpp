@@ -11,9 +11,9 @@ private:
 
 public:
 	std::vector<VERTEX> vertices;
-	Texture texture;
+	std::vector<Texture*> textures;
 
-	Mesh(std::vector<Vertex> inVerts, Texture inTex);
+	Mesh(std::vector<VERTEX> inVerts, std::vector<Texture*> inTex);
 	~Mesh();
 
 };

@@ -1,12 +1,15 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::vector<Vertex> inVerts, Texture inTex)
-	: vertices(inVerts), texture(inTex)
+Mesh::Mesh(std::vector<VERTEX> inVerts, std::vector<Texture*> inTex)
+	: vertices(inVerts), textures(inTex)
 {
 
 }
 
 Mesh::~Mesh()
 {
-
+    for (size_t i = 0; i < textures.size(); i++)
+    {
+        delete textures[i];
+    }
 }

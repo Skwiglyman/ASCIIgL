@@ -39,6 +39,9 @@
     <ClCompile Include="src\projectCode\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\projectCode\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\projectCode\Screen.hpp">

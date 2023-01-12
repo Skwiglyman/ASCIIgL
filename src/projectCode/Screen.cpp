@@ -99,12 +99,19 @@ void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour)
 {
 	// this function takes in a 2d point and plots it on the pixelBuffer
 
-	if (p.x >= 0 && p.x < SCR_WIDTH && p.y >= 0 && p.y < SCR_HEIGHT)
-	{
-		pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = character; // setting the point in the screen buffer to a hashtag 
-		pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Attributes = Colour;
-	}
+	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = character; // setting the point in the screen buffer to a hashtag 
+	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Attributes = Colour;
+
 	// also reversing the x and y else the image would be flipped (35 = ascii code for #)
+}
+
+void Screen::DrawBorder()
+{
+	// DRAWING BORDERS
+	DrawLine(0, 0, SCR_WIDTH - 1, 0, PIXEL_SOLID, FG_WHITE);
+	DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
+	DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
+	DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
 }
 
 
@@ -428,7 +435,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j])
+				if (tex_w > depthBuffer[i * SCR_WIDTH + j] && j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT)
 				{
 					glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
 					glm::vec2 pixPos = glm::vec2(j, i);
@@ -493,7 +500,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 				
-				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j])
+				if (tex_w > depthBuffer[i * SCR_WIDTH + j] && j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT)
 				{
 					glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
 					glm::vec2 pixPos = glm::vec2(j, i);
@@ -501,6 +508,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 						ASCIIgLEngine::GetColour(BlendRGB(tex->GetPixelCol(texCoords), pixPos)));
 					depthBuffer[i * SCR_WIDTH + j] = tex_w;
 				}
+
 				t += tstep;
 			}
 		}
@@ -513,6 +521,36 @@ void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_t
 	DrawLine((int) *v1.x, (int) *v1.y, (int) *v2.x, (int) *v2.y, pixel_type, col);
 	DrawLine((int) *v2.x, (int) *v2.y, (int) *v3.x, (int) *v3.y, pixel_type, col);
 	DrawLine((int) *v3.x, (int) *v3.y, (int) *v1.x, (int) *v1.y, pixel_type, col);
+}
+
+void Screen::DrawModel(VERTEX_SHADER VSHADER, Model ModelObj, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera)
+{
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+	model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, -0.5f * size.z));
+	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z));
+	model = glm::scale(model, size);
+
+	VSHADER.GLmodel = model;
+	VSHADER.GLview = camera.view;
+	VSHADER.GLproj = camera.proj;
+
+	for (size_t i = 0; i < ModelObj.meshes.size(); i++)
+	{
+		Screen::DrawMesh(VSHADER, *ModelObj.meshes[i]);
+	}
+}
+
+void Screen::DrawMesh(VERTEX_SHADER VSHADER, Mesh mesh)
+{
+	Texture* diffuseTex = nullptr;
+	for (int i = 0; i < mesh.textures.size(); i++)
+		if (mesh.textures[i]->texType == "texture_diffuse")
+			diffuseTex = mesh.textures[i];
+	if (diffuseTex == nullptr)
+		RenderTriangles(VSHADER, mesh.vertices, diffuseTex);
+
 }
 
 VERTEX Screen::ViewPortTransform(VERTEX vertice)

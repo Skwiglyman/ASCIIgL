@@ -17,8 +17,9 @@ private:
 
 public:
 	std::string FilePath;
+	std::string texType;
 
-	Texture(const std::string& path);
+	Texture(const std::string& path, std::string type);
 	~Texture();
 
 	inline int GetWidth() const { return m_Width; }

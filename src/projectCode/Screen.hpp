@@ -4,6 +4,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+// I don't even know what this black magic screen shit does
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+
 // includes from default c++ libraries
 #include <Windows.h>
 #include <functional>
@@ -13,15 +17,14 @@
 #include <random>
 #include <chrono>
 
-// I don't even know what this does black magic screen shit
-#define WIN32_LEAN_AND_MEAN
-
 // includes from other project files
 #include "Camera3D.hpp"
 #include "VertexShader.hpp"
 #include "Vertex.hpp"
 #include "ASCIIgLEngine.hpp"	
 #include "Texture.hpp"
+#include "Mesh.hpp"
+#include "Model.hpp"
 
 class Screen
 {
@@ -65,11 +68,15 @@ public:
 	void ClearBuffer(); // clears buffer
 	void OutputBuffer(); // draws to screen
 	void PlotPixel(glm::vec2 p, CHAR character, short Colour); // plotting pixel onto screen buffer
+	void DrawBorder();
 
 	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
 	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
 	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
 	void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
+
+	void DrawMesh(VERTEX_SHADER VSHADER, Mesh mesh);
+	void DrawModel(VERTEX_SHADER VSHADER, Model ModelObj, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera);
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done
@@ -106,17 +113,8 @@ public:
 			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true) : true))
 			{
 				if (WIREFRAME == true) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
-				else 
-				{ 
-					DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); 
-				}
+				else { DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); }
 			}
 		}
-
-		// DRAWING BORDERS
-		DrawLine(0, 0, SCR_WIDTH - 1, 0, PIXEL_SOLID, FG_WHITE);
-		DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
-		DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
-		DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
 	}
 };

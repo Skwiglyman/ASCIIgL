@@ -181,7 +181,7 @@ CHAR ASCIIgLEngine::GetGlyph(glm::vec3 rgb)
 
 short ASCIIgLEngine::GetColour(glm::vec3 rgb)
 {
-	float Grayscale = GrayScaleRGB(rgb) + 0.05;
+	float Grayscale = GrayScaleRGB(rgb);
 
 	if (Grayscale < 0.25)
 	{

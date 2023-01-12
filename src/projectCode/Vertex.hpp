@@ -71,6 +71,12 @@ public:
 		*w = inXYZW.w;
 	}
 
+	void SetUV(glm::vec2 inUV)
+	{
+		*u = inUV.x;
+		*v = inUV.y;
+	}
+
 	void SetUVW(glm::vec3 inUVW)
 	{
 		*u = inUVW.x;
