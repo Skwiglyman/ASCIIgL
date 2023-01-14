@@ -26,6 +26,11 @@
 #include "Mesh.hpp"
 #include "Model.hpp"
 
+#define NOERROR 1
+#define WIN_WIDTH_TOO_BIG 2
+#define WIN_HEIGHT_TOO_BIG 3
+
+
 class Screen
 {
 private:
@@ -47,12 +52,17 @@ public:
 	glm::vec3* colourBuffer; // stores the rgb colour of every pixel on the screen
 	float* depthBuffer;
 
+	// defining the width and height of the screen
 	int SCR_WIDTH;
-	int SCR_HEIGHT; // defining the width and height of the screen
+	int SCR_HEIGHT; 
+
 	std::wstring SCR_TITLE;
 
+	unsigned int fontW;
+	unsigned int fontH;
+
 	static Screen* GetInstance();
-	void InitializeScreen(int width, int height, std::wstring title);
+	int InitializeScreen(unsigned int width, unsigned int height, const std::wstring title, unsigned int fontX, unsigned int fontY);
 
 	Screen(const Screen& obj) = delete;
 	~Screen();
@@ -75,7 +85,7 @@ public:
 	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
 	void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
 
-	void DrawMesh(VERTEX_SHADER VSHADER, Mesh mesh);
+	void DrawMesh(VERTEX_SHADER VSHADER, Mesh* mesh);
 	void DrawModel(VERTEX_SHADER VSHADER, Model ModelObj, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera);
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
@@ -93,12 +103,13 @@ public:
 		{ 
 			vertices[k] = VSHADER.GLUse(vertices[k]); 
 			vertices[k].refactorPtrs(); // I have to do this for some dumb fucking reason I can't say (idk if the ptrs are messed up when I return the vertex)
+
+			
 		} // VERTEX TRANSFORMING
 
 		// CLIPPING
 		std::vector<VERTEX> CLIPPED_COORDS;
 		ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS);
-		
 
 		for (int i = 0; i < CLIPPED_COORDS.size(); i += 3)
 		{
@@ -112,7 +123,7 @@ public:
 
 			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true) : true))
 			{
-				if (WIREFRAME == true) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
+				if (WIREFRAME == true or tex == nullptr) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
 				else { DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); }
 			}
 		}

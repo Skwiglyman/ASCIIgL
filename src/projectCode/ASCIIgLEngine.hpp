@@ -27,8 +27,8 @@ public:
 	static void PerspectiveDivision(std::vector<VERTEX>& clipCoords, int i);
 	static void ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
 
-	static CHAR GetGlyph(glm::vec3 rgb);
-	static short GetColour(glm::vec3 rgb);
+	static CHAR GetGlyph(float Grayscale);
+	static short GetColour(float Grayscale);
 	static float GrayScaleRGB(glm::vec3 rgb);
 };
 

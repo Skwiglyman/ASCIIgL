@@ -47,9 +47,6 @@
     <ClInclude Include="src\projectCode\Screen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\userCode\Vertex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\projectCode\Camera2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

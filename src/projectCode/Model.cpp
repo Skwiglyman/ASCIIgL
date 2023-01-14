@@ -41,7 +41,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         VERTEX vertex;
-        vertex.SetXYZ(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+        vertex.SetXYZW(glm::vec4(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f));
 
         // normals
         if (mesh->HasNormals())

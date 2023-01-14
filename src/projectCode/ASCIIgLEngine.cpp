@@ -156,11 +156,8 @@ void ASCIIgLEngine::ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VE
 	Clipping(c5, clipped, 0, false);
 }
 
-CHAR ASCIIgLEngine::GetGlyph(glm::vec3 rgb)
+CHAR ASCIIgLEngine::GetGlyph(float Grayscale)
 {
-	float Grayscale = GrayScaleRGB(rgb);
-	//std::cout << Grayscale << " " << rgb.x << " " << rgb.y << " " << rgb.z << std::endl;
-
 	if (Grayscale < 0.25)
 	{
 		return PIXEL_QUARTER;
@@ -179,9 +176,8 @@ CHAR ASCIIgLEngine::GetGlyph(glm::vec3 rgb)
 	}
 }
 
-short ASCIIgLEngine::GetColour(glm::vec3 rgb)
+short ASCIIgLEngine::GetColour(float Grayscale)
 {
-	float Grayscale = GrayScaleRGB(rgb);
 
 	if (Grayscale < 0.25)
 	{
