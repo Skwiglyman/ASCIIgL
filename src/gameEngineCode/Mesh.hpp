@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vertex.hpp"
-#include "Texture.hpp"
+#include "..\renderingEngineCode\Vertex.hpp"
+#include "..\renderingEngineCode\Texture.hpp"
 
 #include <vector>
 

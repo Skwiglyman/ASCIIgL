@@ -6,6 +6,9 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "..\renderingEngineCode\Texture.hpp"
+#include "..\renderingEngineCode\Vertex.hpp"
+
 class Model
 {
 public:

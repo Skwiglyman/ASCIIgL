@@ -18,13 +18,10 @@
 #include <chrono>
 
 // includes from other project files
-#include "Camera3D.hpp"
 #include "VertexShader.hpp"
 #include "Vertex.hpp"
 #include "ASCIIgLEngine.hpp"	
 #include "Texture.hpp"
-#include "Mesh.hpp"
-#include "Model.hpp"
 
 #define NOERROR 1
 #define WIN_WIDTH_TOO_BIG 2
@@ -46,6 +43,11 @@ private:
 	inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
 	inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
 	float elapsedTime;
+
+	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
+	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
+	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
+	void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
 	
 public:
 	CHAR_INFO* pixelBuffer; // pixel output buffer
@@ -75,18 +77,10 @@ public:
 	void EndFPSClock();
 
 	void ClearScreen(); // clears screen (does not clear buffer)
-	void ClearBuffer(); // clears buffer
+	void ClearBuffer(unsigned short backgrounCol); // clears buffer
 	void OutputBuffer(); // draws to screen
 	void PlotPixel(glm::vec2 p, CHAR character, short Colour); // plotting pixel onto screen buffer
-	void DrawBorder();
-
-	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
-	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
-	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
-	void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
-
-	void DrawMesh(VERTEX_SHADER VSHADER, Mesh* mesh);
-	void DrawModel(VERTEX_SHADER VSHADER, Model ModelObj, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera);
+	void DrawBorder(short col);
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done

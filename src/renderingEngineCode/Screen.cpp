@@ -71,7 +71,7 @@ Screen::Screen()
 
 Screen::~Screen()
 {
-
+	delete Instance, pixelBuffer, colourBuffer, depthBuffer;
 }
 
 Screen* Screen::GetInstance()
@@ -118,10 +118,10 @@ void Screen::ClearScreen()
 	// uses native WIN API commands to clear it
 }
 
-void Screen::ClearBuffer()
+void Screen::ClearBuffer(unsigned short backgrounCol)
 {
 	// clears the buffer by setting the entire buffer to spaces (ascii code 32)
-	std::fill(pixelBuffer, pixelBuffer + SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{' ', 0x0000});
+	std::fill(pixelBuffer, pixelBuffer + SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{' ', backgrounCol });
 	std::fill(colourBuffer, colourBuffer + SCR_WIDTH * SCR_HEIGHT, glm::vec3(0, 0, 0));
 	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
 }
@@ -142,13 +142,13 @@ void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour)
 	// also reversing the x and y else the image would be flipped (35 = ascii code for #)
 }
 
-void Screen::DrawBorder()
+void Screen::DrawBorder(short col)
 {
 	// DRAWING BORDERS
-	DrawLine(0, 0, SCR_WIDTH - 1, 0, PIXEL_SOLID, FG_WHITE);
-	DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
-	DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
-	DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, FG_WHITE);
+	DrawLine(0, 0, SCR_WIDTH - 1, 0, PIXEL_SOLID, col);
+	DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, col);
+	DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, col);
+	DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, col);
 }
 
 
@@ -559,37 +559,6 @@ void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_t
 	DrawLine((int) *v1.x, (int) *v1.y, (int) *v2.x, (int) *v2.y, pixel_type, col);
 	DrawLine((int) *v2.x, (int) *v2.y, (int) *v3.x, (int) *v3.y, pixel_type, col);
 	DrawLine((int) *v3.x, (int) *v3.y, (int) *v1.x, (int) *v1.y, pixel_type, col);
-}
-
-void Screen::DrawModel(VERTEX_SHADER VSHADER, Model ModelObj, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera)
-{
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-	model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, -0.5f * size.z));
-	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z));
-	model = glm::scale(model, size);
-
-	VSHADER.GLmodel = model;
-	VSHADER.GLview = camera.view;
-	VSHADER.GLproj = camera.proj;
-
-	for (size_t i = 0; i < ModelObj.meshes.size(); i++)
-	{
-		Screen::DrawMesh(VSHADER, ModelObj.meshes[i]);
-	}
-
-}
-
-void Screen::DrawMesh(VERTEX_SHADER VSHADER, Mesh* mesh)
-{
-	for (int i = 0; i < mesh->textures.size(); i++)
-	{
-		if (mesh->textures[i]->texType == "texture_diffuse")
-		{
-			RenderTriangles(VSHADER, mesh->vertices, mesh->textures[i]);
-		}
-	}
 }
 
 VERTEX Screen::ViewPortTransform(VERTEX vertice)

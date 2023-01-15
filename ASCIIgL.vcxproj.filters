@@ -15,63 +15,69 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\userCode\main.cpp">
+    <ClCompile Include="src\gameCode\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\Screen.cpp">
+    <ClCompile Include="src\renderingEngineCode\Screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\Camera2D.cpp">
+    <ClCompile Include="src\gameEngineCode\Camera2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\Camera3D.cpp">
+    <ClCompile Include="src\gameEngineCode\Camera3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\ASCIIgLEngine.cpp">
+    <ClCompile Include="src\renderingEngineCode\ASCIIgLEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\Texture.cpp">
+    <ClCompile Include="src\renderingEngineCode\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\Mesh.cpp">
+    <ClCompile Include="src\gameEngineCode\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\projectCode\Model.cpp">
+    <ClCompile Include="src\gameEngineCode\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\projectCode\Screen.hpp">
+    <ClInclude Include="src\renderingEngineCode\Screen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\Camera2D.hpp">
+    <ClInclude Include="src\gameEngineCode\Camera2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\Camera3D.hpp">
+    <ClInclude Include="src\gameEngineCode\Camera3D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\VertexShader.hpp">
+    <ClInclude Include="src\renderingEngineCode\VertexShader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\Vertex.hpp">
+    <ClInclude Include="src\renderingEngineCode\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\ASCIIgLEngine.hpp">
+    <ClInclude Include="src\renderingEngineCode\ASCIIgLEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\Texture.hpp">
+    <ClInclude Include="src\renderingEngineCode\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\Mesh.hpp">
+    <ClInclude Include="src\gameEngineCode\Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\projectCode\Model.hpp">
+    <ClInclude Include="src\gameEngineCode\Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameCode\Renderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameCode\Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
