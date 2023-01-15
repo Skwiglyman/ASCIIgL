@@ -2,9 +2,9 @@
 #include "../renderingEngineCode/VertexShader.hpp"
 #include "../renderingEngineCode/Texture.hpp"
 
-#include "../gameEngineCode/Camera3D.hpp"
-#include "../gameEngineCode/Camera2D.hpp"
-#include "../gameEngineCode/Model.hpp"
+#include "Camera3D.hpp"
+#include "Camera2D.hpp"
+#include "Model.hpp"
 
 #include "Renderer.hpp"
 

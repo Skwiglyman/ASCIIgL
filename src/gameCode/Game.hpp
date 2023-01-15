@@ -23,17 +23,6 @@ public:
 	Game(const Game& obj) = delete;
 	~Game();
 
-	Game* Game::GetInstance()
-	{
-		if (Instance == nullptr)
-		{
-			Instance = new Game();
-			return Instance;
-		}
-		else
-		{
-			return Instance;
-		}
-	}
+	Game* Game::GetInstance();
 
 };
