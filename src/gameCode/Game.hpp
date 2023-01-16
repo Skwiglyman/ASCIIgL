@@ -1,5 +1,10 @@
 #pragma once
 
+#include "..\renderingEngineCode\Screen.hpp"
+
+#include "Camera2D.hpp"
+#include "Camera3D.hpp"
+
 class Game
 {
 private:
@@ -19,10 +24,20 @@ private:
 	unsigned int SCR_WIDTH = 500;
 	unsigned int SCR_HEIGHT = 300;
 
+	bool running = true;
+	VERTEX_SHADER vertexShader;
+
+
+	// MENU TEXTURES
+	Texture title, startSel, startUnsel, howToSel, howToUnsel, gameInfo1, gameInfo2;
+
 public:
+
 	Game(const Game& obj) = delete;
 	~Game();
 
-	Game* Game::GetInstance();
+	void Run();
+
+	Game* GetInstance();
 
 };

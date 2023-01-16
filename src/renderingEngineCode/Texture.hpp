@@ -19,7 +19,7 @@ public:
 	std::string FilePath;
 	std::string texType;
 
-	Texture(const std::string& path, std::string type);
+	Texture(const std::string& path, std::string type = "NULL");
 	~Texture();
 
 	inline int GetWidth() const { return m_Width; }

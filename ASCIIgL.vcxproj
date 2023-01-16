@@ -149,11 +149,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\gameCode\Game.cpp" />
     <ClCompile Include="src\renderingEngineCode\ASCIIgLEngine.cpp" />
-    <ClCompile Include="src\gameEngineCode\Camera2D.cpp" />
-    <ClCompile Include="src\gameEngineCode\Camera3D.cpp" />
-    <ClCompile Include="src\gameEngineCode\Mesh.cpp" />
-    <ClCompile Include="src\gameEngineCode\Model.cpp" />
+    <ClCompile Include="src\gameCode\Camera2D.cpp" />
+    <ClCompile Include="src\gameCode\Camera3D.cpp" />
+    <ClCompile Include="src\gameCode\Mesh.cpp" />
+    <ClCompile Include="src\gameCode\Model.cpp" />
     <ClCompile Include="src\renderingEngineCode\Texture.cpp" />
     <ClCompile Include="src\gameCode\main.cpp" />
     <ClCompile Include="src\renderingEngineCode\Screen.cpp" />
@@ -163,10 +164,10 @@
     <ClInclude Include="src\gameCode\Game.hpp" />
     <ClInclude Include="src\gameCode\Renderer.hpp" />
     <ClInclude Include="src\renderingEngineCode\ASCIIgLEngine.hpp" />
-    <ClInclude Include="src\gameEngineCode\Camera2D.hpp" />
-    <ClInclude Include="src\gameEngineCode\Camera3D.hpp" />
-    <ClInclude Include="src\gameEngineCode\Mesh.hpp" />
-    <ClInclude Include="src\gameEngineCode\Model.hpp" />
+    <ClInclude Include="src\gameCode\Camera2D.hpp" />
+    <ClInclude Include="src\gameCode\Camera3D.hpp" />
+    <ClInclude Include="src\gameCode\Mesh.hpp" />
+    <ClInclude Include="src\gameCode\Model.hpp" />
     <ClInclude Include="src\renderingEngineCode\Screen.hpp" />
     <ClInclude Include="src\renderingEngineCode\Texture.hpp" />
     <ClInclude Include="src\renderingEngineCode\VertexShader.hpp" />

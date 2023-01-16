@@ -3,9 +3,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "..\gameEngineCode\Mesh.hpp"
-#include "..\gameEngineCode\Model.hpp"
-#include "..\gameEngineCode\Camera3D.hpp"
+#include "Mesh.hpp"
+#include "Model.hpp"
+#include "Camera3D.hpp"
 
 #include "..\renderingEngineCode\VertexShader.hpp"
 #include "..\renderingEngineCode\Screen.hpp"
