@@ -94,5 +94,8 @@
     <Image Include="res\textures\OhNo.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\textures\GUI\Title.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

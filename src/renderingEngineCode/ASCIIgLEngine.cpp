@@ -213,7 +213,7 @@ short ASCIIgLEngine::GetColour(float Grayscale)
 
 float ASCIIgLEngine::GrayScaleRGB(glm::vec3 rgb)
 {
-	return (0.299 * rgb.x + 0.587 * rgb.y + 0.114 * rgb.z) + 0.1;
+	return (0.299 * rgb.x + 0.587 * rgb.y + 0.114 * rgb.z);
 }
 
 bool ASCIIgLEngine::BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3, bool CCW) // function that returns a negative if face is not culled

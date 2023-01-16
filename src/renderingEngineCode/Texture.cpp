@@ -20,7 +20,5 @@ glm::vec4 Texture::GetPixelCol(glm::vec2 coord)
 	float  g = pixelOffset[1];
 	float  b = pixelOffset[2];
 	float  a = m_BPP >= 4 ? pixelOffset[3] : 0xff;
-
-
-	return glm::vec4(r/256, g/256, b/256, a/256);
+	return glm::vec4(r / 256, g / 256, b / 256, a / 256);
 }

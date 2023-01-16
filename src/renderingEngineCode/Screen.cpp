@@ -12,15 +12,11 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 	fontW = fontX;
 	rcRegion = SMALL_RECT{ 0, 0, SHORT(width - 1), SHORT(height - 1) };
 
-	SMALL_RECT m_rectWindow = { 0, 0, 1, 1 };
-	SetConsoleWindowInfo(hOutput, TRUE, &m_rectWindow); // voodoo (setting console buffer to lower than visual size because reasons)
-
 	// Assign screen buffer to the console
 	SetConsoleActiveScreenBuffer(hOutput);
 
 	// setting the buffer size of the console
-	COORD coord = { (short)SCR_WIDTH, (short)SCR_HEIGHT };
-	SetConsoleScreenBufferSize(hOutput, coord);
+	SetConsoleScreenBufferSize(hOutput, dwBufferSize);
 
 	// setting the actual physical size of the console
 	SetConsoleWindowInfo(hOutput, TRUE, &rcRegion);
@@ -472,9 +468,9 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j])
+				glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
+				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
 				{
-					glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
 					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
 
 					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(blendedGrayScale), ASCIIgLEngine::GetColour(blendedGrayScale));
@@ -537,10 +533,9 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 				
-				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j])
+				glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
+				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
 				{
-					glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
-
 					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
 
 					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(blendedGrayScale), ASCIIgLEngine::GetColour(blendedGrayScale));

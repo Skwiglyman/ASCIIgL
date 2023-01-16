@@ -4,6 +4,9 @@
 
 #include "Camera2D.hpp"
 #include "Camera3D.hpp"
+#include "Renderer.hpp"
+
+#include <map>
 
 class Game
 {
@@ -29,7 +32,10 @@ private:
 
 
 	// MENU TEXTURES
-	Texture title, startSel, startUnsel, howToSel, howToUnsel, gameInfo1, gameInfo2;
+	std::map<std::string, Texture*> GUI_Textures;
+
+	Camera2D guiCamera;
+	void RunMainMenu();
 
 public:
 
@@ -38,6 +44,6 @@ public:
 
 	void Run();
 
-	Game* GetInstance();
+	static Game* GetInstance();
 
 };
