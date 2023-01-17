@@ -5,18 +5,22 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 	// innitializing all of the variables
 	dwBufferSize = COORD{ (SHORT)width, (SHORT)height };
 	dwBufferCoord = COORD{ 0, 0 };
-	SCR_WIDTH = width; 
+	SCR_WIDTH = width;
 	SCR_HEIGHT = height;
 	SCR_TITLE = title;
 	fontH = fontY;
 	fontW = fontX;
 	rcRegion = SMALL_RECT{ 0, 0, SHORT(width - 1), SHORT(height - 1) };
 
+	SMALL_RECT m_rectWindow = { 0, 0, 1, 1 };
+	SetConsoleWindowInfo(hOutput, TRUE, &m_rectWindow); // voodoo (setting console buffer to lower than visual size because reasons)
+
 	// Assign screen buffer to the console
 	SetConsoleActiveScreenBuffer(hOutput);
 
 	// setting the buffer size of the console
-	SetConsoleScreenBufferSize(hOutput, dwBufferSize);
+	COORD coord = { (short)SCR_WIDTH, (short)SCR_HEIGHT };
+	SetConsoleScreenBufferSize(hOutput, coord);
 
 	// setting the actual physical size of the console
 	SetConsoleWindowInfo(hOutput, TRUE, &rcRegion);
@@ -55,7 +59,7 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 	ReadConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion); // this puts a image of the console in the buffer (clears garbage memory from other programs)
 	std::fill(colourBuffer, colourBuffer + SCR_WIDTH * SCR_HEIGHT, glm::vec3(0, 0, 0));
 	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
-	
+
 	// setting the title of the console with the new title variable
 	SetTitle();
 }

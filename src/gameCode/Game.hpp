@@ -19,12 +19,14 @@ private:
 		MAZE,
 	};
 
+	unsigned int BtnSelected = 0;
+
 	Game();
 	static inline Game* Instance = nullptr;
 
 	unsigned int gameState = MAIN_MENU;
 
-	unsigned int SCR_WIDTH = 500;
+	unsigned int SCR_WIDTH = 450;
 	unsigned int SCR_HEIGHT = 300;
 
 	bool running = true;
@@ -36,6 +38,9 @@ private:
 
 	Camera2D guiCamera;
 	void RunMainMenu();
+	void RunHowToPlay();
+	void RunLore();
+	void RunMaze();
 
 public:
 

@@ -11,7 +11,7 @@ Game::Game()
 	GUI_Textures["GameInfo1"] = new Texture("res/textures/GUI/GameInfo1.png");
 	GUI_Textures["GameInfo2"] = new Texture("res/textures/GUI/GameInfo2.png");
 	GUI_Textures["Select_Btn"] = new Texture("res/textures/GUI/PressQ.png");
-
+	GUI_Textures["BackInfo"] = new Texture("res/textures/GUI/BackInfo.png");
 }
 
 Game::~Game()
@@ -55,7 +55,7 @@ Game* Game::GetInstance()
 
 void Game::Run()
 {
-	Screen::GetInstance()->InitializeScreen(500, 350, L"I Don't Wanna Run For Christmas", 2, 2); // 900x540 is the biggest resolution for my monitor
+	Screen::GetInstance()->InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2); // 900x540 is the biggest resolution for my monitor
 
 	Screen::GetInstance()->WIREFRAME = false;
 	Screen::GetInstance()->BACKFACECULLING = true;
@@ -65,39 +65,98 @@ void Game::Run()
 	while (running == true)
 	{
 		// starting fps timer
-		//Screen::GetInstance()->StartFPSClock();
+		Screen::GetInstance()->StartFPSClock();
 
 		// resetting screen and buffer
-		//Screen::GetInstance()->ClearScreen();
-		//Screen::GetInstance()->ClearBuffer(FG_BLACK);
+		Screen::GetInstance()->ClearScreen();
+		Screen::GetInstance()->ClearBuffer(FG_BLACK);
 
 		// do game logic here
-		//if (gameState == MAIN_MENU)
-			//RunMainMenu();
+		if (gameState == MAIN_MENU)
+			RunMainMenu();
+		else if (gameState == HOW_TO_PLAY)
+			RunHowToPlay();
+		else if (gameState == GAME_LORE)
+			RunLore();
+
 
 		// drawing
-		//Screen::GetInstance()->DrawBorder(FG_WHITE);
-		//Screen::GetInstance()->OutputBuffer();
+		Screen::GetInstance()->DrawBorder(FG_WHITE);
+		Screen::GetInstance()->OutputBuffer();
 
 		// fps stuff and title of console
-		//Screen::GetInstance()->EndFPSClock();
-		//Screen::GetInstance()->SetTitle();
+		Screen::GetInstance()->EndFPSClock();
+		Screen::GetInstance()->SetTitle();
 	}
 
 }
 
 void Game::RunMainMenu()
 {
-	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["Title"], glm::vec2(240, 80), glm::vec2(0, 0), glm::vec2(130, 50), guiCamera, 0);
+	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["Title"], glm::vec2(220, 80), glm::vec2(0, 0), glm::vec2(130, 50), guiCamera, 0);
 	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["Select_Btn"], glm::vec2(85, 270), glm::vec2(0, 0), glm::vec2(55, 10), guiCamera, 0);
 
-	glm::vec2 howToPlayCoords(235, 150);
-	glm::vec2 howToPlaySize(75, 30);
+	if (GetKeyState(VK_UP) & 0x8000)
+	{
+		BtnSelected = 0;
+	}
+	if (GetKeyState(VK_DOWN) & 0x8000)
+	{
+		BtnSelected += 1;
+	}
 
-	if (true)
-		Renderer::Draw2DQuad(vertexShader, *GUI_Textures["How_To_Play_Sel"], howToPlayCoords, glm::vec2(0, 0), howToPlaySize, guiCamera, 0);
+	if (GetKeyState('Q') & 0x8000)
+	{
+		if (BtnSelected != 0)
+		{
+			gameState = GAME_LORE;
+			BtnSelected = 0;
+			Sleep(100);
+		}
+		else
+		{
+			gameState = HOW_TO_PLAY;
+			BtnSelected = 0;
+			Sleep(100);
+		}
+	}
+
+
+	if (BtnSelected != 0)
+	{
+		Renderer::Draw2DQuad(vertexShader, *GUI_Textures["How_To_Play_Sel"], glm::vec2(215, 150), glm::vec2(0, 0), glm::vec2(75, 30), guiCamera, 0);
+		Renderer::Draw2DQuad(vertexShader, *GUI_Textures["Start_Unsel"], glm::vec2(217, 200), glm::vec2(0, 0), glm::vec2(60, 30), guiCamera, 0);
+	}
 	else
-		Renderer::Draw2DQuad(vertexShader, *GUI_Textures["How_To_Play_Unsel"], howToPlayCoords, glm::vec2(0, 0), howToPlaySize, guiCamera, 0);
+	{
+		Renderer::Draw2DQuad(vertexShader, *GUI_Textures["How_To_Play_Unsel"], glm::vec2(215, 150), glm::vec2(0, 0), glm::vec2(75, 30), guiCamera, 0);
+		Renderer::Draw2DQuad(vertexShader, *GUI_Textures["Start_Sel"], glm::vec2(217, 200), glm::vec2(0, 0), glm::vec2(60, 30), guiCamera, 0);
+	}
+	
+}
 
-	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["Start_Unsel"], glm::vec2(237, 200), glm::vec2(0, 0), glm::vec2(60, 30), guiCamera, 0);
+void Game::RunHowToPlay()
+{
+	if (GetKeyState('Q') & 0x8000)
+	{
+		gameState = MAIN_MENU;
+		Sleep(100);
+		BtnSelected = 0;
+	}
+
+	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["GameInfo2"], glm::vec2(215, 120), glm::vec2(0, 0), glm::vec2(175, 100), guiCamera, 0);
+	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["BackInfo"], glm::vec2(217, 250), glm::vec2(0, 0), glm::vec2(100, 15), guiCamera, 0);
+
+}
+
+void Game::RunLore()
+{
+	Renderer::Draw2DQuad(vertexShader, *GUI_Textures["GameInfo1"], glm::vec2(225, 150), glm::vec2(0, 0), glm::vec2(200, 125), guiCamera, 0);
+	Screen::GetInstance()->OutputBuffer();
+	Sleep(7500);
+	gameState = MAZE;
+}
+
+void Game::RunMaze()
+{
 }
