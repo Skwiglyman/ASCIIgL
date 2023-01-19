@@ -45,6 +45,12 @@
     <ClCompile Include="src\gameCode\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\gameCode\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameCode\GameObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\renderingEngineCode\Screen.hpp">
@@ -83,6 +89,12 @@
     <ClInclude Include="src\gameCode\Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\gameCode\Player.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameCode\GameObj.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Crate.png">
@@ -95,6 +107,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\textures\GUI\Title.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\models\wall\Wall.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

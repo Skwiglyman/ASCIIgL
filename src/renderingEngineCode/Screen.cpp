@@ -19,8 +19,7 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 	SetConsoleActiveScreenBuffer(hOutput);
 
 	// setting the buffer size of the console
-	COORD coord = { (short)SCR_WIDTH, (short)SCR_HEIGHT };
-	SetConsoleScreenBufferSize(hOutput, coord);
+	SetConsoleScreenBufferSize(hOutput, dwBufferSize);
 
 	// setting the actual physical size of the console
 	SetConsoleWindowInfo(hOutput, TRUE, &rcRegion);
@@ -29,10 +28,17 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(hOutput, &csbi);
 	if (SCR_HEIGHT > csbi.dwMaximumWindowSize.Y)
-		return WIN_WIDTH_TOO_BIG;
-	if (SCR_WIDTH > csbi.dwMaximumWindowSize.X)
+	{
+		delete Instance;
 		return WIN_HEIGHT_TOO_BIG;
+	}
+	if (SCR_WIDTH > csbi.dwMaximumWindowSize.X)
+	{
+		delete Instance;
+		return WIN_WIDTH_TOO_BIG;
 
+	}
+		
 	// creating console font
 	CONSOLE_FONT_INFOEX cfi;
 	cfi.cbSize = sizeof(cfi);
@@ -62,6 +68,8 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 
 	// setting the title of the console with the new title variable
 	SetTitle();
+
+	return NOERROR;
 }
 
 Screen::Screen()
@@ -173,7 +181,8 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 	y = y1;
 	if (dx > dy)
 	{
-		PlotPixel(glm::vec2(x, y), pixel_type, col);
+		if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
+			PlotPixel(glm::vec2(x, y), pixel_type, col);
 		e = 2 * dy - dx;
 		inc1 = 2 * (dy - dx);
 		inc2 = 2 * dy;
@@ -182,7 +191,8 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 			if (e >= 0)
 			{
 				y += incy;
-				PlotPixel(glm::vec2(x, y), pixel_type, col);
+				if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
+					PlotPixel(glm::vec2(x, y), pixel_type, col);
 				e += inc1;
 				x += incx;
 			}
@@ -191,12 +201,14 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 				e += inc2; x += incx;
 				//points.push_back(glm::vec2(x, y - incy));
 			}
-			PlotPixel(glm::vec2(x, y), pixel_type, col);
+			if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
+				PlotPixel(glm::vec2(x, y), pixel_type, col);
 		}
 	}
 	else
 	{
-		PlotPixel(glm::vec2(x, y), pixel_type, col);
+		if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
+			PlotPixel(glm::vec2(x, y), pixel_type, col);
 		e = 2 * dx - dy;
 		inc1 = 2 * (dx - dy);
 		inc2 = 2 * dx;
@@ -205,7 +217,8 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 			if (e >= 0)
 			{
 				x += incx;
-				PlotPixel(glm::vec2(x, y), pixel_type, col);
+				if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
+					PlotPixel(glm::vec2(x, y), pixel_type, col);
 				y += incy;
 				e += inc1;
 
@@ -216,7 +229,8 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 				//points.push_back(glm::vec2(x + incx, y));
 			}
 
-			PlotPixel(glm::vec2(x, y), pixel_type, col);
+			if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
+				PlotPixel(glm::vec2(x, y), pixel_type, col);
 		}
 	}
 
@@ -576,7 +590,6 @@ glm::vec3 Screen::BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos)
 
 	glm::vec3 destRGB = colourBuffer[int(pixelPos.y) * SCR_WIDTH + int(pixelPos.x)];
 	glm::vec3 tempRGB = glm::vec3(0, 0, 0);
-
 	tempRGB.x = (inRGB.x * inRGB.w) + (destRGB.x * (1 - inRGB.w));
 	tempRGB.y = (inRGB.y * inRGB.w) + (destRGB.y * (1 - inRGB.w));
 	tempRGB.z = (inRGB.z * inRGB.w) + (destRGB.z * (1 - inRGB.w));

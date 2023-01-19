@@ -13,6 +13,7 @@ class Model
 {
 public:
     Model(std::string path) { loadModel(path); }
+    Model(std::vector<VERTEX> vertices, std::vector<Texture*> textures) { meshes.push_back(new Mesh(vertices, textures)); };
     ~Model();
 
     std::vector<Mesh*> meshes;

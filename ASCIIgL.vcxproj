@@ -150,6 +150,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\gameCode\Game.cpp" />
+    <ClCompile Include="src\gameCode\GameObj.cpp" />
+    <ClCompile Include="src\gameCode\Player.cpp" />
     <ClCompile Include="src\renderingEngineCode\ASCIIgLEngine.cpp" />
     <ClCompile Include="src\gameCode\Camera2D.cpp" />
     <ClCompile Include="src\gameCode\Camera3D.cpp" />
@@ -162,6 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gameCode\Game.hpp" />
+    <ClInclude Include="src\gameCode\GameObj.hpp" />
+    <ClInclude Include="src\gameCode\Player.hpp" />
     <ClInclude Include="src\gameCode\Renderer.hpp" />
     <ClInclude Include="src\renderingEngineCode\ASCIIgLEngine.hpp" />
     <ClInclude Include="src\gameCode\Camera2D.hpp" />
@@ -177,6 +181,7 @@
   <ItemGroup>
     <Image Include="res\textures\cherno.png" />
     <Image Include="res\textures\Crate.png" />
+    <Image Include="res\models\wall\Wall.png" />
     <Image Include="res\textures\GUI\Title.png" />
     <Image Include="res\textures\OhNo.png" />
   </ItemGroup>

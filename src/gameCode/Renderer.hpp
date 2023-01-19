@@ -16,13 +16,36 @@ class Renderer
 private:
 
 public:
-	static const void DrawMesh(VERTEX_SHADER VSHADER, Mesh* mesh)
+	static const void DrawMeshForModel(VERTEX_SHADER VSHADER, Mesh* mesh)
 	{
 		for (int i = 0; i < mesh->textures.size(); i++)
 		{
 			if (mesh->textures[i]->texType == "texture_diffuse")
 			{
 				Screen::GetInstance()->RenderTriangles(VSHADER, mesh->vertices, mesh->textures[i]);
+			}
+		}
+	}
+
+	static const void DrawMesh(VERTEX_SHADER VSHADER, Mesh* mesh, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera)
+	{
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+		model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, -0.5f * size.z));
+		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z));
+		model = glm::scale(model, size);
+
+		VSHADER.GLmodel = model;
+		VSHADER.GLview = camera.view;
+		VSHADER.GLproj = camera.proj;
+
+		for (int i = 0; i < mesh->textures.size(); i++)
+		{
+			if (mesh->textures[i]->texType == "texture_diffuse")
+			{
+				Screen::GetInstance()->RenderTriangles(VSHADER, mesh->vertices, mesh->textures[i]);
+				return;
 			}
 		}
 	}
@@ -42,7 +65,7 @@ public:
 
 		for (size_t i = 0; i < ModelObj.meshes.size(); i++)
 		{
-			DrawMesh(VSHADER, ModelObj.meshes[i]);
+			DrawMeshForModel(VSHADER, ModelObj.meshes[i]);
 		}
 	}
 

@@ -3,10 +3,16 @@
 #include "..\renderingEngineCode\Screen.hpp"
 
 #include "Camera2D.hpp"
-#include "Camera3D.hpp"
 #include "Renderer.hpp"
+#include "Player.hpp"
+#include "GameObj.hpp"
 
 #include <map>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <random>
 
 class Game
 {
@@ -17,6 +23,8 @@ private:
 		HOW_TO_PLAY,
 		GAME_LORE,
 		MAZE,
+		CAUGHT,
+		WIN,
 	};
 
 	unsigned int BtnSelected = 0;
@@ -32,11 +40,23 @@ private:
 	bool running = true;
 	VERTEX_SHADER vertexShader;
 
+	// LOADING LEVEL
+	std::string levelData = "";
+	int levelWidth = 100;
+	int levelHeight = 100;
+
+	void LoadLevel(const std::string path);
+
 
 	// MENU TEXTURES
-	std::map<std::string, Texture*> GUI_Textures;
+	std::map<std::string, Texture*> Textures;
 
+	// Game Objects
+	std::vector<GameObj*> gameObjs;
 	Camera2D guiCamera;
+
+	Model* WallModel;
+
 	void RunMainMenu();
 	void RunHowToPlay();
 	void RunLore();
@@ -50,5 +70,8 @@ public:
 	void Run();
 
 	static Game* GetInstance();
+
+	int playerHeight = 10;
+	Player* player = nullptr;
 
 };
