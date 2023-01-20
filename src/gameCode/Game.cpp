@@ -58,7 +58,7 @@ void Game::Run()
 
 		// resetting screen and buffer
 		Screen::GetInstance()->ClearScreen();
-		Screen::GetInstance()->ClearBuffer(FG_BLACK);
+		Screen::GetInstance()->ClearBuffer(FG_BLUE);
 
 		// do game logic here
 		if (gameState == MAIN_MENU)
@@ -83,7 +83,7 @@ void Game::Run()
 
 void Game::LoadLevel(const std::string path)
 {
-	LevelModel = new Model("res/models/level/MazeTest.mtl.obj");
+	LevelModel = new Model("res/models/level/MazeTest.obj");
 
 	gameObjs.push_back(new GameObj(glm::vec3(0, 10, 0), glm::vec2(0, 0), glm::vec3(10, -20, 10), LevelModel));
 	player = new Player(glm::vec2(levelHeight / 2, levelWidth / 2), glm::vec2(0, 0), -playerHeight);

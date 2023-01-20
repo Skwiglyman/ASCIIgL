@@ -96,10 +96,7 @@ public:
 
 		for (int k = 0; k < vertices.size(); k++) 
 		{ 
-			vertices[k] = VSHADER.GLUse(vertices[k]); 
-			vertices[k].refactorPtrs(); // I have to do this for some dumb fucking reason I can't say (idk if the ptrs are messed up when I return the vertex)
-
-			
+			VSHADER.GLUse(vertices[k]); 
 		} // VERTEX TRANSFORMING
 
 		// CLIPPING
@@ -119,8 +116,7 @@ public:
 			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW) : true))
 			{
 				if (WIREFRAME == true or tex == nullptr) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
-				else { DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); 
-				}
+				else { DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); }
 			}
 		}
 	}

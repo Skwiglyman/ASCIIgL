@@ -457,7 +457,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 
 	if (dy1)
 	{
-		for (int i = y1; i <= y2; i++)
+		for (int i = y1; i <= y2 && i < SCR_HEIGHT; i++)
 		{
 			int ax = x1 + (float)(i - y1) * dax_step;
 			int bx = x1 + (float)(i - y1) * dbx_step;
@@ -485,14 +485,14 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 			float tstep = 1.0f / ((float)(bx - ax));
 			float t = 0.0f;
 
-			for (int j = ax; j < bx; j++)
+			for (int j = ax; j < bx && j < SCR_WIDTH; j++)
 			{
 				tex_u = (1.0f - t) * tex_su + t * tex_eu;
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
 				glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
-				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
+				if (tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
 				{
 					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
 
@@ -522,7 +522,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 
 	if (dy1)
 	{
-		for (int i = y2; i <= y3; i++)
+		for (int i = y2; i <= y3 && i < SCR_HEIGHT; i++)
 		{
 			int ax = x2 + (float)(i - y2) * dax_step;
 			int bx = x1 + (float)(i - y1) * dbx_step;
@@ -550,14 +550,14 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 			float tstep = 1.0f / ((float)(bx - ax));
 			float t = 0.0f;
 	
-			for (int j = ax; j < bx; j++)
+			for (int j = ax; j < bx && j < SCR_WIDTH; j++)
 			{
 				tex_u = (1.0f - t) * tex_su + t * tex_eu;
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 				
 				glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
-				if (j > 0 && j < SCR_WIDTH && i > 0 && i < SCR_HEIGHT && tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
+				if (tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
 				{
 					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
 

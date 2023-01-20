@@ -156,61 +156,6 @@ void ASCIIgLEngine::ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VE
 	Clipping(c5, clipped, 0, false);
 }
 
-CHAR ASCIIgLEngine::GetGlyph(float Grayscale)
-{
-	if (Grayscale < 0.25)
-	{
-		return PIXEL_QUARTER;
-	}
-	else if (Grayscale < 0.5)
-	{
-		return PIXEL_HALF;
-	}
-	else if (Grayscale < 0.75)
-	{
-		return PIXEL_THREEQUARTERS;
-	}
-	else
-	{
-		return PIXEL_SOLID;
-	}
-}
-
-short ASCIIgLEngine::GetColour(float Grayscale)
-{
-
-	if (Grayscale < 0.25)
-	{
-		if (Grayscale < (0 + (0.25 / 4) * 1)) { return FG_BLACK; }
-		if (Grayscale < (0 + (0.25 / 4) * 2)) { return FG_DARK_GREY; }
-		if (Grayscale < (0 + (0.25 / 4) * 3)) { return FG_GREY; }
-		if (Grayscale < (0 + (0.25 / 4) * 4)) { return FG_WHITE; }
-	}
-	else if (Grayscale < 0.5)
-	{
-		if (Grayscale < (0.25 + (0.25 / 4) * 2)) { return FG_DARK_GREY; }
-		if (Grayscale < (0.25 + (0.25 / 4) * 3)) { return FG_GREY; }
-		if (Grayscale < (0.25 + (0.25 / 4) * 4)) { return FG_WHITE; }
-	}
-	else if (Grayscale < 0.75)
-	{
-		if (Grayscale < (0.50 + (0.25 / 4) * 2)) { return FG_DARK_GREY; }
-		if (Grayscale < (0.50 + (0.25 / 4) * 3)) { return FG_GREY; }
-		if (Grayscale < (0.50 + (0.25 / 4) * 4)) { return FG_WHITE; }
-	}
-	else
-	{
-		if (Grayscale < (0.75 + (0.25 / 4) * 2)) { return FG_DARK_GREY; }
-		if (Grayscale < (0.75 + (0.25 / 4) * 3)) { return FG_GREY; }
-	}
-	return FG_WHITE;
-
-
-} //I bought this amongus opotion feom the dark web 
-	//this is the amongus potion
-// If you dsrink this amongus potion, you become... The impostor!!!
-//your so sussy, I know you too my fortinte card
-
 CHAR_INFO ASCIIgLEngine::GetColGlyph(float GreyScale)
 {
 	const CHAR_INFO vals[16]
