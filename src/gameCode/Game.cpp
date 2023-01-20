@@ -12,8 +12,6 @@ Game::Game()
 	Textures["GameInfo2"] = new Texture("res/textures/GUI/GameInfo2.png");
 	Textures["Select_Btn"] = new Texture("res/textures/GUI/PressQ.png");
 	Textures["BackInfo"] = new Texture("res/textures/GUI/BackInfo.png");
-
-	WallModel = new Model("res/models/wall/wall.obj");
 }
 
 Game::~Game()
@@ -28,7 +26,7 @@ Game::~Game()
 		delete i;
 	}
 
-	delete Instance, player, WallModel;
+	delete Instance, player, LevelModel;
 }
 
 Game* Game::GetInstance()
@@ -50,7 +48,7 @@ void Game::Run()
 
 	Screen::GetInstance()->WIREFRAME = false;
 	Screen::GetInstance()->BACKFACECULLING = true;
-	Screen::GetInstance()->CCW = true;
+	Screen::GetInstance()->CCW = false;
 	Screen::GetInstance()->BLEND = true;
 
 	while (running == true)
@@ -85,7 +83,10 @@ void Game::Run()
 
 void Game::LoadLevel(const std::string path)
 {
-	player = new Player(glm::vec2(levelHeight / 2, levelWidth / 2), glm::vec2(180, 0), -playerHeight);
+	LevelModel = new Model("res/models/level/MazeTest.mtl.obj");
+
+	gameObjs.push_back(new GameObj(glm::vec3(0, 10, 0), glm::vec2(0, 0), glm::vec3(10, -20, 10), LevelModel));
+	player = new Player(glm::vec2(levelHeight / 2, levelWidth / 2), glm::vec2(0, 0), -playerHeight);
 }
 
 void Game::RunMainMenu()
@@ -107,13 +108,11 @@ void Game::RunMainMenu()
 		if (BtnSelected != 0)
 		{
 			gameState = GAME_LORE;
-			BtnSelected = 0;
 			Sleep(100);
 		}
 		else
 		{
 			gameState = HOW_TO_PLAY;
-			BtnSelected = 0;
 			Sleep(100);
 		}
 	}
@@ -139,6 +138,7 @@ void Game::RunHowToPlay()
 		gameState = MAIN_MENU;
 		Sleep(100);
 		BtnSelected = 0;
+		
 	}
 
 	Renderer::Draw2DQuad(vertexShader, *Textures["GameInfo2"], glm::vec2(215, 120), glm::vec2(0, 0), glm::vec2(175, 100), guiCamera, 0);

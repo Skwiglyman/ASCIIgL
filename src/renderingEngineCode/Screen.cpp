@@ -150,6 +150,11 @@ void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour)
 	// also reversing the x and y else the image would be flipped (35 = ascii code for #)
 }
 
+void Screen::PlotPixel(glm::vec2 p, CHAR_INFO charCol)
+{
+	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)] = charCol;
+}
+
 void Screen::DrawBorder(short col)
 {
 	// DRAWING BORDERS
@@ -491,7 +496,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				{
 					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
 
-					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(blendedGrayScale), ASCIIgLEngine::GetColour(blendedGrayScale));
+					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
 					depthBuffer[i * SCR_WIDTH + j] = tex_w;
 				}
 
@@ -556,7 +561,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 				{
 					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
 
-					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetGlyph(blendedGrayScale), ASCIIgLEngine::GetColour(blendedGrayScale));
+					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
 					depthBuffer[i * SCR_WIDTH + j] = tex_w;
 				}
 

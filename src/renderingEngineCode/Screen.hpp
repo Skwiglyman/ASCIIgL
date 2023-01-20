@@ -80,6 +80,7 @@ public:
 	void ClearBuffer(unsigned short backgrounCol); // clears buffer
 	void OutputBuffer(); // draws to screen
 	void PlotPixel(glm::vec2 p, CHAR character, short Colour); // plotting pixel onto screen buffer
+	void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
 	void DrawBorder(short col);
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
@@ -115,7 +116,7 @@ public:
 				CLIPPED_COORDS[i + k].refactorPtrs();
 			}	
 		
-			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], true) : true))
+			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW) : true))
 			{
 				if (WIREFRAME == true or tex == nullptr) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
 				else { DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); 

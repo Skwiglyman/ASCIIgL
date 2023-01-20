@@ -55,7 +55,7 @@ private:
 	std::vector<GameObj*> gameObjs;
 	Camera2D guiCamera;
 
-	Model* WallModel;
+	Model* LevelModel;
 
 	void RunMainMenu();
 	void RunHowToPlay();
@@ -71,7 +71,7 @@ public:
 
 	static Game* GetInstance();
 
-	int playerHeight = 10;
+	int playerHeight = 7;
 	Player* player = nullptr;
 
 };

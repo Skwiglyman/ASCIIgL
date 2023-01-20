@@ -30,6 +30,7 @@ public:
 	static CHAR GetGlyph(float Grayscale);
 	static short GetColour(float Grayscale);
 	static float GrayScaleRGB(glm::vec3 rgb);
+	static CHAR_INFO GetColGlyph(float GreyScale);
 };
 
 
