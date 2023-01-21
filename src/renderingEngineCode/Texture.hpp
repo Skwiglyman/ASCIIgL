@@ -26,4 +26,5 @@ public:
 	inline int GetHeight() const { return m_Height; }
 
 	glm::vec4 GetPixelCol(glm::vec2 xy);
+	glm::vec4 GetPixelCol(int x, int y);
 };

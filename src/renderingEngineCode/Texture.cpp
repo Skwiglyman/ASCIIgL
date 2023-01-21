@@ -15,11 +15,22 @@ Texture::~Texture()
 
 glm::vec4 Texture::GetPixelCol(glm::vec2 coord)
 {
-	const stbi_uc* pixelOffset = m_LocalBuffer + (4 * (size_t(coord.y) * size_t(m_Width) + size_t(coord.x)));
-	float  r = pixelOffset[0];
-	float  g = pixelOffset[1];
-	float  b = pixelOffset[2];
-	float  a = m_BPP >= 4 ? pixelOffset[3] : 0xff;
+	const int offset = 4 * (size_t(coord.y) * size_t(m_Width) + size_t(coord.x));
+	float  r = m_LocalBuffer[offset];
+	float  g = m_LocalBuffer[offset + 1];
+	float  b = m_LocalBuffer[offset + 2];
+	float  a = m_LocalBuffer[offset + 3];
+
+	return glm::vec4(r / 255, g / 255, b / 255, a / 255);
+}
+
+glm::vec4 Texture::GetPixelCol(int x, int y)
+{
+	const int offset = 4 * (y * m_Width + x);
+	float  r = m_LocalBuffer[offset];
+	float  g = m_LocalBuffer[offset + 1];
+	float  b = m_LocalBuffer[offset + 2];
+	float  a = m_LocalBuffer[offset + 3];
 
 	return glm::vec4(r / 255, g / 255, b / 255, a / 255);
 }

@@ -99,6 +99,7 @@ public:
 			VSHADER.GLUse(vertices[k]); 
 		} // VERTEX TRANSFORMING
 
+
 		// CLIPPING
 		std::vector<VERTEX> CLIPPED_COORDS;
 		ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS);

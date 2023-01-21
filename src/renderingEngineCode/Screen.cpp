@@ -437,7 +437,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 	float du2 = u3 - u1;
 	float dw2 = w3 - w1;
 
-	float tex_u, tex_v, tex_w;
+	float tex_u, tex_v, tex_w, tex_uw, tex_vw;
 
 	float dax_step = 0, dbx_step = 0,
 		du1_step = 0, dv1_step = 0,
@@ -487,19 +487,21 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 
 			for (int j = ax; j < bx && j < SCR_WIDTH; j++)
 			{
-				tex_u = (1.0f - t) * tex_su + t * tex_eu;
-				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-				glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
-				if (tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
+				if (tex_w > depthBuffer[i * SCR_WIDTH + j])
 				{
-					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
+					tex_uw = ((1.0f - t) * tex_su + t * tex_eu) / tex_w;
+					tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
 
-					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
-					depthBuffer[i * SCR_WIDTH + j] = tex_w;
+					if (tex_uw < 1 && tex_vw < 1)
+					{
+						float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(tex_uw * tex->GetWidth(), tex_vw * tex->GetHeight()), glm::vec2(j, i)));
+
+						PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
+						depthBuffer[i * SCR_WIDTH + j] = tex_w;
+					}
 				}
-
 				t += tstep;
 			}
 
@@ -552,19 +554,21 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
 	
 			for (int j = ax; j < bx && j < SCR_WIDTH; j++)
 			{
-				tex_u = (1.0f - t) * tex_su + t * tex_eu;
-				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
-				
-				glm::vec2 texCoords = glm::vec2((tex_u / tex_w) * tex->GetWidth(), (tex_v / tex_w) * tex->GetHeight());
-				if (tex_w > depthBuffer[i * SCR_WIDTH + j] && texCoords.x < tex->GetWidth() && texCoords.y < tex->GetHeight())
+
+				if (tex_w > depthBuffer[i * SCR_WIDTH + j])
 				{
-					float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(texCoords), glm::vec2(j, i)));
+					tex_uw = ((1.0f - t) * tex_su + t * tex_eu) / tex_w;
+					tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
 
-					PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
-					depthBuffer[i * SCR_WIDTH + j] = tex_w;
+					if (tex_uw < 1 && tex_vw < 1)
+					{
+						float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(tex_uw * tex->GetWidth(), tex_vw * tex->GetHeight()), glm::vec2(j, i)));
+
+						PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
+						depthBuffer[i * SCR_WIDTH + j] = tex_w;
+					}
 				}
-
 				t += tstep;
 			}
 		}
