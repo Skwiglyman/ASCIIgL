@@ -1,7 +1,7 @@
 #include "Player.hpp"
 
-Player::Player(glm::vec2 xz, glm::vec2 yawPitch, float playerHeight)
-	: camera(glm::vec3(xz.x, playerHeight, xz.y), fov, (float)Screen::GetInstance()->SCR_WIDTH / (float)Screen::GetInstance()->SCR_HEIGHT, yawPitch, nearClip, farClip)
+Player::Player(glm::vec2 xz, glm::vec2 yawPitch)
+	: camera(glm::vec3(xz.x, -playerHeight, xz.y), fov, (float)Screen::GetInstance()->SCR_WIDTH / (float)Screen::GetInstance()->SCR_HEIGHT, yawPitch, nearClip, farClip)
 {
 
 }
@@ -38,11 +38,48 @@ glm::vec2 Player::GetViewChange()
 	return view;
 }
 
-void Player::Update(std::vector<GameObj*> obstacles)
+void Player::Update(GameObj* Level)
 {
 	glm::vec3 newPos = GetMovement();
-	camera.setCamPos(camera.pos + newPos);
+	if (CollideLevel(glm::vec3(camera.pos.x + newPos.x, camera.pos.y, camera.pos.z), Level) == false)
+	{
+		camera.setCamPos(glm::vec3(camera.pos.x + newPos.x, camera.pos.y, camera.pos.z));
+	}
+	if (CollideLevel(glm::vec3(camera.pos.x, camera.pos.y, camera.pos.z + newPos.z), Level) == false)
+	{
+		camera.setCamPos(glm::vec3(camera.pos.x, camera.pos.y, camera.pos.z + newPos.z));
+	}
 
 	glm::vec2 newDir = GetViewChange();
 	camera.setCamDir(newDir.x, newDir.y);
+}
+
+bool Player::CollideLevel(glm::vec3 move, GameObj* Level)
+{
+	glm::vec2 p1, p2, p3, p4;
+	glm::vec2 newMove = glm::vec2(move.x, move.z);
+	int levelSize = Level->size.x;
+	int levelOffset = -Level->size.x;
+	p1 = glm::vec2(levelOffset, levelOffset);
+	p2 = glm::vec2(levelOffset, levelSize);
+	p3 = glm::vec2(levelSize, levelSize);
+	p4 = glm::vec2(levelSize, levelOffset);
+
+	glm::vec3 col1 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p1, p2);
+	if (col1.x == 1)
+		return true;
+
+	glm::vec3 col2 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p2, p3);
+	if (col2.x == 1)
+		return true;
+
+	glm::vec3 col3 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p3, p4);
+	if (col3.x == 1)
+		return true;
+
+	glm::vec3 col4 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p4, p1);
+	if (col4.x == 1)
+		return true;
+
+	return false;
 }

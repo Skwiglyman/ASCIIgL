@@ -10,6 +10,7 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <math.h>
 
 class ASCIIgLEngine
 {
@@ -17,8 +18,14 @@ private:
 
 public:
 	static glm::vec3 CalcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, bool out); // calculates normals given 3 points
+	static float CalcDist2D(glm::vec2 p1, glm::vec2 p2);
+	static glm::mat4 CalcModelMatrix(glm::vec3 position, glm::vec2 rotation, glm::vec3 size);
 
-	static VERTEX LineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
+	static bool pointLineCol2D(glm::vec2 p, glm::vec2 lineStart, glm::vec2 lineEnd);
+	static glm::vec3 lineCircleCol2D(glm::vec2 c, float r, glm::vec2 lineStart, glm::vec2 lineEnd);
+	static bool pointCircle2D(glm::vec2 p, glm::vec2 c, float r);
+
+	static glm::vec3 LineMeetsPlane(glm::vec3 planeN, glm::vec3 planeP, glm::vec3 lineStart, glm::vec3 lineEnd);
 	static VERTEX HomogenousPlaneIntersect(VERTEX v1, VERTEX v2, int component, bool Near);
 
 	static void Clipping(std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, int component, bool Near);

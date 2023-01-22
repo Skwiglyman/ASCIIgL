@@ -2,17 +2,16 @@
 
 #include "..\renderingEngineCode\Screen.hpp"
 
-#include "Camera2D.hpp"
-#include "Renderer.hpp"
+#include "../gameEngineCode/Camera2D.hpp"
+#include "../gameEngineCode/Renderer.hpp"
+#include "../gameEngineCode/GameObj.hpp"
+
 #include "Player.hpp"
-#include "GameObj.hpp"
+#include "Enemies.hpp"
 
 #include <map>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <random>
+#include <Windows.h>
+#include "MMSystem.h"
 
 class Game
 {
@@ -42,8 +41,9 @@ private:
 
 	// LOADING LEVEL
 	std::string levelData = "";
-	int levelWidth = 100;
-	int levelHeight = 100;
+	int levelXSize = 300;
+	int levelZSize = 300;
+	int levelHeight = 300;
 
 	void LoadLevel(const std::string path);
 
@@ -52,7 +52,7 @@ private:
 	std::map<std::string, Texture*> Textures;
 
 	// Game Objects
-	std::vector<GameObj*> gameObjs;
+	GameObj* Level = nullptr;
 	Camera2D guiCamera;
 
 	Model* LevelModel;
@@ -71,7 +71,6 @@ public:
 
 	static Game* GetInstance();
 
-	int playerHeight = 7;
 	Player* player = nullptr;
 
 };

@@ -1,11 +1,5 @@
-#include "../renderingEngineCode/Screen.hpp"
-#include "../renderingEngineCode/VertexShader.hpp"
-#include "../renderingEngineCode/Texture.hpp"
 
-#include "Camera3D.hpp"
-#include "Camera2D.hpp"
-#include "Model.hpp"
-#include "Renderer.hpp"
+
 #include "Game.hpp"
 
 int main()

@@ -21,10 +21,10 @@
     <ClCompile Include="src\renderingEngineCode\Screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gameCode\Camera2D.cpp">
+    <ClCompile Include="src\gameEngineCode\Camera2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gameCode\Camera3D.cpp">
+    <ClCompile Include="src\gameEngineCode\Camera3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\renderingEngineCode\ASCIIgLEngine.cpp">
@@ -36,10 +36,10 @@
     <ClCompile Include="src\renderingEngineCode\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gameCode\Mesh.cpp">
+    <ClCompile Include="src\gameEngineCode\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gameCode\Model.cpp">
+    <ClCompile Include="src\gameEngineCode\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gameCode\Game.cpp">
@@ -48,7 +48,7 @@
     <ClCompile Include="src\gameCode\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gameCode\GameObj.cpp">
+    <ClCompile Include="src\gameEngineCode\GameObj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,10 +56,10 @@
     <ClInclude Include="src\renderingEngineCode\Screen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gameCode\Camera2D.hpp">
+    <ClInclude Include="src\gameEngineCode\Camera2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gameCode\Camera3D.hpp">
+    <ClInclude Include="src\gameEngineCode\Camera3D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderingEngineCode\VertexShader.hpp">
@@ -77,13 +77,13 @@
     <ClInclude Include="src\renderingEngineCode\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gameCode\Mesh.hpp">
+    <ClInclude Include="src\gameEngineCode\Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gameCode\Model.hpp">
+    <ClInclude Include="src\gameEngineCode\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gameCode\Renderer.hpp">
+    <ClInclude Include="src\gameEngineCode\Renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\gameCode\Game.hpp">
@@ -92,7 +92,10 @@
     <ClInclude Include="src\gameCode\Player.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gameCode\GameObj.hpp">
+    <ClInclude Include="src\gameEngineCode\GameObj.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameCode\Enemies.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

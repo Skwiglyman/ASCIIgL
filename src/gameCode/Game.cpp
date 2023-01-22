@@ -21,12 +21,7 @@ Game::~Game()
 		delete val;
 	}
 
-	for (auto& i : gameObjs)
-	{
-		delete i;
-	}
-
-	delete Instance, player, LevelModel;
+	delete Instance, player, LevelModel, Level;
 }
 
 Game* Game::GetInstance()
@@ -83,10 +78,9 @@ void Game::Run()
 
 void Game::LoadLevel(const std::string path)
 {
-	LevelModel = new Model("res/models/level/MazeTest.obj");
-
-	gameObjs.push_back(new GameObj(glm::vec3(0, 10, 0), glm::vec2(0, 0), glm::vec3(10, -20, 10), LevelModel));
-	player = new Player(glm::vec2(levelHeight / 2, levelWidth / 2), glm::vec2(0, 0), -playerHeight);
+	LevelModel = new Model("res/models/level2/MazeTest.obj");
+	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
+	player = new Player(glm::vec2(0, 0), glm::vec2(0, 0));
 }
 
 void Game::RunMainMenu()
@@ -153,14 +147,12 @@ void Game::RunLore()
 	Sleep(100);
 	gameState = MAZE;
 	LoadLevel("res/levels/TestMaze.txt");
+	PlaySound(TEXT("C:\\Users\\Skwig\\OneDrive\\Desktop\\Programs\\C_Programs\\3d_Ascii_Games\\ASCIIgL\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_LOOP);
 }
 
 void Game::RunMaze()
 {
-	player->Update(gameObjs);
+	player->Update(Level);
 
-	for (int i = 0; i < gameObjs.size(); i++)
-	{
-		Renderer::DrawModel(vertexShader,*gameObjs[i]->model, gameObjs[i]->position, gameObjs[i]->rotation, gameObjs[i]->size, player->camera);
-	}
+	Renderer::DrawModel(vertexShader,*Level->model, Level->position, Level->rotation, Level->size, player->camera);
 }
