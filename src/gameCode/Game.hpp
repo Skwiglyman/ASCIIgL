@@ -60,6 +60,7 @@ private:
 	Model* LevelModel;
 	Model* MariahModel;
 	Model* PresentModel;
+	Model* Mariah2Model;
 
 	void RunMainMenu();
 	void RunHowToPlay();
@@ -67,6 +68,8 @@ private:
 	void RunMaze();
 	void RunLost();
 	void RunWin();
+
+	void initLevel();
 
 	void MariahAI();
 

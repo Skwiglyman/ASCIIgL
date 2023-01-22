@@ -101,15 +101,10 @@ void Game::LoadLevel()
 {
 	LevelModel = new Model("res/models/level2/MazeTest.obj");
 	MariahModel = new Model("res/models/mariah/mariah.obj");
+	Mariah2Model = new Model("res/models/Mariah2/mariah.obj");
 	PresentModel = new Model("res/models/Present/present.obj");
 
-	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
-	player = new Player(glm::vec2(0, 0), glm::vec2(0, 0));
-
-	float enemyHeightOffset = 20;
-	enemies.push_back(new Enemy(glm::vec3(0, -enemyHeightOffset, levelZSize / 2), glm::vec3(10, -10, 0), MariahModel));
-
-	presents.push_back(new Present(glm::vec3(levelXSize-30, -15, 0), glm::vec3(10, -10, 0), PresentModel));
+	initLevel();
 }
 
 void Game::RunMainMenu()
@@ -185,7 +180,8 @@ void Game::RunMaze()
 
 	for (int i = 0; i < enemies.size(); i++)
 	{
-		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->position.z), glm::vec3(player->GetPlayerPos().x, enemies[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
+		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->position.z), 
+			glm::vec3(player->GetPlayerPos().x, enemies[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
 		model = glm::scale(model, glm::vec3(-enemies[i]->size.x, enemies[i]->size.y, enemies[i]->size.z));
 
 		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->camera);
@@ -199,15 +195,21 @@ void Game::RunMaze()
 
 	for (int i = 0; i < presents.size(); i++)
 	{
-		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(presents[i]->position.x, presents[i]->position.y, presents[i]->position.z), glm::vec3(player->GetPlayerPos().x, presents[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
-		model = glm::scale(model, glm::vec3(-presents[i]->size.x, presents[i]->size.y, presents[i]->size.z));
-
-		Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->camera);
-
-		bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->playerHitBoxRad);
-		if (hit == true)
+		if (presents[i]->collected != true)
 		{
-			presents[i]->collected = true;
+			glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(presents[i]->position.x, presents[i]->position.y, presents[i]->position.z), 
+				glm::vec3(player->GetPlayerPos().x, presents[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
+			model = glm::scale(model, glm::vec3(-presents[i]->size.x, presents[i]->size.y, presents[i]->size.z));
+
+			Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->camera);
+
+			bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->playerHitBoxRad);
+			if (hit == true)
+			{
+				presents[i]->collected = true;
+
+				enemies.push_back(new Enemy(glm::vec3(0, -20, 0), glm::vec3(10, -10, 0), Mariah2Model));
+			}
 		}
 	}
 
@@ -249,23 +251,55 @@ void Game::RunLost()
 	if (GetKeyState('R') & 0x8000)
 	{
 		gameState = MAZE;
-		player->camera.setCamPos(glm::vec3(0, -player->playerHeight, 0));
+		
+		delete player, Level;
+
 		for (int i = 0; i < enemies.size(); i++)
 		{
-			enemies[i]->position = glm::vec3(0, -10, levelZSize / 2);
+			delete enemies[i];
 		}
+
+		for (int i = 0; i < presents.size(); i++)
+		{
+			delete presents[i];
+		}
+
+		presents.clear();
+		enemies.clear();
 		
+		initLevel();
+
 		Sleep(100);
 	}
 }
 
 void Game::MariahAI()
 {
-	float mariahSpeedFactor = 0.7f;
+	float chaseSpeed = 0.9f;
+	float patrolSpeed = 3.0f;
 	for (int i = 0; i < enemies.size(); i++)
 	{
-		glm::vec3 move = glm::normalize(player->GetPlayerPos() - enemies[i]->position) * Screen::GetInstance()->GetDeltaTime() * mariahSpeedFactor;
-		enemies[i]->position += glm::vec3(move.x, 0, move.z);
+		if (enemies[i]->aiState == Enemy::CHASE)
+		{
+			glm::vec3 move = glm::normalize(player->GetPlayerPos() - enemies[i]->position) * Screen::GetInstance()->GetDeltaTime() * chaseSpeed;
+			enemies[i]->position += glm::vec3(move.x, 0, move.z);
+		}
+
+		if (enemies[i]->aiState == Enemy::PATROL)
+		{
+			glm::vec2 pos1 = glm::vec2(enemies[i]->position.x, enemies[i]->position.z);
+			glm::vec2 pos2 = glm::vec2(enemies[i]->patrolDest.x, enemies[i]->patrolDest.z);
+
+			if (ASCIIgLEngine::pointCircle2D(pos1, pos2, enemies[i]->destRadius))
+			{
+				if (enemies[i]->patrolDest == enemies[i]->patrolEnd)
+					enemies[i]->patrolDest = enemies[i]->patrolStart;
+				else
+					enemies[i]->patrolDest = enemies[i]->patrolEnd;
+			}
+			glm::vec3 move = glm::normalize(enemies[i]->patrolDest - enemies[i]->position) * Screen::GetInstance()->GetDeltaTime() * patrolSpeed;
+			enemies[i]->position += glm::vec3(move.x, 0, move.z);
+		}
 	}
 }
 
@@ -284,4 +318,48 @@ int Game::GetPresentsCollected()
 void Game::RunWin()
 {
 	Renderer::Draw2DQuad(vertexShader, *Textures["Win"], glm::vec2(225, 150), glm::vec2(0, 0), glm::vec2(200, 125), guiCamera, 0);
+}
+
+void Game::initLevel()
+{
+	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
+	player = new Player(glm::vec2(0, levelZSize / 2), glm::vec2(-90, 0));
+	
+	float wOff = 20;
+
+	glm::vec3 size = glm::vec3(10, -8, 0);
+	enemies.push_back(new Enemy(glm::vec3(0, -20, 0), size, Mariah2Model));
+
+	glm::vec3 sp1 = glm::vec3(levelXSize / 2, -20, 0);
+	enemies.push_back(new Enemy(sp1, size, MariahModel, Enemy::PATROL, sp1, glm::vec3(levelXSize / 2, -20, levelZSize - wOff)));
+	enemies.push_back(new Enemy(sp1, size, MariahModel, Enemy::PATROL, sp1, glm::vec3(levelXSize / 2, -20, -levelZSize + wOff)));
+
+	glm::vec3 sp2 = glm::vec3(levelXSize - wOff, -20, 0);
+	enemies.push_back(new Enemy(sp2, size, MariahModel, Enemy::PATROL, sp2, glm::vec3(levelXSize - wOff, -20, levelZSize - wOff)));
+	enemies.push_back(new Enemy(sp2, size, MariahModel, Enemy::PATROL, sp2, glm::vec3(levelXSize - wOff, -20, -levelZSize + wOff)));
+
+	glm::vec3 sp3 = glm::vec3(-levelXSize / 2, -20, 0);
+	enemies.push_back(new Enemy(sp3, size, MariahModel, Enemy::PATROL, sp3, glm::vec3(-levelXSize / 2, -20, levelZSize - wOff)));
+	enemies.push_back(new Enemy(sp3, size, MariahModel, Enemy::PATROL, sp3, glm::vec3(-levelXSize / 2, -20, -levelZSize + wOff)));
+																						  
+	glm::vec3 sp4 = glm::vec3(-levelXSize + wOff, -20, 0);								  
+	enemies.push_back(new Enemy(sp4, size, MariahModel, Enemy::PATROL, sp4, glm::vec3(-levelXSize + wOff, -20, levelZSize - wOff)));
+	enemies.push_back(new Enemy(sp4, size, MariahModel, Enemy::PATROL, sp4, glm::vec3(-levelXSize + wOff, -20, -levelZSize + wOff)));
+
+	glm::vec3 ep6 = glm::vec3(0, -20, levelZSize - wOff);
+	enemies.push_back(new Enemy(ep6, size, MariahModel, Enemy::PATROL, glm::vec3(levelXSize - wOff, -20, levelZSize - wOff), ep6));
+	enemies.push_back(new Enemy(ep6, size, MariahModel, Enemy::PATROL, glm::vec3(-levelXSize + wOff, -20, levelZSize - wOff), ep6));
+
+	glm::vec3 ep8 = glm::vec3(0, -20, -levelZSize + wOff);
+	enemies.push_back(new Enemy(ep8, size, MariahModel, Enemy::PATROL, glm::vec3(levelXSize - wOff, -20, -levelZSize + wOff), ep8));
+	enemies.push_back(new Enemy(ep8, size, MariahModel, Enemy::PATROL, glm::vec3(-levelXSize + wOff, -20, -levelZSize + wOff), ep8));
+
+
+	presents.push_back(new Present(glm::vec3(levelXSize - 30, -15, 0), glm::vec3(10, -10, 0), PresentModel));
+	presents.push_back(new Present(glm::vec3(levelXSize - 30, -15, levelZSize - 30), glm::vec3(10, -10, 0), PresentModel));
+	presents.push_back(new Present(glm::vec3(levelXSize - 30, -15, -levelZSize + 30), glm::vec3(10, -10, 0), PresentModel));
+
+	presents.push_back(new Present(glm::vec3(-levelXSize + 30, -15, 0), glm::vec3(10, -10, 0), PresentModel));
+	presents.push_back(new Present(glm::vec3(-levelXSize + 30, -15, levelZSize - 30), glm::vec3(10, -10, 0), PresentModel));
+	presents.push_back(new Present(glm::vec3(-levelXSize + 30, -15, -levelZSize + 30), glm::vec3(10, -10, 0), PresentModel));
 }
