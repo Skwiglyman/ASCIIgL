@@ -185,7 +185,6 @@
     <Image Include="res\textures\Crate.png" />
     <Image Include="res\models\wall\Wall.png" />
     <Image Include="res\textures\GUI\Title.png" />
-    <Image Include="res\textures\OhNo.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

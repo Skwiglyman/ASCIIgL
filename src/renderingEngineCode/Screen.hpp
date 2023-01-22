@@ -42,7 +42,6 @@ private:
 
 	inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
 	inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
-	float elapsedTime;
 
 	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
 	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
@@ -59,6 +58,8 @@ public:
 	int SCR_HEIGHT; 
 
 	std::wstring SCR_TITLE;
+	
+	static inline float elapsedTime = 0;
 
 	unsigned int fontW;
 	unsigned int fontH;
@@ -82,6 +83,8 @@ public:
 	void PlotPixel(glm::vec2 p, CHAR character, short Colour); // plotting pixel onto screen buffer
 	void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
 	void DrawBorder(short col);
+
+	float GetDeltaTime();
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done

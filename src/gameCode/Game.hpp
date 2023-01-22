@@ -40,30 +40,34 @@ private:
 	VERTEX_SHADER vertexShader;
 
 	// LOADING LEVEL
-	std::string levelData = "";
 	int levelXSize = 300;
 	int levelZSize = 300;
 	int levelHeight = 300;
 
-	void LoadLevel(const std::string path);
-
+	void LoadLevel();
 
 	// MENU TEXTURES
 	std::map<std::string, Texture*> Textures;
 
 	// Game Objects
 	GameObj* Level = nullptr;
+	Enemy* Mariah = nullptr;
+	std::vector<Enemy*> enemies;
+
 	Camera2D guiCamera;
 
 	Model* LevelModel;
+	Model* MariahModel;
 
 	void RunMainMenu();
 	void RunHowToPlay();
 	void RunLore();
 	void RunMaze();
+	void RunLost();
+
+	void MariahAI();
 
 public:
-
 	Game(const Game& obj) = delete;
 	~Game();
 

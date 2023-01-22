@@ -12,6 +12,8 @@ Game::Game()
 	Textures["GameInfo2"] = new Texture("res/textures/GUI/GameInfo2.png");
 	Textures["Select_Btn"] = new Texture("res/textures/GUI/PressQ.png");
 	Textures["BackInfo"] = new Texture("res/textures/GUI/BackInfo.png");
+	Textures["Lost"] = new Texture("res/textures/GUI/Lost.png");
+
 }
 
 Game::~Game()
@@ -20,6 +22,11 @@ Game::~Game()
 	{
 		delete val;
 	}
+
+	//for (auto i : enemies)
+	//{
+	//	delete i;
+	//}
 
 	delete Instance, player, LevelModel, Level;
 }
@@ -46,6 +53,8 @@ void Game::Run()
 	Screen::GetInstance()->CCW = false;
 	Screen::GetInstance()->BLEND = true;
 
+	PlaySound(TEXT("C:\\Users\\Skwig\\OneDrive\\Desktop\\Programs\\C_Programs\\3d_Ascii_Games\\ASCIIgL\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_LOOP);
+
 	while (running == true)
 	{
 		// starting fps timer
@@ -64,6 +73,8 @@ void Game::Run()
 			RunLore();
 		else if (gameState == MAZE)
 			RunMaze();
+		else if (gameState == CAUGHT)
+			RunLost();
 
 		// drawing
 		Screen::GetInstance()->DrawBorder(FG_WHITE);
@@ -76,11 +87,15 @@ void Game::Run()
 
 }
 
-void Game::LoadLevel(const std::string path)
+void Game::LoadLevel()
 {
 	LevelModel = new Model("res/models/level2/MazeTest.obj");
+	MariahModel = new Model("res/models/mariah/mariah.obj");
+
 	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
 	player = new Player(glm::vec2(0, 0), glm::vec2(0, 0));
+	Mariah = new Enemy(glm::vec3(0, 0, levelZSize/2), glm::vec3(10, -player->playerHeight, 10), MariahModel);
+	enemies.push_back(Mariah);
 }
 
 void Game::RunMainMenu()
@@ -146,13 +161,45 @@ void Game::RunLore()
 	Screen::GetInstance()->OutputBuffer();
 	Sleep(100);
 	gameState = MAZE;
-	LoadLevel("res/levels/TestMaze.txt");
-	PlaySound(TEXT("C:\\Users\\Skwig\\OneDrive\\Desktop\\Programs\\C_Programs\\3d_Ascii_Games\\ASCIIgL\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_LOOP);
+	LoadLevel();
 }
 
 void Game::RunMaze()
 {
 	player->Update(Level);
+	MariahAI();
+
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(enemies[i]->position.x, 0, enemies[i]->position.z), glm::vec3(player->GetPlayerPos().x, 0, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
+		model = glm::scale(model, glm::vec3(-enemies[i]->size.x, enemies[i]->size.y, enemies[i]->size.z));
+
+		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->camera);
+
+		bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->playerHitBoxRad);
+		if (hit == true)
+		{
+			gameState = CAUGHT;
+		}
+	}
 
 	Renderer::DrawModel(vertexShader,*Level->model, Level->position, Level->rotation, Level->size, player->camera);
+}
+
+void Game::RunLost()
+{
+	Renderer::Draw2DQuad(vertexShader, *Textures["Lost"], glm::vec2(225, 150), glm::vec2(0, 0), glm::vec2(200, 125), guiCamera, 0);
+
+	if (GetKeyState('R') & 0x8000)
+	{
+		gameState = MAZE;
+		player->camera.setCamPos(glm::vec3(0, -player->playerHeight, 0));
+		Mariah->position = glm::vec3(0, 0, levelZSize / 2);
+		Sleep(100);
+	}
+}
+
+void Game::MariahAI()
+{
+	Mariah->position += glm::normalize(Mariah->position.x - player->GetPlayerPos()) * Screen::GetInstance()->GetDeltaTime;
 }

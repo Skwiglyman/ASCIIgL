@@ -23,7 +23,10 @@ glm::vec3 Player::GetMovement()
 	if (GetKeyState('S') & 0x8000) { move += glm::vec3(camera.getCamBack().x,  0, camera.getCamBack().z); }
 	if (GetKeyState('A') & 0x8000) { move += glm::vec3(camera.getCamLeft().x,  0, camera.getCamLeft().z); }
 	if (GetKeyState('D') & 0x8000) { move += glm::vec3(camera.getCamRight().x, 0, camera.getCamRight().z); }
-	return move;
+
+	if (move == glm::vec3(0, 0, 0))
+		return glm::vec3(0, 0, 0);
+	return glm::normalize(move);
 }
 
 glm::vec2 Player::GetViewChange()
@@ -40,7 +43,7 @@ glm::vec2 Player::GetViewChange()
 
 void Player::Update(GameObj* Level)
 {
-	glm::vec3 newPos = GetMovement();
+	glm::vec3 newPos = GetMovement() * Screen::GetInstance()->GetDeltaTime();
 	if (CollideLevel(glm::vec3(camera.pos.x + newPos.x, camera.pos.y, camera.pos.z), Level) == false)
 	{
 		camera.setCamPos(glm::vec3(camera.pos.x + newPos.x, camera.pos.y, camera.pos.z));

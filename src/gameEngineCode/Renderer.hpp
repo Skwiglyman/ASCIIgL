@@ -59,6 +59,18 @@ public:
 		}
 	}
 
+	static const void DrawModel(VERTEX_SHADER VSHADER, Model& ModelObj, glm::mat4 model, Camera3D& camera)
+	{
+		VSHADER.GLmodel = model;
+		VSHADER.GLview = camera.view;
+		VSHADER.GLproj = camera.proj;
+
+		for (size_t i = 0; i < ModelObj.meshes.size(); i++)
+		{
+			DrawMeshForModel(VSHADER, ModelObj.meshes[i]);
+		}
+	}
+
 	static const void Draw2DQuad(VERTEX_SHADER VSHADER, Texture& tex, glm::vec2 position, glm::vec2 rotation, glm::vec2 size, Camera2D& camera, int layer)
 	{
 		glm::mat4 model = ASCIIgLEngine::CalcModelMatrix(glm::vec3(position, layer), rotation, glm::vec3(size, 0.0f));

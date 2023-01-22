@@ -66,6 +66,14 @@ void Camera3D::setCamDir(float Pyaw, float Ppitch)
 	recalculateViewMat();
 }
 
+void Camera3D::setCamDir(glm::vec3 dir)
+{
+	yaw = acos(dir.x / (-dir.y));
+	pitch = sqrt(pow(dir.x, 2) + pow(dir.y, 2)) / dir.z;
+
+	recalculateViewMat();
+}
+
 void Camera3D::recalculateViewMat()
 {
 	// sets the cameras view mat to a glm::look at matrix using the place the camera is facing as the position matrix + the direction of the camera

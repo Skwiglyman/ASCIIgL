@@ -97,9 +97,6 @@ Screen* Screen::GetInstance()
 
 void Screen::SetTitle()
 {
-	std::chrono::duration<float> elapsedTimeTemp = endTimeFps - startTimeFps;
-	elapsedTime = elapsedTimeTemp.count();
-
 	wchar_t s[256];
 	swprintf_s(s, 256, L"ASCIIGL - Console Game Engine - %s - FPS: %3.2f", SCR_TITLE.c_str(), 1.0f / (elapsedTime > 0 ? elapsedTime : 0.0001));
 	SetConsoleTitle(s);
@@ -113,6 +110,9 @@ void Screen::StartFPSClock()
 void Screen::EndFPSClock()
 {
 	endTimeFps = std::chrono::system_clock::now();
+
+	std::chrono::duration<float> elapsedTimeTemp = endTimeFps - startTimeFps;
+	elapsedTime = elapsedTimeTemp.count();
 }
 
 void Screen::ClearScreen()
@@ -162,6 +162,11 @@ void Screen::DrawBorder(short col)
 	DrawLine(SCR_WIDTH - 1, 0, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, col);
 	DrawLine(SCR_WIDTH - 1, SCR_HEIGHT - 1, 0, SCR_HEIGHT - 1, PIXEL_SOLID, col);
 	DrawLine(0, 0, 0, SCR_HEIGHT - 1, PIXEL_SOLID, col);
+}
+
+float Screen::GetDeltaTime()
+{
+	return elapsedTime*60.0f;
 }
 
 

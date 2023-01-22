@@ -35,5 +35,6 @@ public:
 
 	void setCamPos(glm::vec3 Pposition);
 	void setCamDir(float yaw, float pitch); // this sets the camera dir using angles (not vectors)
+	void setCamDir(glm::vec3 dir);
 	void recalculateViewMat(); // recalculates the view matrix using the cameras euler angles and position
 };
