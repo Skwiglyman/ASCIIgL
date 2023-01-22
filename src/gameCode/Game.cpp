@@ -13,7 +13,15 @@ Game::Game()
 	Textures["Select_Btn"] = new Texture("res/textures/GUI/PressQ.png");
 	Textures["BackInfo"] = new Texture("res/textures/GUI/BackInfo.png");
 	Textures["Lost"] = new Texture("res/textures/GUI/Lost.png");
+	Textures["Win"] = new Texture("res/textures/GUI/Win.png");
 
+	Textures["Tired"] = new Texture("res/textures/GUI/Tired.png");
+	Textures["Stamina1"] = new Texture("res/textures/GUI/Stamina1.png");
+	Textures["Stamina2"] = new Texture("res/textures/GUI/Stamina2.png");
+	Textures["Stamina3"] = new Texture("res/textures/GUI/Stamina3.png");
+	Textures["Stamina4"] = new Texture("res/textures/GUI/Stamina4.png");
+	Textures["Stamina5"] = new Texture("res/textures/GUI/Stamina5.png");
+	Textures["Stamina6"] = new Texture("res/textures/GUI/Stamina6.png");
 }
 
 Game::~Game()
@@ -23,12 +31,12 @@ Game::~Game()
 		delete val;
 	}
 
-	//for (auto i : enemies)
-	//{
-	//	delete i;
-	//}
+	for (auto i : enemies)
+	{
+		delete i;
+	}
 
-	delete Instance, player, LevelModel, Level;
+	delete Instance, player, LevelModel, Level, PresentModel, MariahModel;
 }
 
 Game* Game::GetInstance()
@@ -75,6 +83,8 @@ void Game::Run()
 			RunMaze();
 		else if (gameState == CAUGHT)
 			RunLost();
+		else if (gameState == WIN)
+			RunWin();
 
 		// drawing
 		Screen::GetInstance()->DrawBorder(FG_WHITE);
@@ -91,11 +101,15 @@ void Game::LoadLevel()
 {
 	LevelModel = new Model("res/models/level2/MazeTest.obj");
 	MariahModel = new Model("res/models/mariah/mariah.obj");
+	PresentModel = new Model("res/models/Present/present.obj");
 
 	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
 	player = new Player(glm::vec2(0, 0), glm::vec2(0, 0));
-	Mariah = new Enemy(glm::vec3(0, 0, levelZSize/2), glm::vec3(10, -player->playerHeight, 10), MariahModel);
-	enemies.push_back(Mariah);
+
+	float enemyHeightOffset = 20;
+	enemies.push_back(new Enemy(glm::vec3(0, -enemyHeightOffset, levelZSize / 2), glm::vec3(10, -10, 0), MariahModel));
+
+	presents.push_back(new Present(glm::vec3(levelXSize-30, -15, 0), glm::vec3(10, -10, 0), PresentModel));
 }
 
 void Game::RunMainMenu()
@@ -171,7 +185,7 @@ void Game::RunMaze()
 
 	for (int i = 0; i < enemies.size(); i++)
 	{
-		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(enemies[i]->position.x, 0, enemies[i]->position.z), glm::vec3(player->GetPlayerPos().x, 0, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
+		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(enemies[i]->position.x, enemies[i]->position.y, enemies[i]->position.z), glm::vec3(player->GetPlayerPos().x, enemies[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
 		model = glm::scale(model, glm::vec3(-enemies[i]->size.x, enemies[i]->size.y, enemies[i]->size.z));
 
 		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->camera);
@@ -182,6 +196,48 @@ void Game::RunMaze()
 			gameState = CAUGHT;
 		}
 	}
+
+	for (int i = 0; i < presents.size(); i++)
+	{
+		glm::mat4 model = glm::inverse(glm::lookAt(glm::vec3(presents[i]->position.x, presents[i]->position.y, presents[i]->position.z), glm::vec3(player->GetPlayerPos().x, presents[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
+		model = glm::scale(model, glm::vec3(-presents[i]->size.x, presents[i]->size.y, presents[i]->size.z));
+
+		Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->camera);
+
+		bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->playerHitBoxRad);
+		if (hit == true)
+		{
+			presents[i]->collected = true;
+		}
+	}
+
+	glm::vec2 barSize = glm::vec2(50, 20);
+	glm::vec2 barPos = glm::vec2(380, 270);
+
+	if (player->stamina > player->maxStamina * 0.99f)
+		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina6"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+	
+	else if (player->stamina > player->maxStamina * 0.83f)
+		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina5"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+	
+	else if (player->stamina > player->maxStamina * 0.66f)
+		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina4"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+	
+	else if (player->stamina > player->maxStamina * 0.5)
+		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina3"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+	
+	else if (player->stamina > player->maxStamina * 0.33f)
+		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina2"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+
+	else if (player->stamina > player->maxStamina * 0.16)
+		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina1"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+
+	else
+		Renderer::Draw2DQuad(vertexShader, *Textures["Tired"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+
+	int presentsCollected = GetPresentsCollected();
+	if (presentsCollected == presents.size() && presentsCollected != 0)
+		gameState = WIN;
 
 	Renderer::DrawModel(vertexShader,*Level->model, Level->position, Level->rotation, Level->size, player->camera);
 }
@@ -194,12 +250,38 @@ void Game::RunLost()
 	{
 		gameState = MAZE;
 		player->camera.setCamPos(glm::vec3(0, -player->playerHeight, 0));
-		Mariah->position = glm::vec3(0, 0, levelZSize / 2);
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			enemies[i]->position = glm::vec3(0, -10, levelZSize / 2);
+		}
+		
 		Sleep(100);
 	}
 }
 
 void Game::MariahAI()
 {
-	Mariah->position += glm::normalize(Mariah->position.x - player->GetPlayerPos()) * Screen::GetInstance()->GetDeltaTime;
+	float mariahSpeedFactor = 0.7f;
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		glm::vec3 move = glm::normalize(player->GetPlayerPos() - enemies[i]->position) * Screen::GetInstance()->GetDeltaTime() * mariahSpeedFactor;
+		enemies[i]->position += glm::vec3(move.x, 0, move.z);
+	}
+}
+
+int Game::GetPresentsCollected()
+{
+	int presentsCollected = 0;
+
+	for (int i = 0; i < presents.size(); i++)
+	{
+		if (presents[i]->collected == true)
+			presentsCollected += 1;
+	}
+	return presentsCollected;
+}
+
+void Game::RunWin()
+{
+	Renderer::Draw2DQuad(vertexShader, *Textures["Win"], glm::vec2(225, 150), glm::vec2(0, 0), glm::vec2(200, 125), guiCamera, 0);
 }

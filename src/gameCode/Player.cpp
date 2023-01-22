@@ -44,6 +44,8 @@ glm::vec2 Player::GetViewChange()
 void Player::Update(GameObj* Level)
 {
 	glm::vec3 newPos = GetMovement() * Screen::GetInstance()->GetDeltaTime();
+	newPos = Sprinting(newPos);
+
 	if (CollideLevel(glm::vec3(camera.pos.x + newPos.x, camera.pos.y, camera.pos.z), Level) == false)
 	{
 		camera.setCamPos(glm::vec3(camera.pos.x + newPos.x, camera.pos.y, camera.pos.z));
@@ -55,6 +57,34 @@ void Player::Update(GameObj* Level)
 
 	glm::vec2 newDir = GetViewChange();
 	camera.setCamDir(newDir.x, newDir.y);
+}
+
+glm::vec3 Player::Sprinting(glm::vec3 move)
+{
+	if (stamina < 0)
+	{
+		tired = true;
+		stamina = 0;
+	}
+
+	else if (stamina > maxStamina)
+	{
+		stamina = maxStamina;
+		tired = false;
+	}
+
+	if (!(GetKeyState(VK_SHIFT) & 0x8000) || tired == true)
+	{
+		stamina += staminaRegen;
+	}
+
+	if (GetKeyState(VK_SHIFT) & 0x8000 && stamina > 0 && tired == false)
+	{
+		move *= sprintFactor;
+		stamina -= staminaLoss;
+	}
+
+	return move;
 }
 
 bool Player::CollideLevel(glm::vec3 move, GameObj* Level)

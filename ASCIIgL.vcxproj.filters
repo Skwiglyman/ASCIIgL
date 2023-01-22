@@ -98,6 +98,9 @@
     <ClInclude Include="src\gameCode\Enemies.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\gameCode\Present.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Crate.png">

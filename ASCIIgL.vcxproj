@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="src\gameCode\Game.hpp" />
     <ClInclude Include="src\gameCode\Enemies.hpp" />
+    <ClInclude Include="src\gameCode\Present.hpp" />
     <ClInclude Include="src\gameEngineCode\GameObj.hpp" />
     <ClInclude Include="src\gameCode\Player.hpp" />
     <ClInclude Include="src\gameEngineCode\Renderer.hpp" />

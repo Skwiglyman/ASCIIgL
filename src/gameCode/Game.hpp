@@ -8,6 +8,7 @@
 
 #include "Player.hpp"
 #include "Enemies.hpp"
+#include "Present.hpp"
 
 #include <map>
 #include <Windows.h>
@@ -51,21 +52,25 @@ private:
 
 	// Game Objects
 	GameObj* Level = nullptr;
-	Enemy* Mariah = nullptr;
 	std::vector<Enemy*> enemies;
+	std::vector<Present*> presents;
 
 	Camera2D guiCamera;
 
 	Model* LevelModel;
 	Model* MariahModel;
+	Model* PresentModel;
 
 	void RunMainMenu();
 	void RunHowToPlay();
 	void RunLore();
 	void RunMaze();
 	void RunLost();
+	void RunWin();
 
 	void MariahAI();
+
+	int GetPresentsCollected();
 
 public:
 	Game(const Game& obj) = delete;
