@@ -110,7 +110,7 @@ void Game::LoadLevel()
 void Game::RunMainMenu()
 {
 	Renderer::Draw2DQuad(vertexShader, *Textures["Title"], glm::vec2(220, 80), glm::vec2(0, 0), glm::vec2(130, 50), guiCamera, 0);
-	Renderer::Draw2DQuad(vertexShader, *Textures["Select_Btn"], glm::vec2(85, 270), glm::vec2(0, 0), glm::vec2(55, 10), guiCamera, 0);
+	Renderer::Draw2DQuad(vertexShader, *Textures["Select_Btn"], glm::vec2(105, 270), glm::vec2(0, 0), glm::vec2(100, 15), guiCamera, 0);
 
 	if (GetKeyState(VK_UP) & 0x8000)
 	{
@@ -168,9 +168,11 @@ void Game::RunLore()
 {
 	Renderer::Draw2DQuad(vertexShader, *Textures["GameInfo1"], glm::vec2(225, 150), glm::vec2(0, 0), glm::vec2(200, 125), guiCamera, 0);
 	Screen::GetInstance()->OutputBuffer();
-	Sleep(100);
+	Sleep(7500);
+	Screen::GetInstance()->StartFPSClock();
 	gameState = MAZE;
 	LoadLevel();
+
 }
 
 void Game::RunMaze()
@@ -212,7 +214,7 @@ void Game::RunMaze()
 			}
 		}
 	}
-
+	
 	glm::vec2 barSize = glm::vec2(50, 20);
 	glm::vec2 barPos = glm::vec2(380, 270);
 
@@ -324,6 +326,7 @@ void Game::initLevel()
 {
 	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
 	player = new Player(glm::vec2(0, levelZSize / 2), glm::vec2(-90, 0));
+	player->stamina = player->maxStamina;
 	
 	float wOff = 20;
 
