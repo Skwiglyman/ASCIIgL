@@ -3,6 +3,8 @@
 Game::Game()
 	: guiCamera(glm::vec2(0, 0), SCR_WIDTH, SCR_HEIGHT)
 {
+
+	// don't mind me just loading in 100030423 textures for my simple gui
 	Textures["Title"] = new Texture("res/textures/GUI/Title.png");
 	Textures["Start_Sel"] = new Texture("res/textures/GUI/StartSelected.png");
 	Textures["Start_Unsel"] = new Texture("res/textures/GUI/StartUnselected.png");
@@ -15,6 +17,7 @@ Game::Game()
 	Textures["Lost"] = new Texture("res/textures/GUI/Lost.png");
 	Textures["Win"] = new Texture("res/textures/GUI/Win.png");
 
+	// stamina bar gui textures
 	Textures["Tired"] = new Texture("res/textures/GUI/Tired.png");
 	Textures["Stamina1"] = new Texture("res/textures/GUI/Stamina1.png");
 	Textures["Stamina2"] = new Texture("res/textures/GUI/Stamina2.png");
@@ -26,6 +29,7 @@ Game::Game()
 
 Game::~Game()
 {
+	// this destructor just deletes everything
 	for (auto const& [key, val] : Textures)
 	{
 		delete val;
@@ -36,11 +40,12 @@ Game::~Game()
 		delete i;
 	}
 
-	delete Instance, player, LevelModel, Level, PresentModel, MariahModel;
+	delete Instance, player, LevelModel, Level, PresentModel, MariahModel, Mariah2Model;
 }
 
 Game* Game::GetInstance()
 {
+	// just returns the instance of the game class, and if there isn't one creates one
 	if (Instance == nullptr)
 	{
 		Instance = new Game();
@@ -52,17 +57,21 @@ Game* Game::GetInstance()
 	}
 }
 
-void Game::Run()
+void Game::Run() // this is just a function that stores the main gameloop of the game, it should just be run once in theory in the main file
 {
+	// sets up the screen settings
 	Screen::GetInstance()->InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2); // 900x500 is biggest
 
+	// setting up rendering settings
 	Screen::GetInstance()->WIREFRAME = false;
 	Screen::GetInstance()->BACKFACECULLING = true;
 	Screen::GetInstance()->CCW = false;
 	Screen::GetInstance()->BLEND = true;
 
+	// playing All I Want For Chrismtas, it playes it on loop on a seperate thread (because of the SND_ASYNC flag) outside the program, so I don't have to pause the program to play it
 	PlaySound(TEXT("C:\\Users\\Skwig\\OneDrive\\Desktop\\Programs\\C_Programs\\3d_Ascii_Games\\ASCIIgL\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_LOOP);
 
+	// main gameloop
 	while (running == true)
 	{
 		// starting fps timer
@@ -277,8 +286,8 @@ void Game::RunLost()
 
 void Game::MariahAI()
 {
-	float chaseSpeed = 0.9f;
-	float patrolSpeed = 3.0f;
+	float chaseSpeed = 1.0f;
+	float patrolSpeed = 3.5f;
 	for (int i = 0; i < enemies.size(); i++)
 	{
 		if (enemies[i]->aiState == Enemy::CHASE)

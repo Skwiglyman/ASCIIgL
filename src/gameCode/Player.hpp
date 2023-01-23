@@ -1,37 +1,38 @@
 #pragma once
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
+// Game Engine Code Includes
 #include "../gameEngineCode/Camera3D.hpp"
 #include "../gameEngineCode/Mesh.hpp"
 #include "../gameEngineCode/GameObj.hpp"
 
+// Rendering Engine Code Includes
 #include "../renderingEngineCode/Screen.hpp"
 #include "../renderingEngineCode/ASCIIgLEngine.hpp"
 
-class Player
+class Player // this class represents the player, its not a singleton because I was too lazy to make it one
 {
 private:
-	static inline float nearClip = 1.0f;
-	static inline float farClip = 2000.0f;
-	static inline float fov = 80;
+	static inline float nearClip = 1.0f;   	   // honestly I just want this project over at this point this code is so bad
+	static inline float farClip = 2000.0f;	   // why am I making this static inline idk but I guess I am
+	static inline float fov = 80;			   // anyway these are just camera settings for the player
 
 public:
-	Player(glm::vec2 xz, glm::vec2 yawPitch);
+	Player(glm::vec2 xz, glm::vec2 yawPitch); // player has no y input because you cant go up or down in the game
 	~Player();
 
-	glm::vec3 GetPlayerPos();
-	glm::vec3 GetMovement();
-	glm::vec2 GetViewChange();
-	glm::vec3 Sprinting(glm::vec3 move);
+	glm::vec3 GetPlayerPos(); // just simplifies getting position
+	glm::vec3 GetMovement(); // gets input and spits out a movement vector that it wants to do
+	glm::vec2 GetViewChange(); // gets input and spits out a new direction the camera looks at
+	glm::vec3 Sprinting(glm::vec3 move); // this handles all of the sprinting logic
 
-	bool CollideLevel(glm::vec3 move, GameObj* Level);
+	bool CollideLevel(glm::vec3 move, GameObj* Level); // handles all of the collision with the outside walls of the level
 
-	void Update(GameObj* Level);
+	void Update(GameObj* Level); // just a general update method that runs everything for the player
 
+	// fps camera
 	Camera3D camera;
 
+	// stamina system
 	static inline float maxStamina = 500;
 	static inline float stamina = maxStamina;
 	static inline float staminaRegen = 2;
@@ -40,7 +41,7 @@ public:
 	static inline bool tired = false;
 	
 	static inline float playerHeight = 20;
-	static inline float playerHitBoxRad = 20.0f;
+	static inline float playerHitBoxRad = 15.0f;
 	
 
 };

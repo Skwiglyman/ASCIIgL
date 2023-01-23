@@ -91,6 +91,7 @@ public:
 	bool CCW = true; // counter clockwise vertice winding order
 	bool BLEND = false;
 
+	// rendering routine that draws triangles onto the screen
 	void RenderTriangles(VERTEX_SHADER VSHADER, std::vector<VERTEX> vertices, Texture* tex)
 	{
 		// check if there are enough vertices to make a triangle or enough vertice data (at least xyz)
