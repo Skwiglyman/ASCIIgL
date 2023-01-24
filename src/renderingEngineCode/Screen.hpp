@@ -1,8 +1,8 @@
 #pragma once
 
 // includes from downloaded libraries
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include "../vendor/glm/glm.hpp"
+#include "../vendor/glm/gtc/matrix_transform.hpp"
 
 // I don't even know what this black magic screen shit does
 #define WIN32_LEAN_AND_MEAN

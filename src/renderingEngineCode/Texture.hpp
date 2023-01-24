@@ -1,11 +1,11 @@
 #pragma once
 
-#include "stb_image/stb_image.h"
+#include "../vendor/stb_image/stb_image.h"
 
 #include <string>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include "../vendor/glm/glm.hpp"
+#include "../vendor/glm/gtc/matrix_transform.hpp"
 
 #include <iostream>
 
