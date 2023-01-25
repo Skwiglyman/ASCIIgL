@@ -2,8 +2,8 @@
 
 #include "Model.hpp"
 
-class GameObj
-{
+class GameObj // this class just represents a general game object, meant to be inherited and extended
+{ // just holds a model, and a position size and rotation
 private:
 
 public:

@@ -182,6 +182,9 @@
   <ItemGroup>
     <Image Include="res\models\wall\Wall.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="READMEPLEASE.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

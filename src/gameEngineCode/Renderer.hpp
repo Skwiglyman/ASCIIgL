@@ -1,21 +1,26 @@
 #pragma once
 
+// includes from downloaded libraries
 #include "../vendor/glm/glm.hpp"
 #include "../vendor/glm/gtc/matrix_transform.hpp"
 
+// includes from game engine code
 #include "Mesh.hpp"
 #include "Model.hpp"
 #include "Camera3D.hpp"
+#include "Camera2D.hpp"
 
+// includes from rendering code
 #include "..\renderingEngineCode\VertexShader.hpp"
 #include "..\renderingEngineCode\Screen.hpp"
 
 
-class Renderer
+class Renderer // this class ust holds all the methods for easy renderings 
 {
 private:
 
 public:
+	// draws mesh specifically for model
 	static const void DrawMeshForModel(VERTEX_SHADER VSHADER, Mesh* mesh)
 	{
 		for (int i = 0; i < mesh->textures.size(); i++)
@@ -27,6 +32,7 @@ public:
 		}
 	}
 
+	// draws mesh on its own without a model
 	static const void DrawMesh(VERTEX_SHADER VSHADER, Mesh* mesh, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera)
 	{
 		glm::mat4 model = ASCIIgLEngine::CalcModelMatrix(position, rotation, size);
@@ -45,6 +51,7 @@ public:
 		}
 	}
 
+	// draws model given transformations and the camera
 	static const void DrawModel(VERTEX_SHADER VSHADER, Model& ModelObj, glm::vec3 position, glm::vec2 rotation, glm::vec3 size, Camera3D& camera)
 	{
 		glm::mat4 model = ASCIIgLEngine::CalcModelMatrix(position, rotation, size);
@@ -59,6 +66,7 @@ public:
 		}
 	}
 
+	// draws model given a 3d camera and model matrix
 	static const void DrawModel(VERTEX_SHADER VSHADER, Model& ModelObj, glm::mat4 model, Camera3D& camera)
 	{
 		VSHADER.GLmodel = model;
@@ -71,6 +79,8 @@ public:
 		}
 	}
 
+
+	// this function just draws a texture as a 2d gui element, layer dos not work right now
 	static const void Draw2DQuad(VERTEX_SHADER VSHADER, Texture& tex, glm::vec2 position, glm::vec2 rotation, glm::vec2 size, Camera2D& camera, int layer)
 	{
 		glm::mat4 model = ASCIIgLEngine::CalcModelMatrix(glm::vec3(position, layer), rotation, glm::vec3(size, 0.0f));

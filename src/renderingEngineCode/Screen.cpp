@@ -72,17 +72,17 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
 	return NOERROR;
 }
 
-Screen::Screen()
+Screen::Screen() // setting up singleton class, default constructor is needed
 {
 
 }
 
-Screen::~Screen()
+Screen::~Screen() // this deletes stuff I allocated on the heap
 {
 	delete Instance, pixelBuffer, colourBuffer, depthBuffer;
 }
 
-Screen* Screen::GetInstance()
+Screen* Screen::GetInstance() // singleton class functionality, gets pointer to itself guaranteeing only one can exist
 {
 	if (Instance == nullptr)
 	{
@@ -97,6 +97,7 @@ Screen* Screen::GetInstance()
 
 void Screen::SetTitle()
 {
+	// sets the title and calculates the fps
 	wchar_t s[256];
 	swprintf_s(s, 256, L"ASCIIGL - Console Game Engine - %s - FPS: %3.2f", SCR_TITLE.c_str(), 1.0f / (elapsedTime > 0 ? elapsedTime : 0.0001));
 	SetConsoleTitle(s);
@@ -104,11 +105,13 @@ void Screen::SetTitle()
 
 void Screen::StartFPSClock()
 {
+	// starts fps counter
 	startTimeFps = std::chrono::system_clock::now();
 }
 
 void Screen::EndFPSClock()
 {
+	// gets the elapsed time and ends fps counter
 	endTimeFps = std::chrono::system_clock::now();
 
 	std::chrono::duration<float> elapsedTimeTemp = endTimeFps - startTimeFps;
@@ -152,7 +155,7 @@ void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour)
 
 void Screen::PlotPixel(glm::vec2 p, CHAR_INFO charCol)
 {
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)] = charCol;
+	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)] = charCol; // plots pixel using a char_info instead of individual attributes
 }
 
 void Screen::DrawBorder(short col)
@@ -166,12 +169,15 @@ void Screen::DrawBorder(short col)
 
 float Screen::GetDeltaTime()
 {
+	// this function just returns the elapsed time * the desired fps of my program
 	return elapsedTime*60.0f;
 }
 
 
 void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col)
 {
+	// Got this algorithm from Code-It-Yourself! 3D Graphics Engine tutorial series by javidx9 on youtube
+
 	int dx, dy, i, e;
 	int incx, incy, inc1, inc2;
 	int x, y;
@@ -247,155 +253,10 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 	// Shade Characters is #x/- in order of luminescence
 }
 
-void Screen::DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col)
-{
-	int x1 = *v1.x;
-	int y1 = *v1.y;
-
-	int x2 = *v2.x;
-	int y2 = *v2.y;
-
-	int x3 = *v3.x;
-	int y3 = *v3.y;
-
-	auto SWAP = [](int& x, int& y) { int t = x; x = y; y = t; };
-	auto drawline = [&](int sx, int ex, int ny) { for (int i = sx; i <= ex; i++) PlotPixel(glm::vec2(i, ny), pixel_type, col); };
-
-	int t1x, t2x, y, minx, maxx, t1xp, t2xp;
-	bool changed1 = false;
-	bool changed2 = false;
-	int signx1, signx2, dx1, dy1, dx2, dy2;
-	int e1, e2;
-	// Sort vertices
-	if (y1 > y2) { SWAP(y1, y2); SWAP(x1, x2); }
-	if (y1 > y3) { SWAP(y1, y3); SWAP(x1, x3); }
-	if (y2 > y3) { SWAP(y2, y3); SWAP(x2, x3); }
-
-	t1x = t2x = x1; y = y1;   // Starting points
-	dx1 = (int)(x2 - x1); if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
-	else signx1 = 1;
-	dy1 = (int)(y2 - y1);
-
-	dx2 = (int)(x3 - x1); if (dx2 < 0) { dx2 = -dx2; signx2 = -1; }
-	else signx2 = 1;
-	dy2 = (int)(y3 - y1);
-
-	if (dy1 > dx1) {   // swap values
-		SWAP(dx1, dy1);
-		changed1 = true;
-	}
-	if (dy2 > dx2) {   // swap values
-		SWAP(dy2, dx2);
-		changed2 = true;
-	}
-
-	e2 = (int)(dx2 >> 1);
-	// Flat top, just process the second half
-	if (y1 == y2) goto next;
-	e1 = (int)(dx1 >> 1);
-
-	for (int i = 0; i < dx1;) {
-		t1xp = 0; t2xp = 0;
-		if (t1x < t2x) { minx = t1x; maxx = t2x; }
-		else { minx = t2x; maxx = t1x; }
-		// process first line until y value is about to change
-		while (i < dx1) {
-			i++;
-			e1 += dy1;
-			while (e1 >= dx1) {
-				e1 -= dx1;
-				if (changed1) t1xp = signx1;//t1x += signx1;
-				else          goto next1;
-			}
-			if (changed1) break;
-			else t1x += signx1;
-		}
-		// Move line
-	next1:
-		// process second line until y value is about to change
-		while (1) {
-			e2 += dy2;
-			while (e2 >= dx2) {
-				e2 -= dx2;
-				if (changed2) t2xp = signx2;//t2x += signx2;
-				else          goto next2;
-			}
-			if (changed2)     break;
-			else              t2x += signx2;
-		}
-	next2:
-		if (minx > t1x) minx = t1x; if (minx > t2x) minx = t2x;
-		if (maxx < t1x) maxx = t1x; if (maxx < t2x) maxx = t2x;
-		drawline(minx, maxx, y);    // Draw line from min to max points found on the y
-									 // Now increase y
-		if (!changed1) t1x += signx1;
-		t1x += t1xp;
-		if (!changed2) t2x += signx2;
-		t2x += t2xp;
-		y += 1;
-		if (y == y2) break;
-
-	}
-next:
-	// Second half
-	dx1 = (int)(x3 - x2); if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
-	else signx1 = 1;
-	dy1 = (int)(y3 - y2);
-	t1x = x2;
-
-	if (dy1 > dx1) {   // swap values
-		SWAP(dy1, dx1);
-		changed1 = true;
-	}
-	else changed1 = false;
-
-	e1 = (int)(dx1 >> 1);
-
-	for (int i = 0; i <= dx1; i++) {
-		t1xp = 0; t2xp = 0;
-		if (t1x < t2x) { minx = t1x; maxx = t2x; }
-		else { minx = t2x; maxx = t1x; }
-		// process first line until y value is about to change
-		while (i < dx1) {
-			e1 += dy1;
-			while (e1 >= dx1) {
-				e1 -= dx1;
-				if (changed1) { t1xp = signx1; break; }//t1x += signx1;
-				else          goto next3;
-			}
-			if (changed1) break;
-			else   	   	  t1x += signx1;
-			if (i < dx1) i++;
-		}
-	next3:
-		// process second line until y value is about to change
-		while (t2x != x3) {
-			e2 += dy2;
-			while (e2 >= dx2) {
-				e2 -= dx2;
-				if (changed2) t2xp = signx2;
-				else          goto next4;
-			}
-			if (changed2)     break;
-			else              t2x += signx2;
-		}
-	next4:
-
-		if (minx > t1x) minx = t1x; if (minx > t2x) minx = t2x;
-		if (maxx < t1x) maxx = t1x; if (maxx < t2x) maxx = t2x;
-		drawline(minx, maxx, y);
-		if (!changed1) t1x += signx1;
-		t1x += t1xp;
-		if (!changed2) t2x += signx2;
-		t2x += t2xp;
-		y += 1;
-		if (y > y3) return;
-	}
-	// Shade Characters is #x/- in order of luminescence
-}
-
 void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex)
 {
+	// Got this algorithm from Code-It-Yourself! 3D Graphics Engine tutorial series by javidx9 on youtube
+
 	int x1 = *vert1.x; int x2 = *vert2.x; int x3 = *vert3.x;
 	int y1 = *vert1.y; int y2 = *vert2.y; int y3 = *vert3.y;
 	int z1 = *vert1.z; int z2 = *vert2.z; int z3 = *vert3.z;
@@ -590,6 +451,7 @@ void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_t
 
 VERTEX Screen::ViewPortTransform(VERTEX vertice)
 {
+	// transforms vertice from [-1 to 1] to [0 to scr_dim]
 	VERTEX newVert = vertice;
 	glm::vec4 newPos = glm::vec4(((*vertice.x + 1.0f) / 2.0f) * SCR_WIDTH, ((*vertice.y + 1.0f) / 2.0f) * SCR_HEIGHT, *vertice.z, *vertice.w);
 	newVert.SetXYZW(newPos);
@@ -599,6 +461,7 @@ VERTEX Screen::ViewPortTransform(VERTEX vertice)
 
 glm::vec3 Screen::BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos)
 {
+	// blends the input colour and the destination colour in the colour buffer by their alpha values
 	if (BLEND == false)
 		return inRGB;
 

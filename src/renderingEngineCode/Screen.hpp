@@ -23,12 +23,13 @@
 #include "ASCIIgLEngine.hpp"	
 #include "Texture.hpp"
 
+// defining error codes for screen initialization
 #define NOERROR 1
 #define WIN_WIDTH_TOO_BIG 2
 #define WIN_HEIGHT_TOO_BIG 3
 
 
-class Screen
+class Screen // this class will represent the window itself, in retrospect it has many things it shouldn't have, but thats okay, its also a singleton
 {
 private:
 	HANDLE hOutput = (HANDLE)GetStdHandle(STD_OUTPUT_HANDLE); // handle thing (I got no idea what this is)
@@ -36,16 +37,17 @@ private:
 	COORD dwBufferSize; // size of buffer
 	COORD dwBufferCoord; // starting coord of buffer
 	SMALL_RECT rcRegion; // rectangle of coords of buffer { 0, 0, width - 1, height - 1 }
-
+	
+	// setting up singleton class functionality by removing constructor
 	Screen();
 	static inline Screen* Instance = nullptr;
 
+	// initializing the fps clock
 	inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
 	inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
 
 	void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
 	void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
-	void DrawTriangleFill(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
 	void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
 	
 public:
@@ -57,22 +59,28 @@ public:
 	int SCR_WIDTH;
 	int SCR_HEIGHT; 
 
+	// holds the title of the window itself
 	std::wstring SCR_TITLE;
 	
-	static inline float elapsedTime = 0;
+	static inline float elapsedTime = 0; // holds elapsed time used for calculating delta time and fps
 
+	// holds font width and height
 	unsigned int fontW;
 	unsigned int fontH;
 
+	// setting up singleton class functionality
 	static Screen* GetInstance();
 	int InitializeScreen(unsigned int width, unsigned int height, const std::wstring title, unsigned int fontX, unsigned int fontY);
 
+	// deleting the copy constructor for singleton class
 	Screen(const Screen& obj) = delete;
 	~Screen();
 
+	// transforms vertice from [-1, 1] to [0 - scr_dim]
 	VERTEX ViewPortTransform(VERTEX vertice); // changes clip space to screen space coords
-	glm::vec3 BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos);
+	glm::vec3 BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos); // blends colour based on their alpha value
 
+	// these functions control fps and the setting of the title, the order they need to be called in is start, end, set title
 	void SetTitle();
 	void StartFPSClock();
 	void EndFPSClock();
@@ -82,9 +90,9 @@ public:
 	void OutputBuffer(); // draws to screen
 	void PlotPixel(glm::vec2 p, CHAR character, short Colour); // plotting pixel onto screen buffer
 	void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
-	void DrawBorder(short col);
+	void DrawBorder(short col); // shortcut function that draws a border onto the screen of 1 tile width
 
-	float GetDeltaTime();
+	float GetDeltaTime(); // returns the elapsed time x desired fps (idk if this is a good system I literally made it up in a minute...)
 
 	bool WIREFRAME = true; // flag that determines whether triangles are drawn normally or using wireframe
 	bool BACKFACECULLING = true; // flag that determines whether backface culling is done
@@ -107,7 +115,6 @@ public:
 		// CLIPPING
 		std::vector<VERTEX> CLIPPED_COORDS;
 		ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS);
-
 		for (int i = 0; i < CLIPPED_COORDS.size(); i += 3)
 		{
 			for (int k = 0; k < 3; k++)
@@ -117,9 +124,10 @@ public:
 				CLIPPED_COORDS[i + k] = ViewPortTransform(CLIPPED_COORDS[i + k]);
 				CLIPPED_COORDS[i + k].refactorPtrs();
 			}	
-		
+			// BACKCULLING
 			if ((BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW) : true))
 			{
+				// DRAWING
 				if (WIREFRAME == true or tex == nullptr) { DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE); }
 				else { DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex); }
 			}

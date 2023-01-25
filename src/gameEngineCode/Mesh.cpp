@@ -10,6 +10,7 @@ Mesh::~Mesh()
 {
     for (size_t i = 0; i < textures.size(); i++)
     {
-        delete textures[i];
+        delete textures[i]; // deleting heap memory
     }
+    textures.clear();
 }
