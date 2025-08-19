@@ -1,28 +1,8 @@
 # Build folders
 build/
-bin/
-*.obj
-*.lib
-*.dll
-*.exe
 
 #libraries
 libs/assimp/
 
-# Visual Studio files
-*.vcxproj*
-*.sln
-*.user
-*.opensdf
-*.sdf
-*.ipch
-*.log
-
 # OS/Editor files
-.DS_Store
-Thumbs.db
 .vscode/
-*.swp
-
-# Other
-logs/
