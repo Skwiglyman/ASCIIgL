@@ -29,6 +29,6 @@ public:
 	inline int GetHeight() const { return m_Height; }
 
 	// returns an rgba between 0 and 1
-	glm::vec4 GetPixelCol(glm::vec2 xy);
-	glm::vec4 GetPixelCol(int x, int y);
+	glm::vec3 GetPixelCol(glm::vec2 xy);
+	glm::vec3 GetPixelCol(int x, int y);
 };

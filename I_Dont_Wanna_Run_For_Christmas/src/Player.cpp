@@ -1,5 +1,12 @@
 #include "Player.hpp"
 
+#include <engine/Camera3D.hpp>
+#include <engine/Mesh.hpp>
+#include <engine/GameObj.hpp>
+
+#include <renderer/Screen.hpp>
+#include <renderer/ASCIIgLEngine.hpp>
+
 
 Player::Player(glm::vec2 xz, glm::vec2 yawPitch)
 	: camera(glm::vec3(xz.x, -playerHeight, xz.y), fov, (float)Screen::GetInstance()->SCR_WIDTH / (float)Screen::GetInstance()->SCR_HEIGHT, yawPitch, nearClip, farClip)
@@ -12,13 +19,11 @@ Player::~Player()
 	//honestly this is probably causing a memory leak at this point
 }
 
-glm::vec3 Player::GetPlayerPos()
-{
-	return camera.pos;
+glm::vec3 Player::GetPlayerPos() { 
+	return camera.pos; 
 }
 
-glm::vec3 Player::GetMovement()
-{
+glm::vec3 Player::GetMoveVector() {
 	glm::vec3 move(0, 0, 0);
 	if (GetKeyState('W') & 0x8000) { move += glm::vec3(camera.getCamFront().x, 0, camera.getCamFront().z); }
 	if (GetKeyState('S') & 0x8000) { move += glm::vec3(camera.getCamBack().x,  0, camera.getCamBack().z); }
@@ -29,9 +34,7 @@ glm::vec3 Player::GetMovement()
 		return glm::vec3(0, 0, 0);
 	return glm::normalize(move);
 }
-
-glm::vec2 Player::GetViewChange() // it is a tradgedy that I couldn't get this to work with mouse inputs
-{
+glm::vec2 Player::GetViewChange() {
 	glm::vec2 view(camera.yaw, camera.pitch);
 	float turnRate = 5;
 
@@ -42,9 +45,21 @@ glm::vec2 Player::GetViewChange() // it is a tradgedy that I couldn't get this t
 	return view;
 }
 
-void Player::Update(GameObj* Level)
-{
-	glm::vec3 newPos = GetMovement() * Screen::GetInstance()->GetDeltaTime(); // the deltatime ensures that you are going at the same speed at any FPS
+Camera3D& Player::GetCamera() {
+	return camera;
+}
+
+float Player::GetPlayerHitBoxRad() {
+	return playerHitBoxRad;
+}
+
+unsigned int Player::GetStaminaChunk(unsigned int numChunks, int leeway) {
+	const float chunking = maxStamina / numChunks;
+	return (unsigned int)(stamina / chunking) + leeway;
+}
+
+void Player::Update(GameObj* Level) {
+	glm::vec3 newPos = GetMoveVector() * Screen::GetInstance()->GetDeltaTime() * walkingSpeed;
 	newPos = Sprinting(newPos);
 
 	// checks if you are colliding om the x axis first, then the z axis
@@ -62,8 +77,7 @@ void Player::Update(GameObj* Level)
 	camera.setCamDir(newDir.x, newDir.y);
 }
 
-glm::vec3 Player::Sprinting(glm::vec3 move)
-{
+glm::vec3 Player::Sprinting(glm::vec3 move) {
 	// basically the stamina system is simple
 	// you start with a certain amount, you lose faster than you regen when sprinting
 	// and if you run out fully, you can't sprint again until its full
@@ -98,8 +112,7 @@ glm::vec3 Player::Sprinting(glm::vec3 move)
 	return move;
 }
 
-bool Player::CollideLevel(glm::vec3 move, GameObj* Level) // this method checks collision on the player and the walls of the level
-{
+bool Player::CollideLevel(glm::vec3 move, GameObj* Level) {
 	glm::vec2 p1, p2, p3, p4;
 	glm::vec2 newMove = glm::vec2(move.x, move.z);
 	int levelSize = Level->size.x;
@@ -129,4 +142,9 @@ bool Player::CollideLevel(glm::vec3 move, GameObj* Level) // this method checks 
 		return true;
 
 	return false;
+}
+
+void Player::ResetStamina() {
+	stamina = maxStamina;
+	tired = false;
 }

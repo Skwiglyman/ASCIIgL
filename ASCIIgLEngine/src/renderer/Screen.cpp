@@ -1,4 +1,9 @@
+#include <thread>
+#include <chrono>
+#include <algorithm>
+
 #include "Screen.hpp"
+
 #include <engine/Logger.hpp>
 
 int Screen::InitializeScreen(unsigned int width, unsigned int height, const std::wstring title, unsigned int fontX, unsigned int fontY)
@@ -71,7 +76,7 @@ int Screen::InitializeScreen(unsigned int width, unsigned int height, const std:
     std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
 
     Logger::Debug(L"[DEBUG] Setting console title.");
-    SetTitle();
+    SetTitle(true);
 
     Logger::Debug(L"[DEBUG] Screen initialization complete.");
     return NOERROR;
@@ -100,38 +105,33 @@ Screen* Screen::GetInstance() // singleton class functionality, gets pointer to 
 	}
 }
 
-void Screen::SetTitle()
-{
-	// sets the title and calculates the fps
-	char s[256];
-	sprintf_s(s, 256, "ASCIIGL - Console Game Engine - %ls - FPS: %3.2f", SCR_TITLE.c_str(), 1.0f / (elapsedTime > 0 ? elapsedTime : 0.0001));
-	SetConsoleTitleA(s);
-}
+void Screen::SetTitle(bool showFps) {
+    char titleBuffer[256];
 
-void Screen::StartFPSClock()
-{
-	// starts fps counter
-	startTimeFps = std::chrono::system_clock::now();
-}
+    if (showFps) {
+        sprintf_s(
+            titleBuffer, sizeof(titleBuffer),
+            "ASCIIGL - Console Game Engine - %ls - FPS: %.2f",
+            SCR_TITLE.c_str(), std::min(fps, static_cast<double>(frameCap))
+        );
+    } else {
+        sprintf_s(
+            titleBuffer, sizeof(titleBuffer),
+            "ASCIIGL - Console Game Engine - %ls",
+            SCR_TITLE.c_str()
+        );
+    }
 
-void Screen::EndFPSClock()
-{
-	// gets the elapsed time and ends fps counter
-	endTimeFps = std::chrono::system_clock::now();
-
-	std::chrono::duration<float> elapsedTimeTemp = endTimeFps - startTimeFps;
-	elapsedTime = elapsedTimeTemp.count();
+    SetConsoleTitleA(titleBuffer);
 }
 
 void Screen::ClearScreen()
 {
-	// I think this function scrolls the console past the outputted text and sort of pseudo clears the console (I just ctrl c ctrl v off cus fuck learning windows api)
-
 	COORD cursorPosition;
 	cursorPosition.X = 0;
 	cursorPosition.Y = 0;
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
-	// uses native WIN API commands to clear it
+	// uses native WIN API commands to scroll clear it
 }
 
 void Screen::ClearBuffer(unsigned short backgrounCol)
@@ -174,8 +174,7 @@ void Screen::DrawBorder(short col)
 
 float Screen::GetDeltaTime()
 {
-	// this function just returns the elapsed time * the desired fps of my program
-	return elapsedTime*60.0f;
+	return deltaTime;
 }
 
 
@@ -258,17 +257,16 @@ void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col
 	// Shade Characters is #x/- in order of luminescence
 }
 
-void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex)
-{
-    Logger::Debug("[DEBUG] DrawTriangleTextured called.");
-    Logger::Debug("[DEBUG] Vertices: "
-        + std::to_string(*vert1.x) + "," + std::to_string(*vert1.y) + " | "
-        + std::to_string(*vert2.x) + "," + std::to_string(*vert2.y) + " | "
-        + std::to_string(*vert3.x) + "," + std::to_string(*vert3.y));
+void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col) {
+	// RENDERING LINES BETWEEN VERTICES
+	DrawLine((int) *v1.x, (int) *v1.y, (int) *v2.x, (int) *v2.y, pixel_type, col);
+	DrawLine((int) *v2.x, (int) *v2.y, (int) *v3.x, (int) *v3.y, pixel_type, col);
+	DrawLine((int) *v3.x, (int) *v3.y, (int) *v1.x, (int) *v1.y, pixel_type, col);
+}
 
+void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex) {
     int texWidth = tex->GetWidth();
     int texHeight = tex->GetHeight();
-    Logger::Debug("[DEBUG] Texture size: " + std::to_string(texWidth) + "x" + std::to_string(texHeight));
     if (texWidth == 0 || texHeight == 0)
     {
         Logger::Error("[ERROR] Invalid texture size. Width: " + std::to_string(texWidth) + ", Height: " + std::to_string(texHeight));
@@ -282,9 +280,9 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
     float v1 = *vert1.v, v2 = *vert2.v, v3 = *vert3.v;
 
     // Sort vertices by y
-    if (y2 < y1) { Logger::Debug("[DEBUG] Swapping v1 and v2 for y-order."); std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
-    if (y3 < y1) { Logger::Debug("[DEBUG] Swapping v1 and v3 for y-order."); std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
-    if (y3 < y2) { Logger::Debug("[DEBUG] Swapping v2 and v3 for y-order."); std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
+    if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
+    if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
+    if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
 
     // Precompute steps
     int dy1 = y2 - y1, dx1 = x2 - x1;
@@ -304,7 +302,6 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
     // Upper part
     if (dy1)
     {
-        Logger::Debug("[DEBUG] Drawing upper part of triangle.");
         for (int i = y1; i <= y2 && i < SCR_HEIGHT; i++)
         {
             int ax = x1 + (float)(i - y1) * dax_step;
@@ -321,13 +318,13 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
             for (int j = ax; j < bx && j < SCR_WIDTH; j++)
             {
                 float tex_w = (1.0f - t) * tex_sw + t * tex_ew;
-                if (tex_w > depthBuffer[i * SCR_WIDTH + j])
-                {
+                if (tex_w > depthBuffer[i * SCR_WIDTH + j]) {
                     float tex_uw = ((1.0f - t) * tex_su + t * tex_eu) / tex_w;
                     float tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
-                    if (tex_uw < 1 && tex_vw < 1)
-                    {
-                        float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(tex_uw * texWidth, tex_vw * texHeight), glm::vec2(j, i)));
+                    float texWidthProd = tex_uw * texWidth;
+                    float texHeightProd = tex_vw * texHeight;
+                    if (tex_uw < 1 && tex_vw < 1) {
+                        float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(tex->GetPixelCol(texWidthProd, texHeightProd));
                         PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
                         depthBuffer[i * SCR_WIDTH + j] = tex_w;
                     }
@@ -347,7 +344,6 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
     dw1_step = dy1 ? dw1 / (float)abs(dy1) : 0;
     if (dy1)
     {
-        Logger::Debug("[DEBUG] Drawing lower part of triangle.");
         for (int i = y2; i <= y3 && i < SCR_HEIGHT; i++)
         {
             int ax = x2 + (float)(i - y2) * dax_step;
@@ -370,7 +366,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
                     float tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
                     if (tex_uw < 1 && tex_vw < 1)
                     {
-                        float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(BlendRGB(tex->GetPixelCol(tex_uw * texWidth, tex_vw * texHeight), glm::vec2(j, i)));
+                        float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(tex->GetPixelCol(tex_uw * texWidth, tex_vw * texHeight));
                         PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
                         depthBuffer[i * SCR_WIDTH + j] = tex_w;
                     }
@@ -379,19 +375,63 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
             }
         }
     }
-    Logger::Debug("[DEBUG] Finished DrawTriangleTextured.");
 }
 
-void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col)
-{
-	// RENDERING LINES BETWEEN VERTICES
-	DrawLine((int) *v1.x, (int) *v1.y, (int) *v2.x, (int) *v2.y, pixel_type, col);
-	DrawLine((int) *v2.x, (int) *v2.y, (int) *v3.x, (int) *v3.y, pixel_type, col);
-	DrawLine((int) *v3.x, (int) *v3.y, (int) *v1.x, (int) *v1.y, pixel_type, col);
+void Screen::FPSSampleCalculate(double currentDeltaTime) {
+    Logger::Debug("[DEBUG] FPSSampleCalculate called. Current deltaTime: " + std::to_string(currentDeltaTime));
+    frameTimes.push_back(currentDeltaTime);
+    currDeltaSum += currentDeltaTime;
+    Logger::Debug("[DEBUG] frameTimes size after push: " + std::to_string(frameTimes.size()));
+
+    while (!frameTimes.empty() && currDeltaSum > fpsWindowSec) {
+        const double popped_front = frameTimes.front();
+        frameTimes.pop_front();
+        currDeltaSum -= popped_front;
+        Logger::Debug("[DEBUG] frameTimes popped. New size: " + std::to_string(frameTimes.size()));
+    }
+
+    double calculatedFps = frameTimes.size() * (1 / fpsWindowSec);
+    Logger::Debug("[DEBUG] Calculated FPS: " + std::to_string(calculatedFps));
+    fps = calculatedFps;
 }
 
-VERTEX Screen::ViewPortTransform(VERTEX vertice)
+void Screen::StartFPSSample()
 {
+    startTimeFps = std::chrono::system_clock::now();
+}
+
+void Screen::EndFPSSample()
+{
+    endTimeFps = std::chrono::system_clock::now();
+    std::chrono::duration<float> deltaTimeTemp = endTimeFps - startTimeFps;
+    deltaTime = deltaTimeTemp.count();
+    Logger::Debug("[DEBUG] Frame deltaTime: " + std::to_string(deltaTime));
+}
+
+void Screen::CapFPS() {
+    Logger::Debug("[DEBUG] CapFPS called. deltaTime: " + std::to_string(deltaTime) + ", frameCap: " + std::to_string(frameCap));
+    const float inverseFrameCap = (1.0f / frameCap);
+
+    if (deltaTime < inverseFrameCap) {
+        Logger::Debug("[DEBUG] Sleeping for " + std::to_string(inverseFrameCap - deltaTime) + " seconds to cap FPS.");
+        std::this_thread::sleep_for(std::chrono::duration<double>(inverseFrameCap - deltaTime));
+
+        deltaTime = inverseFrameCap; // Ensure deltaTime is at least the frame cap
+        fps = frameCap;
+    }
+}
+
+void Screen::StartFPSClock() {
+    GetInstance()->StartFPSSample();
+}
+
+void Screen::EndFPSClock() {
+    GetInstance()->EndFPSSample();
+    GetInstance()->FPSSampleCalculate(Screen::GetInstance()->GetDeltaTime());
+    GetInstance()->CapFPS();
+}
+
+VERTEX Screen::ViewPortTransform(VERTEX vertice) {
 	// transforms vertice from [-1 to 1] to [0 to scr_dim]
 	VERTEX newVert = vertice;
 	glm::vec4 newPos = glm::vec4(((*vertice.x + 1.0f) / 2.0f) * SCR_WIDTH, ((*vertice.y + 1.0f) / 2.0f) * SCR_HEIGHT, *vertice.z, *vertice.w);
@@ -400,19 +440,35 @@ VERTEX Screen::ViewPortTransform(VERTEX vertice)
 	return newVert;
 }
 
-glm::vec3 Screen::BlendRGB(glm::vec4 inRGB, glm::vec2 pixelPos)
-{
-	// blends the input colour and the destination colour in the colour buffer by their alpha values
-	if (BLEND == false)
-		return inRGB;
+void Screen::RenderTriangles(VERTEX_SHADER VSHADER, std::vector<VERTEX> vertices, Texture* tex) {
+    if (vertices.size() < 3 || vertices.size() % 3 != 0) {
+        return;
+    }
 
-	glm::vec3 destRGB = colourBuffer[int(pixelPos.y) * SCR_WIDTH + int(pixelPos.x)];
-	glm::vec3 tempRGB = glm::vec3(0, 0, 0);
-	tempRGB.x = (inRGB.x * inRGB.w) + (destRGB.x * (1 - inRGB.w));
-	tempRGB.y = (inRGB.y * inRGB.w) + (destRGB.y * (1 - inRGB.w));
-	tempRGB.z = (inRGB.z * inRGB.w) + (destRGB.z * (1 - inRGB.w));
+    for (int k = 0; k < vertices.size(); k++) 
+    { 
+        VSHADER.GLUse(vertices[k]); 
+    }
 
-	colourBuffer[int(pixelPos.y) * SCR_WIDTH + int(pixelPos.x)] = tempRGB;
-
-	return tempRGB;
+    std::vector<VERTEX> CLIPPED_COORDS;
+    ASCIIgLEngine::ClippingHelper(vertices, CLIPPED_COORDS);
+    for (int i = 0; i < CLIPPED_COORDS.size(); i += 3)
+    {
+        for (int k = 0; k < 3; k++)
+        {
+            ASCIIgLEngine::PerspectiveDivision(CLIPPED_COORDS, i + k);
+            CLIPPED_COORDS[i + k] = ViewPortTransform(CLIPPED_COORDS[i + k]);
+            CLIPPED_COORDS[i + k].refactorPtrs();
+        }
+        bool cull = (BACKFACECULLING == true ? ASCIIgLEngine::BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW) : true);
+        if (cull)
+        {
+            if (WIREFRAME == true || tex == nullptr) {
+                DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
+            }
+            else {
+                DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex);
+            }
+        }
+    }
 }

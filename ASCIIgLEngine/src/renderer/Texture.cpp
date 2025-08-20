@@ -15,26 +15,32 @@ Texture::~Texture()
 	stbi_image_free(m_LocalBuffer);
 }
 
-glm::vec4 Texture::GetPixelCol(glm::vec2 coord)
+glm::vec3 Texture::GetPixelCol(glm::vec2 coord)
 {
-	// gets the rgba value from the buffer, and returns it in a 0-1 format instead of 0-255
-	const int offset = m_BPP * (size_t(coord.y) * size_t(m_Width) + size_t(coord.x));
-	float  r = m_LocalBuffer[offset];
-	float  g = m_LocalBuffer[offset + 1];
-	float  b = m_LocalBuffer[offset + 2];
-	float  a = m_BPP >= 4 ? m_LocalBuffer[offset + 3] : 0xFF;
+    // Use integer math for offset calculation and unsigned char for pixel data
+    const size_t x = static_cast<size_t>(coord.x);
+    const size_t y = static_cast<size_t>(coord.y);
+    const size_t offset = m_BPP * (y * static_cast<size_t>(m_Width) + x);
 
-	return glm::vec4(r / 255, g / 255, b / 255, a / 255);
+    const unsigned char* buffer = reinterpret_cast<unsigned char*>(m_LocalBuffer);
+    float r = buffer[offset];
+    float g = buffer[offset + 1];
+    float b = buffer[offset + 2];
+
+    constexpr float inv255 = 1.0f / 255.0f;
+    return glm::vec3(r * inv255, g * inv255, b * inv255);
 }
 
-glm::vec4 Texture::GetPixelCol(int x, int y)
+glm::vec3 Texture::GetPixelCol(int x, int y)
 {
-	// gets the rgba value from the buffer, and returns it in a 0-1 format instead of 0-255
-	const int offset = m_BPP * (y * m_Width + x);
-	float  r = m_LocalBuffer[offset];
-	float  g = m_LocalBuffer[offset + 1];
-	float  b = m_LocalBuffer[offset + 2];
-	float  a = m_BPP >= 4 ? m_LocalBuffer[offset + 3] : 0xFF;
+    // Use integer math for offset calculation and unsigned char for pixel data
+    const size_t offset = m_BPP * (static_cast<size_t>(y) * static_cast<size_t>(m_Width) + static_cast<size_t>(x));
 
-	return glm::vec4(r / 255, g / 255, b / 255, a / 255);
+    const unsigned char* buffer = reinterpret_cast<unsigned char*>(m_LocalBuffer);
+    float r = buffer[offset];
+    float g = buffer[offset + 1];
+    float b = buffer[offset + 2];
+
+    constexpr float inv255 = 1.0f / 255.0f;
+    return glm::vec3(r * inv255, g * inv255, b * inv255);
 }

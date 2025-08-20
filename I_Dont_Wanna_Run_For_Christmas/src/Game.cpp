@@ -46,7 +46,6 @@ Game::~Game()
 
 Game* Game::GetInstance()
 {
-	// just returns the instance of the game class, and if there isn't one creates one
 	if (Instance == nullptr)
 	{
 		Instance = new Game();
@@ -67,7 +66,6 @@ void Game::Run()
     Screen::GetInstance()->WIREFRAME = false;
     Screen::GetInstance()->BACKFACECULLING = true;
     Screen::GetInstance()->CCW = false;
-    Screen::GetInstance()->BLEND = true;
 
     Logger::Info("[INFO] Playing background music.");
 	BOOL soundResult = PlaySound(TEXT(".\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
@@ -123,8 +121,8 @@ void Game::Run()
 		Logger::Debug("[DEBUG] Outputting buffer.");
         Screen::GetInstance()->OutputBuffer();
 
-        Screen::GetInstance()->EndFPSClock();
-        Screen::GetInstance()->SetTitle();
+		Screen::GetInstance()->EndFPSClock();
+        Screen::GetInstance()->SetTitle(true);
 
         Logger::Debug("[DEBUG] Frame end.");
     }
@@ -214,7 +212,6 @@ void Game::RunLore()
 	Screen::GetInstance()->StartFPSClock();
 	gameState = MAZE;
 	LoadLevel();
-
 }
 
 void Game::RunMaze()
@@ -228,9 +225,9 @@ void Game::RunMaze()
 			glm::vec3(player->GetPlayerPos().x, enemies[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
 		model = glm::scale(model, glm::vec3(-enemies[i]->size.x, enemies[i]->size.y, enemies[i]->size.z));
 
-		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->camera);
+		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->GetCamera());
 
-		bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->playerHitBoxRad);
+		bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
 		if (hit == true)
 		{
 			gameState = CAUGHT;
@@ -245,9 +242,9 @@ void Game::RunMaze()
 				glm::vec3(player->GetPlayerPos().x, presents[i]->position.y, player->GetPlayerPos().z), glm::vec3(0, 1, 0)));
 			model = glm::scale(model, glm::vec3(-presents[i]->size.x, presents[i]->size.y, presents[i]->size.z));
 
-			Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->camera);
+			Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->GetCamera());
 
-			bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->playerHitBoxRad);
+			bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
 			if (hit == true)
 			{
 				presents[i]->collected = true;
@@ -260,32 +257,36 @@ void Game::RunMaze()
 	glm::vec2 barSize = glm::vec2(50, 20);
 	glm::vec2 barPos = glm::vec2(380, 270);
 
-	if (player->stamina > player->maxStamina * 0.99f)
-		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina6"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
-	
-	else if (player->stamina > player->maxStamina * 0.83f)
-		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina5"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
-	
-	else if (player->stamina > player->maxStamina * 0.66f)
-		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina4"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
-	
-	else if (player->stamina > player->maxStamina * 0.5)
-		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina3"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
-	
-	else if (player->stamina > player->maxStamina * 0.33f)
-		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina2"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
-
-	else if (player->stamina > player->maxStamina * 0.16)
-		Renderer::Draw2DQuad(vertexShader, *Textures["Stamina1"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
-
-	else
-		Renderer::Draw2DQuad(vertexShader, *Textures["Tired"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+	unsigned int chunk = player->GetStaminaChunk(6, 0.05);
+	switch (chunk) {
+		case 6:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Stamina6"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+		case 5:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Stamina5"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+		case 4:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Stamina4"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+		case 3:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Stamina3"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+		case 2:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Stamina2"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+		case 1:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Stamina1"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+		default:
+			Renderer::Draw2DQuad(vertexShader, *Textures["Tired"], barPos, glm::vec2(0, 0), barSize, guiCamera, 0);
+			break;
+	}
 
 	int presentsCollected = GetPresentsCollected();
-	if (presentsCollected == presents.size() && presentsCollected != 0)
+	if (presentsCollected == presents.size() && presentsCollected != 0) {
 		gameState = WIN;
-
-	Renderer::DrawModel(vertexShader,*Level->model, Level->position, Level->rotation, Level->size, player->camera);
+	}
+	Renderer::DrawModel(vertexShader,*Level->model, Level->position, Level->rotation, Level->size, player->GetCamera());
 }
 
 void Game::RunLost()
@@ -319,8 +320,8 @@ void Game::RunLost()
 
 void Game::MariahAI()
 {
-	float chaseSpeed = 0.9f;
-	float patrolSpeed = 3.0;
+	float chaseSpeed = 40.0f;
+	float patrolSpeed = 80.0f;
 	for (int i = 0; i < enemies.size(); i++)
 	{
 		if (enemies[i]->aiState == Enemy::CHASE)
@@ -368,10 +369,8 @@ void Game::initLevel()
 {
 	Level = new GameObj(glm::vec3(0, 0, 0), glm::vec2(0, 0), glm::vec3(levelXSize, -levelHeight, levelZSize), LevelModel);
 	player = new Player(glm::vec2(0, levelZSize / 2), glm::vec2(-90, 0));
-	player->stamina = player->maxStamina;
 	
 	float wOff = 20;
-
 	glm::vec3 size = glm::vec3(10, -8, 0);
 	enemies.push_back(new Enemy(glm::vec3(0, -20, 0), size, Mariah2Model));
 

@@ -8,6 +8,10 @@ set(ASSIMP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/assimp")
 set(ASSIMP_INCLUDE_DIR "${ASSIMP_ROOT}/include")
 set(ASSIMP_LIB_DIR "${ASSIMP_ROOT}")
 
+# Make glm accessible as an interface target
+add_library(glm INTERFACE)
+target_include_directories(glm INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glm")
+
 # Find Assimp library
 find_library(ASSIMP_LIB NAMES assimp-vc143-mt PATHS "${ASSIMP_LIB_DIR}" REQUIRED)
 
@@ -37,8 +41,10 @@ target_include_directories(ASCIIgLEngine PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/glm
 )
+
+# Link glm as an interface target
+target_link_libraries(ASCIIgLEngine PUBLIC glm)
 
 # Add Assimp include directory
 target_include_directories(ASCIIgLEngine PUBLIC
