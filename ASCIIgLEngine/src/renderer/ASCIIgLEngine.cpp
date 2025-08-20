@@ -1,5 +1,7 @@
 #include "ASCIIgLEngine.hpp"
 
+#include <algorithm>
+
 glm::vec3 ASCIIgLEngine::CalcNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, bool out)
 {
 	// this just returns the normal of a triangle but returning the cross product of the plane
@@ -238,7 +240,7 @@ void ASCIIgLEngine::ClippingHelper(std::vector<VERTEX>& vertices, std::vector<VE
 CHAR_INFO ASCIIgLEngine::GetColGlyph(float GreyScale)
 {
 	// returns colour combination at the fastest possible speed using gray scale value
-	const CHAR_INFO vals[16]
+	static const CHAR_INFO vals[16]
 	{
 		CHAR_INFO{ PIXEL_QUARTER, FG_BLACK}, CHAR_INFO{ PIXEL_QUARTER, FG_DARK_GREY},
 		CHAR_INFO{ PIXEL_QUARTER, FG_GREY}, CHAR_INFO{ PIXEL_QUARTER, FG_WHITE},
@@ -253,12 +255,12 @@ CHAR_INFO ASCIIgLEngine::GetColGlyph(float GreyScale)
 		CHAR_INFO{ PIXEL_SOLID, FG_GREY}, CHAR_INFO{ PIXEL_SOLID, FG_WHITE},
 	};
 
-	return vals[static_cast<long>(GreyScale * 15.99f)]; // has to be 15.99 or it overflows
+	return vals[static_cast<long>(std::min(GreyScale * 15.99f, 16.0f))]; // has to be 15.99 or it overflows
 }
 
 float ASCIIgLEngine::GrayScaleRGB(glm::vec3 rgb)
 {
-	return (0.299 * rgb.x + 0.587 * rgb.y + 0.114 * rgb.z); // grayscales based on how much we see that wavelength of light instead of just averaging
+	return (0.3 * rgb.x + 0.6 * rgb.y + 0.1 * rgb.z); // grayscales based on how much we see that wavelength of light instead of just averaging
 }
 
 bool ASCIIgLEngine::BackFaceCull(VERTEX v1, VERTEX v2, VERTEX v3, bool CCW) // function that returns a negative if face is not culled

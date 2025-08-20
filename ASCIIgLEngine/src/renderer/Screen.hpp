@@ -45,7 +45,7 @@ class Screen {
 
 		inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
 		inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
-		inline static double fpsWindowSec = 0.5f;
+		inline static double fpsWindowSec = 1.0f;
 		inline static double fps = 0.0f;
 		inline static double deltaTime = 0.0f;
 		inline static double currDeltaSum = 0.0f;
@@ -92,6 +92,8 @@ class Screen {
 		void OutputBuffer();
 		void PlotPixel(glm::vec2 p, CHAR character, short Colour);
 		void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
+		void PlotPixel(int x, int y, CHAR character, short Colour);
+		void PlotPixel(int x, int y, CHAR_INFO charCol);
 		void DrawBorder(short col);
 
 		float GetDeltaTime(); 

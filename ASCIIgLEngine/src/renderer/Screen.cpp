@@ -148,23 +148,37 @@ void Screen::OutputBuffer()
 	WriteConsoleOutput(hOutput, pixelBuffer, dwBufferSize, dwBufferCoord, &rcRegion);
 }
 
-void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour)
-{
-	// this function takes in a 2d point and plots it on the pixelBuffer
-
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Char.AsciiChar = character; // setting the point in the screen buffer to a hashtag 
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)].Attributes = Colour;
-
-	// also reversing the x and y else the image would be flipped (35 = ascii code for #)
+void Screen::PlotPixel(glm::vec2 p, CHAR character, short Colour) {
+    int x = static_cast<int>(p.x);
+    int y = static_cast<int>(p.y);
+    if (x >= 0 && x < SCR_WIDTH && y >= 0 && y < SCR_HEIGHT) {
+        pixelBuffer[y * SCR_WIDTH + x].Char.AsciiChar = character;
+        pixelBuffer[y * SCR_WIDTH + x].Attributes = Colour;
+    }
 }
 
-void Screen::PlotPixel(glm::vec2 p, CHAR_INFO charCol)
-{
-	pixelBuffer[int(p.y) * SCR_WIDTH + int(p.x)] = charCol; // plots pixel using a char_info instead of individual attributes
+void Screen::PlotPixel(glm::vec2 p, CHAR_INFO charCol) {
+    int x = static_cast<int>(p.x);
+    int y = static_cast<int>(p.y);
+    if (x >= 0 && x < SCR_WIDTH && y >= 0 && y < SCR_HEIGHT) {
+        pixelBuffer[y * SCR_WIDTH + x] = charCol;
+    }
 }
 
-void Screen::DrawBorder(short col)
-{
+void Screen::PlotPixel(int x, int y, CHAR character, short Colour) {
+    if (x >= 0 && x < SCR_WIDTH && y >= 0 && y < SCR_HEIGHT) {
+        pixelBuffer[y * SCR_WIDTH + x].Char.AsciiChar = character;
+        pixelBuffer[y * SCR_WIDTH + x].Attributes = Colour;
+    }
+}
+
+void Screen::PlotPixel(int x, int y, CHAR_INFO charCol) {
+    if (x >= 0 && x < SCR_WIDTH && y >= 0 && y < SCR_HEIGHT) {
+        pixelBuffer[y * SCR_WIDTH + x] = charCol;
+    }
+}
+
+void Screen::DrawBorder(short col) {
 	// DRAWING BORDERS
 	DrawLine(1, 1, SCR_WIDTH - 1, 1, PIXEL_SOLID, col);
 	DrawLine(SCR_WIDTH - 1, 1, SCR_WIDTH - 1, SCR_HEIGHT - 1, PIXEL_SOLID, col);
@@ -172,89 +186,46 @@ void Screen::DrawBorder(short col)
 	DrawLine(1, 1, 1, SCR_HEIGHT - 1, PIXEL_SOLID, col);
 }
 
-float Screen::GetDeltaTime()
-{
+float Screen::GetDeltaTime() {
 	return deltaTime;
 }
 
 
 void Screen::DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col)
 {
-	// Got this algorithm from Code-It-Yourself! 3D Graphics Engine tutorial series by javidx9 on youtube
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
+    int incx = (x2 > x1) ? 1 : -1;
+    int incy = (y2 > y1) ? 1 : -1;
+    int x = x1, y = y1;
 
-	int dx, dy, i, e;
-	int incx, incy, inc1, inc2;
-	int x, y;
+    PlotPixel(x, y, pixel_type, col);
 
-	dx = x2 - x1;
-	dy = y2 - y1;
-
-	if (dx < 0) dx = -dx;
-	if (dy < 0) dy = -dy;
-	incx = 1;
-	if (x2 < x1)
-		incx = -1;
-	incy = 1;
-	if (y2 < y1)
-		incy = -1;
-	x = x1;
-	y = y1;
-	if (dx > dy)
-	{
-		if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
-			PlotPixel(glm::vec2(x, y), pixel_type, col);
-		e = 2 * dy - dx;
-		inc1 = 2 * (dy - dx);
-		inc2 = 2 * dy;
-		for (i = 0; i < dx; i++)
-		{
-			if (e >= 0)
-			{
-				y += incy;
-				if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
-					PlotPixel(glm::vec2(x, y), pixel_type, col);
-				e += inc1;
-				x += incx;
-			}
-			else
-			{
-				e += inc2; x += incx;
-				//points.push_back(glm::vec2(x, y - incy));
-			}
-			if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
-				PlotPixel(glm::vec2(x, y), pixel_type, col);
-		}
-	}
-	else
-	{
-		if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
-			PlotPixel(glm::vec2(x, y), pixel_type, col);
-		e = 2 * dx - dy;
-		inc1 = 2 * (dx - dy);
-		inc2 = 2 * dx;
-		for (i = 0; i < dy; i++)
-		{
-			if (e >= 0)
-			{
-				x += incx;
-				if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
-					PlotPixel(glm::vec2(x, y), pixel_type, col);
-				y += incy;
-				e += inc1;
-
-			}
-			else
-			{
-				e += inc2; y += incy;
-				//points.push_back(glm::vec2(x + incx, y));
-			}
-
-			if (x > 0 && x < SCR_WIDTH && y > 0 && y < SCR_HEIGHT)
-				PlotPixel(glm::vec2(x, y), pixel_type, col);
-		}
-	}
-
-	// Shade Characters is #x/- in order of luminescence
+    if (dx > dy) {
+        int e = 2 * dy - dx;
+        for (int i = 0; i < dx; ++i) {
+            x += incx;
+            if (e >= 0) {
+                y += incy;
+                e += 2 * (dy - dx);
+            } else {
+                e += 2 * dy;
+            }
+            PlotPixel(x, y, pixel_type, col);
+        }
+    } else {
+        int e = 2 * dx - dy;
+        for (int i = 0; i < dy; ++i) {
+            y += incy;
+            if (e >= 0) {
+                x += incx;
+                e += 2 * (dx - dy);
+            } else {
+                e += 2 * dx;
+            }
+            PlotPixel(x, y, pixel_type, col);
+        }
+    }
 }
 
 void Screen::DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col) {
@@ -324,7 +295,7 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
                     float texWidthProd = tex_uw * texWidth;
                     float texHeightProd = tex_vw * texHeight;
                     if (tex_uw < 1 && tex_vw < 1) {
-                        float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(tex->GetPixelCol(texWidthProd, texHeightProd));
+                        float blendedGrayScale = tex->GetPixelCol(texWidthProd, texHeightProd);
                         PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
                         depthBuffer[i * SCR_WIDTH + j] = tex_w;
                     }
@@ -364,9 +335,10 @@ void Screen::DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Text
                 {
                     float tex_uw = ((1.0f - t) * tex_su + t * tex_eu) / tex_w;
                     float tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
-                    if (tex_uw < 1 && tex_vw < 1)
-                    {
-                        float blendedGrayScale = ASCIIgLEngine::GrayScaleRGB(tex->GetPixelCol(tex_uw * texWidth, tex_vw * texHeight));
+                    float texWidthProd = tex_uw * texWidth;
+                    float texHeightProd = tex_vw * texHeight;
+                    if (tex_uw < 1 && tex_vw < 1) {
+                        float blendedGrayScale = tex->GetPixelCol(texWidthProd, texHeightProd);
                         PlotPixel(glm::vec2(j, i), ASCIIgLEngine::GetColGlyph(blendedGrayScale));
                         depthBuffer[i * SCR_WIDTH + j] = tex_w;
                     }
