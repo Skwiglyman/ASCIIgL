@@ -89,7 +89,7 @@ std::vector<Texture*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType
         bool skip = false;
         for (unsigned int j = 0; j < textures_loaded.size(); j++)
         {
-            if (std::strcmp(textures_loaded[j]->FilePath.data(), str.C_Str()) == 0) // comparing textures to not repeat them
+            if (std::strcmp(textures_loaded[j]->GetFilePath().data(), str.C_Str()) == 0) // comparing textures to not repeat them
             {
                 textures.push_back(textures_loaded[j]);
                 skip = true;

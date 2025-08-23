@@ -53,7 +53,7 @@ int main()
 		Logger::Init("logs/debug.log", LogLevel::Debug); // Debug build: log everything
 	#endif
 
-	Logger::Info("[INFO] Game started!");
+	Logger::Info("Game started!");
 
 	Game::GetInstance()->Run();
 
