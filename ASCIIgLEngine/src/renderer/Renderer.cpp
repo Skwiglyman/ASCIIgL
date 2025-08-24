@@ -346,23 +346,21 @@ void Renderer::ClippingHelper(const std::vector<VERTEX>& vertices, std::vector<V
 }
 
 CHAR_INFO Renderer::GetColGlyph(const float GreyScale) {
-	// returns colour combination at the fastest possible speed using gray scale value
-	static const CHAR_INFO vals[16]
-	{
-		CHAR_INFO{ PIXEL_QUARTER, FG_BLACK}, CHAR_INFO{ PIXEL_QUARTER, FG_DARK_GREY},
-		CHAR_INFO{ PIXEL_QUARTER, FG_GREY}, CHAR_INFO{ PIXEL_QUARTER, FG_WHITE},
+    static const CHAR_INFO vals[16] = {
+        CHAR_INFO{ PIXEL_QUARTER, FG_BLACK}, CHAR_INFO{ PIXEL_QUARTER, FG_DARK_GREY},
+        CHAR_INFO{ PIXEL_QUARTER, FG_GREY}, CHAR_INFO{ PIXEL_QUARTER, FG_WHITE},
+        CHAR_INFO{ PIXEL_HALF, FG_BLACK}, CHAR_INFO{ PIXEL_HALF, FG_DARK_GREY},
+        CHAR_INFO{ PIXEL_HALF, FG_GREY}, CHAR_INFO{ PIXEL_HALF, FG_WHITE},
+        CHAR_INFO{ PIXEL_THREEQUARTERS, FG_BLACK}, CHAR_INFO{ PIXEL_THREEQUARTERS, FG_DARK_GREY},
+        CHAR_INFO{ PIXEL_THREEQUARTERS, FG_GREY}, CHAR_INFO{ PIXEL_THREEQUARTERS, FG_WHITE},
+        CHAR_INFO{ PIXEL_SOLID, FG_BLACK}, CHAR_INFO{ PIXEL_SOLID, FG_DARK_GREY},
+        CHAR_INFO{ PIXEL_SOLID, FG_GREY}, CHAR_INFO{ PIXEL_SOLID, FG_WHITE},
+    };
 
-		CHAR_INFO{ PIXEL_HALF, FG_BLACK}, CHAR_INFO{ PIXEL_HALF, FG_DARK_GREY},
-		CHAR_INFO{ PIXEL_HALF, FG_GREY}, CHAR_INFO{ PIXEL_HALF, FG_WHITE},
-
-		CHAR_INFO{ PIXEL_THREEQUARTERS, FG_BLACK}, CHAR_INFO{ PIXEL_THREEQUARTERS, FG_DARK_GREY},
-		CHAR_INFO{ PIXEL_THREEQUARTERS, FG_GREY}, CHAR_INFO{ PIXEL_THREEQUARTERS, FG_WHITE},
-
-		CHAR_INFO{ PIXEL_SOLID, FG_BLACK}, CHAR_INFO{ PIXEL_SOLID, FG_DARK_GREY},
-		CHAR_INFO{ PIXEL_SOLID, FG_GREY}, CHAR_INFO{ PIXEL_SOLID, FG_WHITE},
-	};
-
-	return vals[static_cast<long>(std::min(GreyScale * 15.99f, 16.0f))]; // has to be 15.99 or it overflows
+    int idx = static_cast<int>(GreyScale * 16.0f);
+    if (idx > 15) idx = 15;
+    if (idx < 0) idx = 0;
+    return vals[idx];
 }
 
 float Renderer::GrayScaleRGB(const glm::vec3 rgb)

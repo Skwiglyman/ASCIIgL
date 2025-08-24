@@ -19,18 +19,20 @@
 
 // Engine includes
 #include "engine/Logger.hpp"
+#include "renderer/RenderEnums.hpp"
 
 // Error codes
-#ifndef NOERROR
-#define NOERROR 1
-#endif
-#define WIN_WIDTH_TOO_BIG 2
-#define WIN_HEIGHT_TOO_BIG 3
+enum ScreenError {
+    SCREEN_NOERROR = 0,
+    SCREEN_WIN_BUFFER_CREATION_FAILED = -1,
+    SCREEN_WIN_HEIGHT_TOO_BIG = -2,
+    SCREEN_WIN_WIDTH_TOO_BIG = -3
+};
 
 class Screen {
 private:
     // Console handles and buffers
-    inline static HANDLE hOutput = (HANDLE)GetStdHandle(STD_OUTPUT_HANDLE);
+    inline static HANDLE _hOutput = nullptr;
     static inline COORD dwBufferSize = {0, 0};
     static inline COORD dwBufferCoord = {0, 0};
     static inline SMALL_RECT rcRegion = {0, 0, 0, 0};
@@ -43,19 +45,20 @@ private:
     // Timing and FPS
     inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
     inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
-    inline static double fpsWindowSec = 1.0f;
-    inline static double fps = 0.0f;
-	inline static double currDeltaSum = 0.0f;
-    inline static double deltaTime = 0.0f;
-    inline static std::deque<double> frameTimes = {};
-    inline static unsigned int fpsCap = 60;
+    inline static double _fpsWindowSec = 1.0f;
+    inline static double _fps = 0.0f;
+	inline static double _currDeltaSum = 0.0f;
+    inline static double _deltaTime = 0.0f;
+    inline static std::deque<double> _frameTimes = {};
+    inline static unsigned int _fpsCap = 60;
 
     // Screen properties
     static inline int SCR_WIDTH = 0;
     static inline int SCR_HEIGHT = 0;
-    static inline unsigned int fontW = 0;
-    static inline unsigned int fontH = 0;
+    static inline unsigned int _fontW = 0;
+    static inline unsigned int _fontH = 0;
     static inline std::wstring SCR_TITLE = L"";
+    static inline unsigned short _backgroundCol = BG_BLACK;
 
     // Internal FPS helpers
     static void StartFPSSample();
@@ -70,28 +73,41 @@ public:
 	}
 
     // Construction
-    int InitializeScreen(unsigned int width, unsigned int height, const std::wstring title, unsigned int fontX, unsigned int fontY, unsigned int fpsCap, float fpsWindowSec);
+    static int InitializeScreen(
+        const unsigned int width, 
+        const unsigned int height, 
+        const std::wstring title, 
+        const unsigned int fontX, 
+        const unsigned int fontY, 
+        const unsigned int _fpsCap, 
+        const float _fpsWindowSec, 
+        const unsigned short _backgroundCol
+    );
 
     // Rendering and buffer management
     static void StartFPSClock();
     static void EndFPSClock();
     static void RenderTitle(bool showFps);
-    static void ClearScreen();
-    static void ClearBuffer(unsigned short backgrounCol);
+    static void ClearBuffer();
     static void OutputBuffer();
     static void PlotPixel(glm::vec2 p, CHAR character, short Colour);
     static void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
     static void PlotPixel(int x, int y, CHAR character, short Colour);
     static void PlotPixel(int x, int y, CHAR_INFO charCol);
 
-    // Getters
+    // Getters and Setters
     static float GetDeltaTime();
+
     static std::wstring GetTitle();
     static void SetTitle(const std::wstring& title);
+
     static unsigned int GetFontWidth();
     static unsigned int GetFontHeight();
     static unsigned int GetWidth();
     static unsigned int GetHeight();
+
+    static unsigned short GetBackgroundColor();
+    static void SetBackgroundColor(unsigned short color);
 
     static inline CHAR_INFO* pixelBuffer = nullptr;
     static inline glm::vec3* colourBuffer = nullptr;

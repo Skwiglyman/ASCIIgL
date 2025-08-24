@@ -64,7 +64,7 @@ Game* Game::GetInstance()
 void Game::Run()
 {
     Logger::Info("Game loop starting.");
-    const int screenInitResult = Screen::GetInstance().InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2, 1000, 1.0f);
+    const int screenInitResult = Screen::GetInstance().InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2, 60, 1.0f, BG_BLACK);
 
     Logger::Debug("Screen::InitializeScreen returned: " + std::to_string(screenInitResult));
     Renderer::GetInstance().WIREFRAME = false;
@@ -82,8 +82,7 @@ void Game::Run()
     while (running == true)
     {
         Screen::GetInstance().StartFPSClock();
-        Screen::GetInstance().ClearScreen();
-        Screen::GetInstance().ClearBuffer(BG_BLACK);
+        Screen::GetInstance().ClearBuffer();
 
         // do game logic here
         switch (gameState) {

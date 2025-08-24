@@ -1,3 +1,5 @@
+#pragma once
+
 // just a bunch of enums for different colours, taken from a series on OneLoneCoder.com
 enum COLOUR
 {
