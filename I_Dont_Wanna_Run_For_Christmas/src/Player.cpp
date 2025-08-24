@@ -36,12 +36,11 @@ glm::vec3 Player::GetMoveVector() {
 }
 glm::vec2 Player::GetViewChange() {
 	glm::vec2 view(camera.yaw, camera.pitch);
-	float turnRate = 5;
 
-	if (GetKeyState(VK_UP) & 0x8000) { view.y -= turnRate*0.5; }
-	if (GetKeyState(VK_DOWN) & 0x8000) { view.y += turnRate*0.5; }
-	if (GetKeyState(VK_LEFT) & 0x8000) { view.x -= turnRate; }
-	if (GetKeyState(VK_RIGHT) & 0x8000) { view.x += turnRate; }
+	if (GetKeyState(VK_UP) & 0x8000) { view.y -= cameraTurnRate * 0.5 * Screen::GetInstance().GetDeltaTime(); }
+	if (GetKeyState(VK_DOWN) & 0x8000) { view.y += cameraTurnRate * 0.5 * Screen::GetInstance().GetDeltaTime(); }
+	if (GetKeyState(VK_LEFT) & 0x8000) { view.x -= cameraTurnRate * Screen::GetInstance().GetDeltaTime(); }
+	if (GetKeyState(VK_RIGHT) & 0x8000) { view.x += cameraTurnRate * Screen::GetInstance().GetDeltaTime(); }
 	return view;
 }
 

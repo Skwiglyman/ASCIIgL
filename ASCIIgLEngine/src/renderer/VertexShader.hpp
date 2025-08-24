@@ -14,8 +14,7 @@
 
 #include "../engine/Logger.hpp"
 
-typedef struct Vertex_Shader
-{
+typedef struct Vertex_Shader {
     glm::mat4 GLmodel = glm::mat4(1.0f);
     glm::mat4 GLview = glm::mat4(1.0f);
     glm::mat4 GLproj = glm::mat4(1.0f);
