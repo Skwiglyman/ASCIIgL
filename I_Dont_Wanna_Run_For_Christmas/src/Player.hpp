@@ -9,12 +9,13 @@
 class Player
 {
 private:
-    static inline float nearClip = 1.0f; 
-    static inline float farClip = 2000.0f;	   
+    static inline float nearClip = 1.0f;
+    static inline float farClip = 2000.0f;  
     static inline float fov = 80.0f;
 
     static inline float walkingSpeed = 50.0f;
     static inline float sprintFactor = 2;
+    static inline float cameraTurnRate = 200.0f;
 
     static inline float maxStamina = 500;
     static inline float stamina = maxStamina;

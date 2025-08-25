@@ -15,9 +15,9 @@ class Texture // this class loads a texture from a path and holds its data in a 
 private:
 	stbi_uc* m_LocalBuffer; // buffer that holds all of the colour data
 	int m_Width, m_Height, m_BPP;
+	std::string FilePath;
 
 public:
-	std::string FilePath;
 	std::string texType;
 
 	// type is for model drawing, as they have texture types
@@ -27,8 +27,8 @@ public:
 	// getters for width and height
 	inline int GetWidth() const { return m_Width; }
 	inline int GetHeight() const { return m_Height; }
+	inline std::string GetFilePath() const { return FilePath; }
 
 	// returns an rgba between 0 and 1
-	glm::vec3 GetPixelCol(glm::vec2 xy);
-	glm::vec3 GetPixelCol(int x, int y);
+	float GetPixelCol(int x, int y) const;
 };

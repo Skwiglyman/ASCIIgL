@@ -3,6 +3,7 @@
 // includes from downloaded libraries
 #include "../vendor/glm/glm.hpp"
 #include "../vendor/glm/gtc/matrix_transform.hpp"
+#include "../vendor/glm/gtx/string_cast.hpp" // for glm::to_string
 
 // includes from default c++ libraries
 #include <vector>
@@ -11,14 +12,31 @@
 // includes from the rendering engine
 #include "Vertex.hpp"
 
-typedef struct Vertex_Shader // this just represents a program that can have its variables pre programmed from the outside
-{
-	glm::mat4 GLmodel = glm::mat4(1.0f);
-	glm::mat4 GLview = glm::mat4(1.0f);
-	glm::mat4 GLproj = glm::mat4(1.0f);
+#include "../engine/Logger.hpp"
 
-	void GLUse(VERTEX& vertice) // the vertex shader takes in a vertice in local space and spits it out in clip space before perspective divide
-	{
-		vertice.SetXYZW(GLproj * GLview * GLmodel * vertice.GetXYZW());
-	}
+typedef struct Vertex_Shader {
+    glm::mat4 GLmodel = glm::mat4(1.0f);
+    glm::mat4 GLview = glm::mat4(1.0f);
+    glm::mat4 GLproj = glm::mat4(1.0f);
+    glm::mat4 GLmvp = glm::mat4(1.0f); // precomputed MVP matrix
+
+    // Internal helper to update the MVP matrix
+    void UpdateMVP() {
+        GLmvp = GLproj * GLview * GLmodel;
+    }
+
+    // Getters
+    const glm::mat4& GetModel() const { return GLmodel; }
+    const glm::mat4& GetView()  const { return GLview; }
+    const glm::mat4& GetProj()  const { return GLproj; }
+    const glm::mat4& GetMVP()   const { return GLmvp; }
+
+    // Setters
+    void SetModel(const glm::mat4& model) { GLmodel = model; UpdateMVP(); }
+    void SetView(const glm::mat4& view)   { GLview  = view;  UpdateMVP(); }
+    void SetProj(const glm::mat4& proj)   { GLproj  = proj;  UpdateMVP(); }
+
+    void GLUse(VERTEX& vertice) const {
+        vertice.SetXYZW(GLmvp * vertice.GetXYZW());
+    }
 } VERTEX_SHADER;

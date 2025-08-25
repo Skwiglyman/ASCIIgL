@@ -1,5 +1,9 @@
 #include "Game.hpp"
+
 #include "engine/Logger.hpp"
+#include "engine/CollisionUtil.hpp"
+
+#include "renderer/RenderEnums.hpp"
 
 Game::Game()
 	: guiCamera(glm::vec2(0, 0), SCR_WIDTH, SCR_HEIGHT)
@@ -59,74 +63,59 @@ Game* Game::GetInstance()
 
 void Game::Run()
 {
-    Logger::Info("[INFO] Game loop starting.");
-    const int screenInitResult = Screen::GetInstance()->InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2);
+    Logger::Info("Game loop starting.");
+    const int screenInitResult = Screen::GetInstance().InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2, 60, 1.0f, BG_BLACK);
 
-    Logger::Debug("[DEBUG] Screen::InitializeScreen returned: " + std::to_string(screenInitResult));
-    Screen::GetInstance()->WIREFRAME = false;
-    Screen::GetInstance()->BACKFACECULLING = true;
-    Screen::GetInstance()->CCW = false;
+    Logger::Debug("Screen::InitializeScreen returned: " + std::to_string(screenInitResult));
+    Renderer::GetInstance().WIREFRAME = false;
+    Renderer::GetInstance().BACKFACECULLING = true;
+    Renderer::GetInstance().CCW = false;
 
-    Logger::Info("[INFO] Playing background music.");
-	BOOL soundResult = PlaySound(TEXT(".\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	if (soundResult)
-		Logger::Info("[INFO] Background music started successfully.");
-	else
-		Logger::Error("[ERROR] Failed to start background music.");
+    // Logger::Info("Playing background music.");
+	// BOOL soundResult = PlaySound(TEXT(".\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+	// if (soundResult)
+	// 	Logger::Info("Background music started successfully.");
+	// else
+	// 	Logger::Error("Failed to start background music.");
 
     // main gameloop
     while (running == true)
     {
-        Logger::Debug("[DEBUG] Frame start. GameState: " + std::to_string(gameState));
-
-        Screen::GetInstance()->StartFPSClock();
-		Logger::Debug("[DEBUG] Clearing screen and buffers.");
-        Screen::GetInstance()->ClearScreen();
-        Screen::GetInstance()->ClearBuffer(BG_BLACK);
+        Screen::GetInstance().StartFPSClock();
+        Screen::GetInstance().ClearBuffer();
 
         // do game logic here
         switch (gameState) {
             case MAIN_MENU:
-                Logger::Debug("[DEBUG] Running Main Menu.");
                 RunMainMenu();
                 break;
             case HOW_TO_PLAY:
-                Logger::Debug("[DEBUG] Running How To Play.");
                 RunHowToPlay();
                 break;
             case GAME_LORE:
-                Logger::Debug("[DEBUG] Running Game Lore.");
                 RunLore();
                 break;
             case MAZE:
-                Logger::Debug("[DEBUG] Running Maze.");
                 RunMaze();
                 break;
             case CAUGHT:
-                Logger::Debug("[DEBUG] Running Lost.");
                 RunLost();
                 break;
             case WIN:
-                Logger::Debug("[DEBUG] Running Win.");
                 RunWin();
                 break;
             default:
                 Logger::Debug("[WARN] Unknown game state: " + std::to_string(gameState));
                 break;
         }
+        Renderer::GetInstance().DrawScreenBorder(FG_WHITE);
 
-		Logger::Debug("[DEBUG] Drawing border.");
-        Screen::GetInstance()->DrawBorder(FG_WHITE);
+        Screen::GetInstance().OutputBuffer();
 
-		Logger::Debug("[DEBUG] Outputting buffer.");
-        Screen::GetInstance()->OutputBuffer();
-
-		Screen::GetInstance()->EndFPSClock();
-        Screen::GetInstance()->SetTitle(true);
-
-        Logger::Debug("[DEBUG] Frame end.");
+		Screen::GetInstance().EndFPSClock();
+        Screen::GetInstance().RenderTitle(true);
     }
-    Logger::Info("[INFO] Game loop ended.");
+    Logger::Info("Game loop ended.");
 }
 
 void Game::LoadLevel()
@@ -141,48 +130,39 @@ void Game::LoadLevel()
 
 void Game::RunMainMenu()
 {
-	Logger::Debug("[DEBUG] Drawing main menu title and select button.");
 	Renderer::Draw2DQuad(vertexShader, *Textures["Title"], glm::vec2(220, 80), glm::vec2(0, 0), glm::vec2(130, 50), guiCamera, 0);
 	Renderer::Draw2DQuad(vertexShader, *Textures["Select_Btn"], glm::vec2(105, 270), glm::vec2(0, 0), glm::vec2(100, 15), guiCamera, 0);
 
 	if (GetKeyState(VK_UP) & 0x8000)
 	{
-		Logger::Debug("[DEBUG] VK_UP pressed. BtnSelected set to 0.");
 		BtnSelected = 0;
 	}
 	if (GetKeyState(VK_DOWN) & 0x8000)
 	{
-		Logger::Debug("[DEBUG] VK_DOWN pressed. BtnSelected incremented.");
 		BtnSelected += 1;
 	}
 
 	if (GetKeyState('Q') & 0x8000)
 	{
-		Logger::Debug("[DEBUG] Q pressed. BtnSelected=" + std::to_string(BtnSelected));
 		if (BtnSelected != 0)
 		{
-			Logger::Debug("[DEBUG] Switching to GAME_LORE.");
 			gameState = GAME_LORE;
 			Sleep(100);
 		}
 		else
 		{
-			Logger::Debug("[DEBUG] Switching to HOW_TO_PLAY.");
 			gameState = HOW_TO_PLAY;
 			Sleep(100);
 		}
 	}
 
-	Logger::Debug("[DEBUG] BtnSelected=" + std::to_string(BtnSelected));
 	if (BtnSelected != 0)
 	{
-		Logger::Debug("[DEBUG] Drawing How_To_Play_Sel and Start_Unsel.");
 		Renderer::Draw2DQuad(vertexShader, *Textures["How_To_Play_Sel"], glm::vec2(215, 150), glm::vec2(0, 0), glm::vec2(75, 30), guiCamera, 0);
 		Renderer::Draw2DQuad(vertexShader, *Textures["Start_Unsel"], glm::vec2(217, 200), glm::vec2(0, 0), glm::vec2(60, 30), guiCamera, 0);
 	}
 	else
 	{
-		Logger::Debug("[DEBUG] Drawing How_To_Play_Unsel and Start_Sel.");
 		Renderer::Draw2DQuad(vertexShader, *Textures["How_To_Play_Unsel"], glm::vec2(215, 150), glm::vec2(0, 0), glm::vec2(75, 30), guiCamera, 0);
 		Renderer::Draw2DQuad(vertexShader, *Textures["Start_Sel"], glm::vec2(217, 200), glm::vec2(0, 0), glm::vec2(60, 30), guiCamera, 0);
 	}
@@ -207,9 +187,9 @@ void Game::RunHowToPlay()
 void Game::RunLore()
 {
 	Renderer::Draw2DQuad(vertexShader, *Textures["GameInfo1"], glm::vec2(225, 150), glm::vec2(0, 0), glm::vec2(200, 125), guiCamera, 0);
-	Screen::GetInstance()->OutputBuffer();
+	Screen::GetInstance().OutputBuffer();
 	Sleep(7500);
-	Screen::GetInstance()->StartFPSClock();
+	Screen::GetInstance().StartFPSClock();
 	gameState = MAZE;
 	LoadLevel();
 }
@@ -227,7 +207,7 @@ void Game::RunMaze()
 
 		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->GetCamera());
 
-		bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
+		bool hit = CollisionUtil::PointCircleCol2D(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
 		if (hit == true)
 		{
 			gameState = CAUGHT;
@@ -244,7 +224,7 @@ void Game::RunMaze()
 
 			Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->GetCamera());
 
-			bool hit = ASCIIgLEngine::pointCircle2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
+			bool hit = CollisionUtil::PointCircleCol2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
 			if (hit == true)
 			{
 				presents[i]->collected = true;
@@ -286,7 +266,22 @@ void Game::RunMaze()
 	if (presentsCollected == presents.size() && presentsCollected != 0) {
 		gameState = WIN;
 	}
-	Renderer::DrawModel(vertexShader,*Level->model, Level->position, Level->rotation, Level->size, player->GetCamera());
+
+	// Logger::Debug("Level->model has " + std::to_string(Level->model->meshes.size()) + " meshes.");
+	// for (size_t m = 0; m < Level->model->meshes.size(); ++m) {
+	// 	const auto& mesh = Level->model->meshes[m];
+	// 	Logger::Debug("Mesh " + std::to_string(m) + " has " + std::to_string(mesh->vertices.size()) + " vertices:");
+	// 	for (size_t v = 0; v < mesh->vertices.size(); ++v) {
+	// 		const auto& vert = mesh->vertices[v];
+	// 		Logger::Debug("Vertex " + std::to_string(v) +
+	// 			": X=" + std::to_string(vert.X()) +
+	// 			", Y=" + std::to_string(vert.Y()) +
+	// 			", Z=" + std::to_string(vert.Z()) +
+	// 			", W=" + std::to_string(vert.W()));
+	// 	}
+	// }
+
+	Renderer::DrawModel(vertexShader, *Level->model, Level->position, Level->rotation, Level->size, player->GetCamera());
 }
 
 void Game::RunLost()
@@ -326,7 +321,7 @@ void Game::MariahAI()
 	{
 		if (enemies[i]->aiState == Enemy::CHASE)
 		{
-			glm::vec3 move = glm::normalize(player->GetPlayerPos() - enemies[i]->position) * Screen::GetInstance()->GetDeltaTime() * chaseSpeed;
+			glm::vec3 move = glm::normalize(player->GetPlayerPos() - enemies[i]->position) * Screen::GetInstance().GetDeltaTime() * chaseSpeed;
 			enemies[i]->position += glm::vec3(move.x, 0, move.z);
 		}
 
@@ -335,14 +330,14 @@ void Game::MariahAI()
 			glm::vec2 pos1 = glm::vec2(enemies[i]->position.x, enemies[i]->position.z);
 			glm::vec2 pos2 = glm::vec2(enemies[i]->patrolDest.x, enemies[i]->patrolDest.z);
 
-			if (ASCIIgLEngine::pointCircle2D(pos1, pos2, enemies[i]->destRadius))
+			if (CollisionUtil::PointCircleCol2D(pos1, pos2, enemies[i]->destRadius))
 			{
 				if (enemies[i]->patrolDest == enemies[i]->patrolEnd)
 					enemies[i]->patrolDest = enemies[i]->patrolStart;
 				else
 					enemies[i]->patrolDest = enemies[i]->patrolEnd;
 			}
-			glm::vec3 move = glm::normalize(enemies[i]->patrolDest - enemies[i]->position) * Screen::GetInstance()->GetDeltaTime() * patrolSpeed;
+			glm::vec3 move = glm::normalize(enemies[i]->patrolDest - enemies[i]->position) * Screen::GetInstance().GetDeltaTime() * patrolSpeed;
 			enemies[i]->position += glm::vec3(move.x, 0, move.z);
 		}
 	}

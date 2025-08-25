@@ -17,15 +17,21 @@ find_library(ASSIMP_LIB NAMES assimp-vc143-mt PATHS "${ASSIMP_LIB_DIR}" REQUIRED
 
 # Create the ASCIIgLEngine library
 add_library(ASCIIgLEngine
-    src/renderer/ASCIIgLEngine.cpp
+    src/renderer/Renderer.cpp
     src/renderer/Screen.cpp
-    src/renderer/Texture.cpp
+    src/renderer/Vertex.cpp
+
+    src/engine/CollisionUtil.cpp
+    src/engine/Texture.cpp
     src/engine/Camera2D.cpp
     src/engine/Camera3D.cpp
     src/engine/GameObj.cpp
     src/engine/Mesh.cpp
     src/engine/Model.cpp
     src/engine/Logger.cpp
+
+    src/util/MathUtil.cpp
+
     src/vendor/stb_image/stb_image.cpp
 )
 
@@ -40,6 +46,7 @@ target_include_directories(ASCIIgLEngine PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/util
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor
 )
 

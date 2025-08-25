@@ -2,7 +2,7 @@
 
 // includes from rendering code
 #include "renderer/Vertex.hpp"
-#include "renderer/Texture.hpp"
+#include "Texture.hpp"
 
 // includes from default c++ libraries
 #include <vector>

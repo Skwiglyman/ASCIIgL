@@ -3,13 +3,13 @@
 #include <engine/Camera3D.hpp>
 #include <engine/Mesh.hpp>
 #include <engine/GameObj.hpp>
+#include <engine/CollisionUtil.hpp>
 
 #include <renderer/Screen.hpp>
-#include <renderer/ASCIIgLEngine.hpp>
 
 
 Player::Player(glm::vec2 xz, glm::vec2 yawPitch)
-	: camera(glm::vec3(xz.x, -playerHeight, xz.y), fov, (float)Screen::GetInstance()->SCR_WIDTH / (float)Screen::GetInstance()->SCR_HEIGHT, yawPitch, nearClip, farClip)
+	: camera(glm::vec3(xz.x, -playerHeight, xz.y), fov, (float)Screen::GetInstance().GetWidth() / (float)Screen::GetInstance().GetHeight(), yawPitch, nearClip, farClip)
 {
 
 }
@@ -36,12 +36,11 @@ glm::vec3 Player::GetMoveVector() {
 }
 glm::vec2 Player::GetViewChange() {
 	glm::vec2 view(camera.yaw, camera.pitch);
-	float turnRate = 5;
 
-	if (GetKeyState(VK_UP) & 0x8000) { view.y -= turnRate*0.5; }
-	if (GetKeyState(VK_DOWN) & 0x8000) { view.y += turnRate*0.5; }
-	if (GetKeyState(VK_LEFT) & 0x8000) { view.x -= turnRate; }
-	if (GetKeyState(VK_RIGHT) & 0x8000) { view.x += turnRate; }
+	if (GetKeyState(VK_UP) & 0x8000) { view.y -= cameraTurnRate * 0.5 * Screen::GetInstance().GetDeltaTime(); }
+	if (GetKeyState(VK_DOWN) & 0x8000) { view.y += cameraTurnRate * 0.5 * Screen::GetInstance().GetDeltaTime(); }
+	if (GetKeyState(VK_LEFT) & 0x8000) { view.x -= cameraTurnRate * Screen::GetInstance().GetDeltaTime(); }
+	if (GetKeyState(VK_RIGHT) & 0x8000) { view.x += cameraTurnRate * Screen::GetInstance().GetDeltaTime(); }
 	return view;
 }
 
@@ -59,7 +58,7 @@ unsigned int Player::GetStaminaChunk(unsigned int numChunks, int leeway) {
 }
 
 void Player::Update(GameObj* Level) {
-	glm::vec3 newPos = GetMoveVector() * Screen::GetInstance()->GetDeltaTime() * walkingSpeed;
+	glm::vec3 newPos = GetMoveVector() * Screen::GetInstance().GetDeltaTime() * walkingSpeed;
 	newPos = Sprinting(newPos);
 
 	// checks if you are colliding om the x axis first, then the z axis
@@ -125,19 +124,19 @@ bool Player::CollideLevel(glm::vec3 move, GameObj* Level) {
 	// all of these points are different corners on the level
 
 	// these methods check if the player circles
-	glm::vec3 col1 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p1, p2);
+	glm::vec3 col1 = CollisionUtil::LineCircleCol2D(newMove, playerHitBoxRad, p1, p2);
 	if (col1.x == 1)
 		return true;
 
-	glm::vec3 col2 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p2, p3);
+	glm::vec3 col2 = CollisionUtil::LineCircleCol2D(newMove, playerHitBoxRad, p2, p3);
 	if (col2.x == 1)
 		return true;
 
-	glm::vec3 col3 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p3, p4);
+	glm::vec3 col3 = CollisionUtil::LineCircleCol2D(newMove, playerHitBoxRad, p3, p4);
 	if (col3.x == 1)
 		return true;
 
-	glm::vec3 col4 = ASCIIgLEngine::lineCircleCol2D(newMove, playerHitBoxRad, p4, p1);
+	glm::vec3 col4 = CollisionUtil::LineCircleCol2D(newMove, playerHitBoxRad, p4, p1);
 	if (col4.x == 1)
 		return true;
 

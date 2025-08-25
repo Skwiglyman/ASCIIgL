@@ -1,104 +1,118 @@
 #pragma once
 
+// External libraries
 #include "../vendor/glm/glm.hpp"
 #include "../vendor/glm/gtc/matrix_transform.hpp"
 
+// Windows API
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-
 #include <Windows.h>
-#include <functional>
-#include <algorithm>
-#include <vector>
-#include <iostream>
-#include <random>
-#include <chrono>
 
-#include "VertexShader.hpp"
-#include "Vertex.hpp"
-#include "ASCIIgLEngine.hpp"	
-#include "Texture.hpp"
-#include "engine/Logger.hpp"
-
-#ifndef NOERROR
-#define NOERROR 1
-#endif
-#define WIN_WIDTH_TOO_BIG 2
-#define WIN_HEIGHT_TOO_BIG 3
-
+// STL
 #include <deque>
+#include <chrono>
+#include <thread>
+
+// Engine includes
+#include "engine/Logger.hpp"
+#include "renderer/RenderEnums.hpp"
+
+// Error codes
+enum ScreenError {
+    SCREEN_NOERROR = 0,
+    SCREEN_WIN_BUFFER_CREATION_FAILED = -1,
+    SCREEN_WIN_HEIGHT_TOO_BIG = -2,
+    SCREEN_WIN_WIDTH_TOO_BIG = -3
+};
 
 class Screen {
-	private:
-		HANDLE hOutput = (HANDLE)GetStdHandle(STD_OUTPUT_HANDLE);
+private:
+    // parallel processing
+    static inline unsigned int coreCount = std::thread::hardware_concurrency();
 
-		COORD dwBufferSize;
-		COORD dwBufferCoord;
-		SMALL_RECT rcRegion;
-		
-		Screen();
-		static inline Screen* Instance = nullptr;
+    // Console handles and buffers
+    static inline HANDLE _hOutput = nullptr;
+    static inline COORD dwBufferSize = {0, 0};
+    static inline COORD dwBufferCoord = {0, 0};
+    static inline SMALL_RECT rcRegion = {0, 0, 0, 0};
 
-		inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
-		inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
-		inline static double fpsWindowSec = 0.5f;
-		inline static double fps = 0.0f;
-		inline static double deltaTime = 0.0f;
-		inline static double currDeltaSum = 0.0f;
-		inline static std::deque<double> frameTimes = {};
-		inline static unsigned int frameCap = 60;
+    // Singleton instance
+	Screen() = default;
+	Screen(const Screen&) = delete;
+	Screen& operator=(const Screen&) = delete;
 
-		void DrawLine(int x1, int y1, int x2, int y2, CHAR pixel_type, short col);
-		void DrawTriangleWireFrame(VERTEX v1, VERTEX v2, VERTEX v3, CHAR pixel_type, short col);
-		void DrawTriangleTextured(VERTEX vert1, VERTEX vert2, VERTEX vert3, Texture* tex);
+    // Timing and FPS
+    static inline std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
+    static inline std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
+    static inline double _fpsWindowSec = 1.0f;
+    static inline double _fps = 0.0f;
+	static inline double _currDeltaSum = 0.0f;
+    static inline double _deltaTime = 0.0f;
+    static inline std::deque<double> _frameTimes = {};
+    static inline unsigned int _fpsCap = 60;
 
-		void StartFPSSample();
-		void EndFPSSample();
-		void CapFPS();
-		void FPSSampleCalculate(double currentDeltaTime);
+    // Screen properties
+    static inline int SCR_WIDTH = 0;
+    static inline int SCR_HEIGHT = 0;
+    static inline unsigned int _fontW = 0;
+    static inline unsigned int _fontH = 0;
+    static inline std::wstring SCR_TITLE = L"";
+    static inline unsigned short _backgroundCol = BG_BLACK;
 
-	public:
-		CHAR_INFO* pixelBuffer = nullptr;
-		glm::vec3* colourBuffer = nullptr;
-		float* depthBuffer = nullptr;
-		
-		int SCR_WIDTH;
-		int SCR_HEIGHT; 
-		std::wstring SCR_TITLE;
-		
-		
-		unsigned int fontW;
-		unsigned int fontH;
-		
-		static Screen* GetInstance();
-		int InitializeScreen(unsigned int width, unsigned int height, const std::wstring title, unsigned int fontX, unsigned int fontY);
+    // Internal FPS helpers
+    static void StartFPSSample();
+    static void EndFPSSample();
+    static void CapFPS();
+    static void FPSSampleCalculate(double currentDeltaTime);
 
-		Screen(const Screen& obj) = delete;
-		Screen(Screen&& obj) = delete;
-		~Screen();
-		
-		VERTEX ViewPortTransform(VERTEX vertice);
-		
-		void StartFPSClock();
-		void EndFPSClock();
-		
-		void SetTitle(bool showFps);
-		void ClearScreen();
-		void ClearBuffer(unsigned short backgrounCol);
-		void OutputBuffer();
-		void PlotPixel(glm::vec2 p, CHAR character, short Colour);
-		void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
-		void DrawBorder(short col);
+public:
+    static Screen& GetInstance() {
+		static Screen instance;
+		return instance;
+	}
 
-		float GetDeltaTime(); 
+    // Construction
+    static int InitializeScreen(
+        const unsigned int width, 
+        const unsigned int height, 
+        const std::wstring title, 
+        const unsigned int fontX, 
+        const unsigned int fontY, 
+        const unsigned int _fpsCap, 
+        const float _fpsWindowSec, 
+        const unsigned short _backgroundCol
+    );
 
-		bool WIREFRAME = true;
-		bool BACKFACECULLING = true;
-		bool CCW = true;
+    // Rendering and buffer management
+    static void StartFPSClock();
+    static void EndFPSClock();
+    static void RenderTitle(bool showFps);
+    static void ClearBuffer();
+    static void OutputBuffer();
+    static void PlotPixel(glm::vec2 p, CHAR character, short Colour);
+    static void PlotPixel(glm::vec2 p, CHAR_INFO charCol);
+    static void PlotPixel(int x, int y, CHAR character, short Colour);
+    static void PlotPixel(int x, int y, CHAR_INFO charCol);
 
-		void RenderTriangles(VERTEX_SHADER VSHADER, std::vector<VERTEX> vertices, Texture* tex);
+    // Getters and Setters
+    static float GetDeltaTime();
+
+    static std::wstring GetTitle();
+    static void SetTitle(const std::wstring& title);
+
+    static unsigned int GetFontWidth();
+    static unsigned int GetFontHeight();
+    static unsigned int GetWidth();
+    static unsigned int GetHeight();
+
+    static unsigned short GetBackgroundColor();
+    static void SetBackgroundColor(unsigned short color);
+
+    static inline CHAR_INFO* pixelBuffer = nullptr;
+    static inline float* depthBuffer = nullptr;
 };

@@ -29,25 +29,21 @@ glm::vec3 Camera3D::getCamFront()
 
 glm::vec3 Camera3D::getCamBack()
 {
-	// this function returns the vector dir of the back of the camera by taking the reverse of the dir front of the camera
 	return -getCamFront();
 }
 
 glm::vec3 Camera3D::getCamRight()
 {
-	// this function gets the right dir by getting the cross product of front and up vector (gets vector perpendicular to both, which is the right vector)
 	return glm::normalize(glm::cross(getCamFront(), glm::vec3(0, 1, 0)));
 }
 
 glm::vec3 Camera3D::getCamLeft()
 {
-	// this function returns the vector dir of the left of the camera by taking the reverse of the dir right of the camera
 	return -getCamRight();
 }
 
 void Camera3D::setCamPos(glm::vec3 Pposition)
 {
-	// this function takes in a new position for the camera, and sets the cameras position to it, then it recalculates the view mat
 	pos = Pposition;
 	recalculateViewMat();
 }
@@ -76,6 +72,5 @@ void Camera3D::setCamDir(glm::vec3 dir)
 
 void Camera3D::recalculateViewMat()
 {
-	// sets the cameras view mat to a glm::look at matrix using the place the camera is facing as the position matrix + the direction of the camera
 	view = glm::lookAt(pos, pos + getCamFront(), glm::vec3(0.0, 1.0, 0.0));
 }

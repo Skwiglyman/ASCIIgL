@@ -4,8 +4,8 @@
 #include <renderer/Screen.hpp>
 
 // Game Engine Code Includes
+#include <renderer/Renderer.hpp>
 #include <engine/Camera2D.hpp>
-#include <engine/Renderer.hpp>
 #include <engine/GameObj.hpp>
 
 // Game Code Includes

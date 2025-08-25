@@ -6,7 +6,7 @@
 #include <libs/assimp/include/assimp/scene.h>
 #include <libs/assimp/include/assimp/postprocess.h>
 
-#include "renderer/Texture.hpp"
+#include "Texture.hpp"
 #include "renderer/Vertex.hpp"
 
 class Model
