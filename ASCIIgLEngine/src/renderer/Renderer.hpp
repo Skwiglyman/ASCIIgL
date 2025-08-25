@@ -37,7 +37,7 @@ public:
     static void DrawTriangleTextured(const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, const Texture* tex);
 
     static VERTEX HomogenousPlaneIntersect(const VERTEX& v2, const VERTEX& v1, const int component, const bool Near);
-    static void Clipping(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, const int component, const bool Near);
+    static std::vector<VERTEX> Clipping(const std::vector<VERTEX>& vertices, const int component, const bool Near);
     static void PerspectiveDivision(VERTEX& clipCoord);
     static void ClippingHelper(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped);
     static bool BackFaceCull(const VERTEX& v1, const VERTEX& v2, const VERTEX& v3, bool CCW);

@@ -16,6 +16,8 @@ int Screen::InitializeScreen(
     const float fpsWindowSec, 
     const unsigned short backgroundCol
 ) {
+    Logger::Debug(L"CPU has max" + std::to_wstring(coreCount) + L" threads.");
+
     Logger::Debug(L"Setting _fpsCap= " + std::to_wstring(fpsCap) + L" and fpsWindow=" + std::to_wstring(fpsWindowSec));
     _fpsCap = fpsCap;
     _fpsWindowSec = fpsWindowSec;
@@ -65,6 +67,12 @@ int Screen::InitializeScreen(
     Logger::Debug(L"Setting _hOutput as the active console screen buffer.");
     SetConsoleActiveScreenBuffer(_hOutput);
 
+    Logger::Debug(L"Setting console cursor to invisible.");
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(_hOutput, &cursorInfo);
+    cursorInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(_hOutput, &cursorInfo);
+
     Logger::Debug(L"Disabling window resizing");
     HWND hwnd = GetConsoleWindow();
     if (hwnd) {
@@ -95,10 +103,8 @@ int Screen::InitializeScreen(
 
     Logger::Debug(L"Deleting old buffers and creating new ones.");
 	if (pixelBuffer) { delete[] pixelBuffer; pixelBuffer = nullptr; }
-	if (colourBuffer) { delete[] colourBuffer; colourBuffer = nullptr; }
 	if (depthBuffer) { delete[] depthBuffer; depthBuffer = nullptr; }
 	pixelBuffer = new CHAR_INFO[width * height];
-	colourBuffer = new glm::vec3[width * height];
 	depthBuffer = new float[width * height];
 
     Logger::Debug(L"Clearing buffers for first draw.");
@@ -135,7 +141,6 @@ void Screen::RenderTitle(bool showFps) {
 void Screen::ClearBuffer() {
 	// clears the buffer by setting the entire buffer to spaces (ascii code 32)
 	std::fill(pixelBuffer, pixelBuffer + SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{' ', _backgroundCol });
-	std::fill(colourBuffer, colourBuffer + SCR_WIDTH * SCR_HEIGHT, glm::vec3(0, 0, 0));
 	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
 }
 

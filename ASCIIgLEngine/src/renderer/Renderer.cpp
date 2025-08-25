@@ -76,29 +76,25 @@ void Renderer::RenderTriangles(const VERTEX_SHADER& VSHADER, const std::vector<V
     }
 
     std::vector<VERTEX> verticesCopy = vertices;
-
     for (int k = 0; k < verticesCopy.size(); k++) { 
         VSHADER.GLUse(verticesCopy[k]); 
     }
 
     std::vector<VERTEX> CLIPPED_COORDS;
     ClippingHelper(verticesCopy, CLIPPED_COORDS);
-    for (int i = 0; i < CLIPPED_COORDS.size(); i += 3)
-    {
-        for (int k = 0; k < 3; k++)
-        {
-            PerspectiveDivision(CLIPPED_COORDS[i + k]);
-            ViewPortTransform(CLIPPED_COORDS[i + k]);
-        }
-        bool cull = (BACKFACECULLING == true ? BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW) : true);
-        if (cull)
-        {
-            if (WIREFRAME == true || tex == nullptr) {
-                DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_SOLID, FG_WHITE);
-            }
-            else {
-                DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex);
-            }
+
+    for (auto& v : CLIPPED_COORDS) {
+        PerspectiveDivision(v);
+        ViewPortTransform(v);
+    }
+
+    for (int i = 0; i < static_cast<int>(CLIPPED_COORDS.size()); i += 3) {
+        if (BACKFACECULLING && !BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW)) continue;
+
+        if (WIREFRAME || tex == nullptr) {
+            DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_FULL, FG_WHITE);
+        } else {
+            DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex);
         }
     }
 }
@@ -268,13 +264,15 @@ void Renderer::DrawTriangleTextured(const VERTEX& vert1, const VERTEX& vert2, co
 
 void Renderer::DrawScreenBorder(const short col) {
 	// DRAWING BORDERS
-	DrawLine(1, 1, Screen::GetInstance().GetWidth() - 1, 1, PIXEL_SOLID, col);
-	DrawLine(Screen::GetInstance().GetWidth() - 1, 1, Screen::GetInstance().GetWidth() - 1, Screen::GetInstance().GetHeight() - 1, PIXEL_SOLID, col);
-	DrawLine(Screen::GetInstance().GetWidth() - 1, Screen::GetInstance().GetHeight() - 1, 1, Screen::GetInstance().GetHeight() - 1, PIXEL_SOLID, col);
-	DrawLine(1, 1, 1, Screen::GetInstance().GetHeight() - 1, PIXEL_SOLID, col);
+	DrawLine(1, 1, Screen::GetInstance().GetWidth() - 1, 1, PIXEL_FULL, col);
+	DrawLine(Screen::GetInstance().GetWidth() - 1, 1, Screen::GetInstance().GetWidth() - 1, Screen::GetInstance().GetHeight() - 1, PIXEL_FULL, col);
+	DrawLine(Screen::GetInstance().GetWidth() - 1, Screen::GetInstance().GetHeight() - 1, 1, Screen::GetInstance().GetHeight() - 1, PIXEL_FULL, col);
+	DrawLine(1, 1, 1, Screen::GetInstance().GetHeight() - 1, PIXEL_FULL, col);
 }
 
-void Renderer::Clipping(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped, const int component, const bool Near) {
+std::vector<VERTEX> Renderer::Clipping(const std::vector<VERTEX>& vertices, const int component, const bool Near) {
+    std::vector<VERTEX> clipped;
+
     for (int i = 0; i < static_cast<int>(vertices.size()); i += 3)
     {
         std::vector<int> inside;
@@ -294,15 +292,13 @@ void Renderer::Clipping(const std::vector<VERTEX>& vertices, std::vector<VERTEX>
         if (isInside(vertices[i + 1]))  inside.push_back(i + 1);  else outside.push_back(i + 1);
         if (isInside(vertices[i + 2]))  inside.push_back(i + 2);  else outside.push_back(i + 2);
 
-        if (inside.size() == 3)
-        {
+        if (inside.size() == 3) {
             clipped.push_back(vertices[inside[0]]);
             clipped.push_back(vertices[inside[1]]);
             clipped.push_back(vertices[inside[2]]);
             continue;
         }
-        else if (inside.size() == 1)
-        {
+        else if (inside.size() == 1) {
             VERTEX newPos1 = HomogenousPlaneIntersect(vertices[inside[0]], vertices[outside[0]], component, Near);
             VERTEX newPos2 = HomogenousPlaneIntersect(vertices[inside[0]], vertices[outside[1]], component, Near);
 
@@ -311,8 +307,7 @@ void Renderer::Clipping(const std::vector<VERTEX>& vertices, std::vector<VERTEX>
             temp[inside[0] - i] = vertices[inside[0]];
             newTri = 3;
         }
-        else if (inside.size() == 2)
-        {
+        else if (inside.size() == 2) {
             VERTEX newPos1 = HomogenousPlaneIntersect(vertices[inside[0]], vertices[outside[0]], component, Near);
             VERTEX newPos2 = HomogenousPlaneIntersect(vertices[inside[1]], vertices[outside[0]], component, Near);
 
@@ -327,22 +322,26 @@ void Renderer::Clipping(const std::vector<VERTEX>& vertices, std::vector<VERTEX>
             temp[inside[1] - i + 3] = vertices[inside[1]];
             newTri = 6;
         }
-        // If all outside, do nothing
-
-        for (int k = 0; k < newTri; k++)
+        
+        for (int k = 0; k < newTri; k++) {
             clipped.push_back(temp[k]);
+        }
     }
+    return clipped;
 }
 
 void Renderer::ClippingHelper(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& clipped) {
-	std::vector<VERTEX> c1, c2, c3, c4, c5;
-	// calls clipping on every clip plane
-	Clipping(vertices, c1, 2, true);
-	Clipping(c1, c2, 2, false);
-	Clipping(c2, c3, 1, true);
-	Clipping(c3, c4, 1, false);
-	Clipping(c4, c5, 0, true);
-	Clipping(c5, clipped, 0, false);
+    static const int components[6] = {2, 2, 1, 1, 0, 0};
+    static const bool nears[6]     = {true, false, true, false, true, false};
+
+    std::vector<VERTEX> tempA = vertices;
+    std::vector<VERTEX> tempB;
+
+    for (int i = 0; i < 6; ++i) {
+        tempB = Clipping(tempA, components[i], nears[i]);
+        tempA = std::move(tempB);
+    }
+    clipped = std::move(tempA);
 }
 
 CHAR_INFO Renderer::GetColGlyph(const float GreyScale) {
@@ -353,8 +352,8 @@ CHAR_INFO Renderer::GetColGlyph(const float GreyScale) {
         CHAR_INFO{ PIXEL_HALF, FG_GREY}, CHAR_INFO{ PIXEL_HALF, FG_WHITE},
         CHAR_INFO{ PIXEL_THREEQUARTERS, FG_BLACK}, CHAR_INFO{ PIXEL_THREEQUARTERS, FG_DARK_GREY},
         CHAR_INFO{ PIXEL_THREEQUARTERS, FG_GREY}, CHAR_INFO{ PIXEL_THREEQUARTERS, FG_WHITE},
-        CHAR_INFO{ PIXEL_SOLID, FG_BLACK}, CHAR_INFO{ PIXEL_SOLID, FG_DARK_GREY},
-        CHAR_INFO{ PIXEL_SOLID, FG_GREY}, CHAR_INFO{ PIXEL_SOLID, FG_WHITE},
+        CHAR_INFO{ PIXEL_FULL, FG_BLACK}, CHAR_INFO{ PIXEL_FULL, FG_DARK_GREY},
+        CHAR_INFO{ PIXEL_FULL, FG_GREY}, CHAR_INFO{ PIXEL_FULL, FG_WHITE},
     };
 
     int idx = static_cast<int>(GreyScale * 16.0f);
@@ -365,7 +364,7 @@ CHAR_INFO Renderer::GetColGlyph(const float GreyScale) {
 
 float Renderer::GrayScaleRGB(const glm::vec3 rgb)
 {
-	return (0.3 * rgb.x + 0.6 * rgb.y + 0.1 * rgb.z); // grayscales based on how much we see that wavelength of light instead of just averaging
+	return (0.3f * rgb.x + 0.6f * rgb.y + 0.1f * rgb.z); // grayscales based on how much we see that wavelength of light instead of just averaging
 }
 
 bool Renderer::BackFaceCull(const VERTEX& v1, const VERTEX& v2, const VERTEX& v3, bool CCW) { // determines if the triangle is in the correct winding order or not

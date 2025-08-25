@@ -16,6 +16,7 @@
 // STL
 #include <deque>
 #include <chrono>
+#include <thread>
 
 // Engine includes
 #include "engine/Logger.hpp"
@@ -31,8 +32,11 @@ enum ScreenError {
 
 class Screen {
 private:
+    // parallel processing
+    static inline unsigned int coreCount = std::thread::hardware_concurrency();
+
     // Console handles and buffers
-    inline static HANDLE _hOutput = nullptr;
+    static inline HANDLE _hOutput = nullptr;
     static inline COORD dwBufferSize = {0, 0};
     static inline COORD dwBufferCoord = {0, 0};
     static inline SMALL_RECT rcRegion = {0, 0, 0, 0};
@@ -43,14 +47,14 @@ private:
 	Screen& operator=(const Screen&) = delete;
 
     // Timing and FPS
-    inline static std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
-    inline static std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
-    inline static double _fpsWindowSec = 1.0f;
-    inline static double _fps = 0.0f;
-	inline static double _currDeltaSum = 0.0f;
-    inline static double _deltaTime = 0.0f;
-    inline static std::deque<double> _frameTimes = {};
-    inline static unsigned int _fpsCap = 60;
+    static inline std::chrono::system_clock::time_point startTimeFps = std::chrono::system_clock::now();
+    static inline std::chrono::system_clock::time_point endTimeFps = std::chrono::system_clock::now();
+    static inline double _fpsWindowSec = 1.0f;
+    static inline double _fps = 0.0f;
+	static inline double _currDeltaSum = 0.0f;
+    static inline double _deltaTime = 0.0f;
+    static inline std::deque<double> _frameTimes = {};
+    static inline unsigned int _fpsCap = 60;
 
     // Screen properties
     static inline int SCR_WIDTH = 0;
@@ -110,6 +114,5 @@ public:
     static void SetBackgroundColor(unsigned short color);
 
     static inline CHAR_INFO* pixelBuffer = nullptr;
-    static inline glm::vec3* colourBuffer = nullptr;
     static inline float* depthBuffer = nullptr;
 };
