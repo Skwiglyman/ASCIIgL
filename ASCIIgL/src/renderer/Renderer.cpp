@@ -1,6 +1,10 @@
 #include "Renderer.hpp"
 
 #include "engine/Logger.hpp"
+
+#include "util/CollisionUtil.hpp"
+#include "util/MathUtil.hpp"
+
 #include "Screen.hpp"
 #include "RenderEnums.hpp"
 
@@ -70,6 +74,20 @@ void Renderer::Draw2DQuad(VERTEX_SHADER& VSHADER, const Texture& tex, const glm:
     Renderer::RenderTriangles(VSHADER, vertices, &tex);
 }
 
+void Renderer::BackFaceCullHelper(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& RASTER_TRIANGLES) {
+    if (vertices.size() < 3) return;
+
+    for (size_t i = 0; i < vertices.size(); i += 3) {
+        if (BackFaceCull(vertices[i], vertices[i + 1], vertices[i + 2], CCW)) {
+            // This triangle is back-facing, so we can cull it
+            continue;
+        }
+        RASTER_TRIANGLES.push_back(vertices[i]);
+        RASTER_TRIANGLES.push_back(vertices[i + 1]);
+        RASTER_TRIANGLES.push_back(vertices[i + 2]);
+    }
+}
+
 void Renderer::RenderTriangles(const VERTEX_SHADER& VSHADER, const std::vector<VERTEX>& vertices, const Texture* tex) {
     if (vertices.size() < 3 || vertices.size() % 3 != 0) {
         return;
@@ -88,13 +106,32 @@ void Renderer::RenderTriangles(const VERTEX_SHADER& VSHADER, const std::vector<V
         ViewPortTransform(v);
     }
 
-    for (int i = 0; i < static_cast<int>(CLIPPED_COORDS.size()); i += 3) {
-        if (BACKFACECULLING && !BackFaceCull(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], CCW)) continue;
+    // Remove back-face culled triangles before rasterization
+    std::vector<VERTEX> RASTER_TRIANGLES;
+    BackFaceCullHelper(CLIPPED_COORDS, RASTER_TRIANGLES);
 
+    std::vector<Tile> tiles(Screen::GetInstance().GetTileCountX() * Screen::GetInstance().GetTileCountY());
+    Renderer::InitializeTiles(tiles);
+
+    for (int i = 0; i < static_cast<int>(RASTER_TRIANGLES.size()); i += 3) {
+        const auto [minTriPt, maxTriPt] = MathUtil::ComputeBoundingBox(
+            RASTER_TRIANGLES[i].GetXY(),
+            RASTER_TRIANGLES[i + 1].GetXY(),
+            RASTER_TRIANGLES[i + 2].GetXY()
+        );
+
+        for (int i = 0; i < tiles.size(); i++) {
+            if (CollisionUtil::AABBCol2D(minTriPt, maxTriPt, tiles[i].GetBoundingBox())) {
+                // Handle collision
+            }
+        }
+    }
+
+    for (int i = 0; i < static_cast<int>(RASTER_TRIANGLES.size()); i += 3) {
         if (WIREFRAME || tex == nullptr) {
-            DrawTriangleWireFrame(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], PIXEL_FULL, FG_WHITE);
+            DrawTriangleWireFrame(RASTER_TRIANGLES[i], RASTER_TRIANGLES[i + 1], RASTER_TRIANGLES[i + 2], PIXEL_FULL, FG_WHITE);
         } else {
-            DrawTriangleTextured(CLIPPED_COORDS[i], CLIPPED_COORDS[i + 1], CLIPPED_COORDS[i + 2], tex);
+            DrawTriangleTextured(RASTER_TRIANGLES[i], RASTER_TRIANGLES[i + 1], RASTER_TRIANGLES[i + 2], tex);
         }
     }
 }
@@ -432,4 +469,21 @@ glm::mat4 Renderer::CalcModelMatrix(const glm::vec3 position, const glm::vec2 ro
 	model = glm::scale(model, size);
 
 	return model;
+}
+
+void Renderer::InitializeTiles(std::vector<Tile>& tiles) {
+    for (int ty = 0; ty < Screen::GetInstance().GetTileCountY(); ++ty) {
+        for (int tx = 0; tx < Screen::GetInstance().GetTileCountX(); ++tx) {
+            int tileIndex = ty * Screen::GetInstance().GetTileCountX() + tx;
+            int posX = tx * Screen::GetInstance().TILE_SIZE_X;
+            int posY = ty * Screen::GetInstance().TILE_SIZE_Y;
+
+            // Clamp tile size if it would overflow the screen
+            int sizeX = std::min(Screen::GetInstance().TILE_SIZE_X, Screen::GetInstance().GetWidth() - posX);
+            int sizeY = std::min(Screen::GetInstance().TILE_SIZE_Y, Screen::GetInstance().GetHeight() - posY);
+
+            tiles[tileIndex].position = glm::ivec2(posX, posY);
+            tiles[tileIndex].size = glm::ivec2(sizeX, sizeY);
+        }
+    }
 }

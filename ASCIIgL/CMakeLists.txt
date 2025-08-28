@@ -1,7 +1,7 @@
-# ASCIIgLEngine - A Console 3D Rendering Engine
+# ASCIIgL - A Console 3D Rendering Engine
 
 cmake_minimum_required(VERSION 3.16)
-project(ASCIIgLEngine)
+project(ASCIIgL)
 
 # Set Assimp paths
 set(ASSIMP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/assimp")
@@ -15,8 +15,8 @@ target_include_directories(glm INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src/vendor
 # Find Assimp library
 find_library(ASSIMP_LIB NAMES assimp-vc143-mt PATHS "${ASSIMP_LIB_DIR}" REQUIRED)
 
-# Create the ASCIIgLEngine library
-add_library(ASCIIgLEngine
+# Create the ASCIIgL library
+add_library(ASCIIgL
     src/renderer/Renderer.cpp
     src/renderer/Screen.cpp
     src/renderer/Vertex.cpp
@@ -35,45 +35,39 @@ add_library(ASCIIgLEngine
     src/vendor/stb_image/stb_image.cpp
 )
 
-# Set C++ standard for ASCIIgLEngine
-set_target_properties(ASCIIgLEngine PROPERTIES
+# Set C++ standard for ASCIIgL
+set_target_properties(ASCIIgL PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
 
-target_include_directories(ASCIIgLEngine PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/util
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor
-)
-
-# Link glm as an interface target
-target_link_libraries(ASCIIgLEngine PUBLIC glm)
-
-# Add Assimp include directory
-target_include_directories(ASCIIgLEngine PUBLIC
+# Public include directories for consumers
+target_include_directories(ASCIIgL PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include>
     ${ASSIMP_INCLUDE_DIR}
 )
 
-# Link libraries
+# Link glm as an interface target
+target_link_libraries(ASCIIgL PUBLIC glm)
+
+# Link Assimp library
+target_link_libraries(ASCIIgL PRIVATE ${ASSIMP_LIB})
+
+# Link winmm on Windows
 if(WIN32)
-    target_link_libraries(ASCIIgLEngine PUBLIC winmm)
+    target_link_libraries(ASCIIgL PUBLIC winmm)
 endif()
 
-target_link_libraries(ASCIIgLEngine PRIVATE assimp)
-target_link_libraries(ASCIIgLEngine PRIVATE ${ASSIMP_LIB})
-
 # Preprocessor definitions
-target_compile_definitions(ASCIIgLEngine PUBLIC
+target_compile_definitions(ASCIIgL PUBLIC
     WIN32_LEAN_AND_MEAN
     NOMINMAX
 )
 
 # Set output directories for Debug and Release builds
-set_target_properties(ASCIIgLEngine PROPERTIES
+set_target_properties(ASCIIgL PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_BINARY_DIR}/lib/Debug"
     LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_BINARY_DIR}/lib/Debug"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_BINARY_DIR}/bin/Debug"

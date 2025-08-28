@@ -2,12 +2,12 @@
 
 #include "Mesh.hpp"
 
-#include <libs/assimp/include/assimp/Importer.hpp>
-#include <libs/assimp/include/assimp/scene.h>
-#include <libs/assimp/include/assimp/postprocess.h>
+#include <../../libs/assimp/include/assimp/Importer.hpp>
+#include <../../libs/assimp/include/assimp/scene.h>
+#include <../../libs/assimp/include/assimp/postprocess.h>
 
 #include "Texture.hpp"
-#include "renderer/Vertex.hpp"
+#include "../renderer/Vertex.hpp"
 
 class Model
 {

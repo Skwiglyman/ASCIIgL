@@ -30,6 +30,9 @@ int Screen::InitializeScreen(
     SCR_TITLE = title;
     rcRegion = SMALL_RECT{ 0, 0, SHORT(width - 1), SHORT(height - 1) };
 
+    TILE_COUNT_X = (SCR_WIDTH + TILE_SIZE_X - 1) / TILE_SIZE_X; // ceiling division
+    TILE_COUNT_Y = (SCR_HEIGHT + TILE_SIZE_Y - 1) / TILE_SIZE_Y; // ceiling division
+
     Logger::Debug(L"Setting font size to " + std::to_wstring(fontX) + L"x" + std::to_wstring(fontY));
     _fontH = fontY;
     _fontW = fontX;
@@ -206,7 +209,7 @@ unsigned int Screen::GetHeight() {
     return SCR_HEIGHT;
 }
 
-void Screen::FPSSampleCalculate(double currentDeltaTime) {
+void Screen::FPSSampleCalculate(const double currentDeltaTime) {
     Logger::Debug("FPSSampleCalculate called. Current _deltaTime: " + std::to_string(currentDeltaTime));
     _frameTimes.push_back(currentDeltaTime);
     _currDeltaSum += currentDeltaTime;
@@ -264,4 +267,12 @@ void Screen::SetBackgroundColor(unsigned short color) {
 
 unsigned short Screen::GetBackgroundColor() {
     return _backgroundCol;
+}
+
+unsigned int Screen::GetTileCountX() {
+    return TILE_COUNT_X;
+}
+
+unsigned int Screen::GetTileCountY() {
+    return TILE_COUNT_Y;
 }

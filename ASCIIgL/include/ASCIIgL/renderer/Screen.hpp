@@ -1,8 +1,8 @@
 #pragma once
 
 // External libraries
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
+#include "../../vendor/glm/glm.hpp"
+#include "../../vendor/glm/gtc/matrix_transform.hpp"
 
 // Windows API
 #ifndef WIN32_LEAN_AND_MEAN
@@ -19,8 +19,8 @@
 #include <thread>
 
 // Engine includes
-#include "engine/Logger.hpp"
-#include "renderer/RenderEnums.hpp"
+#include "../engine/Logger.hpp"
+#include "../renderer/RenderEnums.hpp"
 
 // Error codes
 enum ScreenError {
@@ -34,6 +34,9 @@ class Screen {
 private:
     // parallel processing
     static inline unsigned int coreCount = std::thread::hardware_concurrency();
+
+    static inline unsigned int TILE_COUNT_X = 0;
+    static inline unsigned int TILE_COUNT_Y = 0;
 
     // Console handles and buffers
     static inline HANDLE _hOutput = nullptr;
@@ -68,7 +71,7 @@ private:
     static void StartFPSSample();
     static void EndFPSSample();
     static void CapFPS();
-    static void FPSSampleCalculate(double currentDeltaTime);
+    static void FPSSampleCalculate(const double currentDeltaTime);
 
 public:
     static Screen& GetInstance() {
@@ -109,10 +112,15 @@ public:
     static unsigned int GetFontHeight();
     static unsigned int GetWidth();
     static unsigned int GetHeight();
+    static unsigned int GetTileCountX();
+    static unsigned int GetTileCountY();
 
     static unsigned short GetBackgroundColor();
-    static void SetBackgroundColor(unsigned short color);
+    static void SetBackgroundColor(const unsigned short color);
 
     static inline CHAR_INFO* pixelBuffer = nullptr;
     static inline float* depthBuffer = nullptr;
+
+    static inline const unsigned int TILE_SIZE_X = 16;
+    static inline const unsigned int TILE_SIZE_Y = 16;
 };

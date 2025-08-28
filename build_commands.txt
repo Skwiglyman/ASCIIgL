@@ -1,9 +1,9 @@
-ASCIIgLEngine
+ASCIIgL
     Build Release
-    ./scripts/buildRelease.ps1
+    ./scripts/build_release.ps1
 
     Build Debug
-    ./scripts/buildDebug.ps1
+    ./scripts/build_debug.ps1
 
 I_Dont_Wanna_Run_For_Christmas
     Run Debug Command
@@ -15,10 +15,10 @@ I_Dont_Wanna_Run_For_Christmas
     .\ChristmasGame.exe
 
     Build Release
-    ./scripts/buildRelease.ps1
+    ./scripts/build_release.ps1
 
     Build Debug
-    ./scripts/buildDebug.ps1
+    ./scripts/build_debug.ps1
 
 Stress_Test
     Run Debug Command
@@ -30,7 +30,7 @@ Stress_Test
     .\Stress_Test.exe
 
     Build Release
-    ./scripts/buildRelease.ps1
+    ./scripts/build_release.ps1
 
     Build Debug
-    ./scripts/buildDebug.ps1
+    ./scripts/build_debug.ps1

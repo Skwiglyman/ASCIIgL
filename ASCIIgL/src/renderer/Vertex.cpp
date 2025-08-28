@@ -6,6 +6,7 @@ Vertex::Vertex(const std::array<float, 10>& indata) : data(indata) {}
 
 Vertex::Vertex(const Vertex& t) : data(t.data) {}
 
+glm::vec2 Vertex::GetXY() const { return glm::vec2(data[0], data[1]); }
 glm::vec3 Vertex::GetXYZ() const { return glm::vec3(data[0], data[1], data[2]); }
 glm::vec4 Vertex::GetXYZW() const { return glm::vec4(data[0], data[1], data[2], data[3]); }
 glm::vec3 Vertex::GetUVW() const { return glm::vec3(data[4], data[5], data[6]); }

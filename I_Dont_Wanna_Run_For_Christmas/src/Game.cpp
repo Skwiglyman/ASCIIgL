@@ -1,9 +1,10 @@
 #include "Game.hpp"
 
-#include "engine/Logger.hpp"
-#include "engine/CollisionUtil.hpp"
+#include <engine/Logger.hpp>
 
-#include "renderer/RenderEnums.hpp"
+#include <util/CollisionUtil.hpp>
+
+#include <renderer/RenderEnums.hpp>
 
 Game::Game()
 	: guiCamera(glm::vec2(0, 0), SCR_WIDTH, SCR_HEIGHT)

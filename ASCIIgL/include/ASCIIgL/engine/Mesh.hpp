@@ -1,7 +1,7 @@
 #pragma once
 
 // includes from rendering code
-#include "renderer/Vertex.hpp"
+#include "../renderer/Vertex.hpp"
 #include "Texture.hpp"
 
 // includes from default c++ libraries

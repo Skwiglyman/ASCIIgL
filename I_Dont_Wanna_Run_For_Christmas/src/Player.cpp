@@ -3,7 +3,8 @@
 #include <engine/Camera3D.hpp>
 #include <engine/Mesh.hpp>
 #include <engine/GameObj.hpp>
-#include <engine/CollisionUtil.hpp>
+
+#include <util/CollisionUtil.hpp>
 
 #include <renderer/Screen.hpp>
 

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <array>
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
+
+#include "../../../vendor/glm/glm.hpp"
+#include "../../../vendor/glm/gtc/matrix_transform.hpp"
 
 struct Vertex {
     std::array<float, 10> data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -12,6 +13,7 @@ struct Vertex {
     Vertex(const Vertex& t);
 
     // Fast accessors
+    glm::vec2 GetXY() const;
     glm::vec3 GetXYZ() const;
     glm::vec4 GetXYZW() const;
     glm::vec3 GetUVW() const;

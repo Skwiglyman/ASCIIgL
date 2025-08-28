@@ -11,6 +11,13 @@
 #include "VertexShader.hpp"
 #include "Screen.hpp"
 
+struct Tile {
+    glm::vec2 position;
+    glm::vec2 size;
+
+    std::vector<int> triIndices;
+};
+
 class Renderer
 {
 private:
@@ -43,6 +50,8 @@ public:
     static bool BackFaceCull(const VERTEX& v1, const VERTEX& v2, const VERTEX& v3, bool CCW);
     static void ViewPortTransform(VERTEX& vertice);
     static glm::mat4 CalcModelMatrix(const glm::vec3 position, const glm::vec2 rotation, const glm::vec3 size);
+    static void BackFaceCullHelper(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& RASTER_TRIANGLES);
+    static void InitializeTiles(std::vector<Tile>& tiles);
 
     static float GrayScaleRGB(const glm::vec3 rgb);
     static CHAR_INFO GetColGlyph(const float GreyScale);

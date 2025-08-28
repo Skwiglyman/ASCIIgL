@@ -6,13 +6,13 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /VERBOSE")
 endif()
 
-# Set ASCIIgLEngine paths
-set(ENGINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../ASCIIgLEngine")
+# Set ASCIIgL paths
+set(ENGINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../ASCIIgL")
 set(ENGINE_INCLUDE_DIR "${ENGINE_ROOT}/src")
 
 # Multi-config generator support (Visual Studio, etc.)
-set(ENGINE_LIB_DIR_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../ASCIIgLEngine/build/lib/Debug")
-set(ENGINE_LIB_DIR_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/../ASCIIgLEngine/build/lib/Release")
+set(ENGINE_LIB_DIR_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/../ASCIIgL/build/lib/Debug")
+set(ENGINE_LIB_DIR_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/../ASCIIgL/build/lib/Release")
 
 # Add executable
 add_executable(ChristmasGame
@@ -29,7 +29,7 @@ include_directories(
     ${ENGINE_ROOT}/src/libs/assimp/include
 )
 
-# Link ASCIIgLEngine library
+# Link ASCIIgL library
 message(STATUS "Assimp lib search path: ${ENGINE_ROOT}/src/libs/assimp")
 
 # Print linker search directories after link_directories
@@ -37,8 +37,8 @@ get_property(LINK_DIRS DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} PROPERTY LINK_DIREC
 message(STATUS "Linker search directories: ${LINK_DIRS}")
 
 # Find and link correct engine library for each config
-find_library(ASCIIGLENGINE_LIB_DEBUG NAMES ASCIIgLEngine.lib PATHS "${ENGINE_LIB_DIR_DEBUG}" REQUIRED)
-find_library(ASCIIGLENGINE_LIB_RELEASE NAMES ASCIIgLEngine.lib PATHS "${ENGINE_LIB_DIR_RELEASE}" REQUIRED)
+find_library(ASCIIGLENGINE_LIB_DEBUG NAMES ASCIIgL.lib PATHS "${ENGINE_LIB_DIR_DEBUG}" REQUIRED)
+find_library(ASCIIGLENGINE_LIB_RELEASE NAMES ASCIIgL.lib PATHS "${ENGINE_LIB_DIR_RELEASE}" REQUIRED)
 
 set(ASSIMP_LIB_PATH "${ENGINE_ROOT}/src/libs/assimp/assimp-vc143-mt.lib")
 message(STATUS "Assimp full library path: ${ASSIMP_LIB_PATH}")
