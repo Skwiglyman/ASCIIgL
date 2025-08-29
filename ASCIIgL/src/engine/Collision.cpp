@@ -1,8 +1,8 @@
-#include "CollisionUtil.hpp"
+#include <ASCIIgL/engine/Collision.hpp>
 
-#include "../util/MathUtil.hpp"
+#include <ASCIIgL/util/MathUtil.hpp>
 
-bool CollisionUtil::DoesPointLineCol(glm::vec2 p, glm::vec2 lineStart, glm::vec2 lineEnd)
+bool Collision::DoesPointLineCol(glm::vec2 p, glm::vec2 lineStart, glm::vec2 lineEnd)
 {
 
 	// get distance from the point to the two ends of the line
@@ -26,7 +26,7 @@ bool CollisionUtil::DoesPointLineCol(glm::vec2 p, glm::vec2 lineStart, glm::vec2
 	return false;
 }
 
-bool CollisionUtil::DoesLineCircleCol(const glm::vec2& c, float r, const glm::vec2& lineStart, const glm::vec2& lineEnd)
+bool Collision::DoesLineCircleCol(const glm::vec2& c, float r, const glm::vec2& lineStart, const glm::vec2& lineEnd)
 {
 	// get length of the line
 	float len = glm::distance(lineStart, lineEnd);
@@ -55,13 +55,13 @@ bool CollisionUtil::DoesLineCircleCol(const glm::vec2& c, float r, const glm::ve
 	return false;
 }
 
-bool CollisionUtil::DoesPointCircleCol(glm::vec2 p, glm::vec2 c, float r)
+bool Collision::DoesPointCircleCol(glm::vec2 p, glm::vec2 c, float r)
 {
 	// if distance between centres is less than r, point is in circle
 	return glm::distance(p, c) < r;
 }
 
-glm::vec3 CollisionUtil::WhereLinePlaneCol(const glm::vec3& planeN, const glm::vec3& planeP, const glm::vec3& lineStart, const glm::vec3& lineEnd)
+glm::vec3 Collision::WhereLinePlaneCol(const glm::vec3& planeN, const glm::vec3& planeP, const glm::vec3& lineStart, const glm::vec3& lineEnd)
 {
     glm::vec3 normPlaneN = glm::normalize(planeN);
     float planeD = -glm::dot(normPlaneN, planeP);
@@ -82,7 +82,7 @@ glm::vec3 CollisionUtil::WhereLinePlaneCol(const glm::vec3& planeN, const glm::v
     return lineStart + lineIntersect;
 }
 
-bool CollisionUtil::DoesAABBCol(const glm::vec2& minA, const glm::vec2& maxA, const glm::vec2& minB, const glm::vec2& maxB)
+bool Collision::DoesAABBCol(const glm::vec2& minA, const glm::vec2& maxA, const glm::vec2& minB, const glm::vec2& maxB)
 {
     // If one rectangle is on left side of other
     if (maxA.x < minB.x || minA.x > maxB.x) return false;

@@ -1,12 +1,10 @@
 #pragma once
 
-// Rendering Engine Code Includes
-#include <renderer/Screen.hpp>
+#include <ASCIIgL/renderer/Screen.hpp>
+#include <ASCIIgL/renderer/Renderer.hpp>
 
-// Game Engine Code Includes
-#include <renderer/Renderer.hpp>
-#include <engine/Camera2D.hpp>
-#include <engine/GameObj.hpp>
+#include <ASCIIgL/engine/Camera2D.hpp>
+#include <ASCIIgL/engine/GameObj.hpp>
 
 // Game Code Includes
 #include "Player.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Camera2D // this is an inbuilt 2d camera that uses orthographic projection instead of perspective projection
 {

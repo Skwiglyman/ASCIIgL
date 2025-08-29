@@ -3,8 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <engine/Camera3D.hpp>
-#include <engine/GameObj.hpp>
+#include <ASCIIgL/engine/Camera3D.hpp>
+#include <ASCIIgL/engine/GameObj.hpp>
 
 class Player
 {

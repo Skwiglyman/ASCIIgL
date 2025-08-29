@@ -1,12 +1,11 @@
 #include "Player.hpp"
 
-#include <engine/Camera3D.hpp>
-#include <engine/Mesh.hpp>
-#include <engine/GameObj.hpp>
+#include <ASCIIgL/engine/Camera3D.hpp>
+#include <ASCIIgL/engine/Mesh.hpp>
+#include <ASCIIgL/engine/GameObj.hpp>
+#include <ASCIIgL/engine/Collision.hpp>
 
-#include <util/CollisionUtil.hpp>
-
-#include <renderer/Screen.hpp>
+#include <ASCIIgL/renderer/Screen.hpp>
 
 
 Player::Player(glm::vec2 xz, glm::vec2 yawPitch)

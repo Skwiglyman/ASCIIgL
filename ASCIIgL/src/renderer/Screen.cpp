@@ -1,10 +1,10 @@
+#include <ASCIIgL/renderer/Screen.hpp>
+
 #include <thread>
 #include <chrono>
 #include <algorithm>
 
-#include "Screen.hpp"
-
-#include <engine/Logger.hpp>
+#include <ASCIIgL/engine/Logger.hpp>
 
 int Screen::InitializeScreen(
     const unsigned int width, 
@@ -16,7 +16,7 @@ int Screen::InitializeScreen(
     const float fpsWindowSec, 
     const unsigned short backgroundCol
 ) {
-    Logger::Debug(L"CPU has max" + std::to_wstring(coreCount) + L" threads.");
+    Logger::Debug(L"CPU has max" + std::to_wstring(std::thread::hardware_concurrency()) + L" threads.");
 
     Logger::Debug(L"Setting _fpsCap= " + std::to_wstring(fpsCap) + L" and fpsWindow=" + std::to_wstring(fpsWindowSec));
     _fpsCap = fpsCap;

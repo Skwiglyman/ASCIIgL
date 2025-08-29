@@ -1,4 +1,5 @@
-#include "Logger.hpp"
+#include <ASCIIgL/engine/Logger.hpp>
+
 #include <fstream>
 #include <mutex>
 #include <codecvt>

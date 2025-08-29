@@ -2,8 +2,8 @@
 
 #include <array>
 
-#include "../../../vendor/glm/glm.hpp"
-#include "../../../vendor/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 struct Vertex {
     std::array<float, 10> data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

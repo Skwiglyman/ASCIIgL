@@ -1,10 +1,9 @@
 #include "Game.hpp"
 
-#include <engine/Logger.hpp>
+#include <ASCIIgL/engine/Logger.hpp>
+#include <ASCIIgL/engine/Collision.hpp>
 
-#include <util/CollisionUtil.hpp>
-
-#include <renderer/RenderEnums.hpp>
+#include <ASCIIgL/renderer/RenderEnums.hpp>
 
 Game::Game()
 	: guiCamera(glm::vec2(0, 0), SCR_WIDTH, SCR_HEIGHT)
@@ -208,7 +207,7 @@ void Game::RunMaze()
 
 		Renderer::DrawModel(vertexShader, *enemies[i]->model, model, player->GetCamera());
 
-		bool hit = CollisionUtil::PointCircleCol2D(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
+		bool hit = Collision::DoesPointCircleCol(glm::vec2(enemies[i]->position.x, enemies[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
 		if (hit == true)
 		{
 			gameState = CAUGHT;
@@ -225,7 +224,7 @@ void Game::RunMaze()
 
 			Renderer::DrawModel(vertexShader, *presents[i]->model, model, player->GetCamera());
 
-			bool hit = CollisionUtil::PointCircleCol2D(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
+			bool hit = Collision::DoesPointCircleCol(glm::vec2(presents[i]->position.x, presents[i]->position.z), glm::vec2(player->GetPlayerPos().x, player->GetPlayerPos().z), player->GetPlayerHitBoxRad());
 			if (hit == true)
 			{
 				presents[i]->collected = true;
@@ -331,7 +330,7 @@ void Game::MariahAI()
 			glm::vec2 pos1 = glm::vec2(enemies[i]->position.x, enemies[i]->position.z);
 			glm::vec2 pos2 = glm::vec2(enemies[i]->patrolDest.x, enemies[i]->patrolDest.z);
 
-			if (CollisionUtil::PointCircleCol2D(pos1, pos2, enemies[i]->destRadius))
+			if (Collision::DoesPointCircleCol(pos1, pos2, enemies[i]->destRadius))
 			{
 				if (enemies[i]->patrolDest == enemies[i]->patrolEnd)
 					enemies[i]->patrolDest = enemies[i]->patrolStart;

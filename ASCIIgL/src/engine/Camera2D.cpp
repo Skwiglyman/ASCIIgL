@@ -1,4 +1,4 @@
-#include "Camera2D.hpp"
+#include <ASCIIgL/engine/Camera2D.hpp>
 
 Camera2D::Camera2D(glm::vec2 Pposition, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT)
 	: position(Pposition)

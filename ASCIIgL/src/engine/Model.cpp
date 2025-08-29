@@ -1,4 +1,4 @@
-#include "Model.hpp"
+#include <ASCIIgL/engine/Model.hpp>
 
 void Model::loadModel(std::string path)
 {

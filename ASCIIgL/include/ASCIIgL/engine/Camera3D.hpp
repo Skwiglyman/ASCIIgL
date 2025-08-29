@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Camera3D // This is an inbuilt camera 3d class that primarily holds a view mat and a perspective proj mat to make a 3d camera
 {

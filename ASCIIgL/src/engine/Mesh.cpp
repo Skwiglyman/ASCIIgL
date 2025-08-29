@@ -1,4 +1,4 @@
-#include "Mesh.hpp"
+#include <ASCIIgL/engine/Mesh.hpp>
 
 Mesh::Mesh(std::vector<VERTEX> inVerts, std::vector<Texture*> inTex)
 	: vertices(inVerts), textures(inTex)

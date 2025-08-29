@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Model.hpp"
+#include <ASCIIgL/engine/Model.hpp>
 
 class GameObj // this class just represents a general game object, meant to be inherited and extended
 { // just holds a model, and a position size and rotation

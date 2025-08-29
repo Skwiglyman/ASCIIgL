@@ -1,10 +1,8 @@
 #pragma once
 
-// includes from rendering code
-#include "../renderer/Vertex.hpp"
-#include "Texture.hpp"
+#include <ASCIIgL/renderer/Vertex.hpp>
+#include <ASCIIgL/engine/Texture.hpp>
 
-// includes from default c++ libraries
 #include <vector>
 
 class Mesh // this class is a mesh the represents a group of vertices along with a group of textures to render them with

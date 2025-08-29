@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace MathUtil {
 	glm::vec3 CalcNormal(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const bool out); // calculates normals given 3 points

@@ -1,4 +1,4 @@
-#include "Vertex.hpp"
+#include <ASCIIgL/renderer/Vertex.hpp>
 
 Vertex::Vertex() : data{0, 0, 0, 0, 0, 0, 0, 0, 0, 0} {}
 

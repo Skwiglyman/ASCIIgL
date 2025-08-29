@@ -1,4 +1,4 @@
-#include "MathUtil.hpp"
+#include <ASCIIgL/util/MathUtil.hpp>
 
 #include <algorithm>
 

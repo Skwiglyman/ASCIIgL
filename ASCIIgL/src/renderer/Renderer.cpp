@@ -1,12 +1,14 @@
-#include "Renderer.hpp"
+#include <ASCIIgL/renderer/Renderer.hpp>
 
-#include "engine/Logger.hpp"
+#include <execution>
 
-#include "util/CollisionUtil.hpp"
-#include "util/MathUtil.hpp"
+#include <ASCIIgL/engine/Logger.hpp>
+#include <ASCIIgL/engine/Collision.hpp>
 
-#include "Screen.hpp"
-#include "RenderEnums.hpp"
+#include <ASCIIgL/util/MathUtil.hpp>
+
+#include <ASCIIgL/renderer/Screen.hpp>
+#include <ASCIIgL/renderer/RenderEnums.hpp>
 
 void Renderer::DrawMesh(VERTEX_SHADER& VSHADER, const Mesh* mesh) {
     for (int i = 0; i < mesh->textures.size(); i++) {
@@ -74,7 +76,7 @@ void Renderer::Draw2DQuad(VERTEX_SHADER& VSHADER, const Texture& tex, const glm:
     Renderer::RenderTriangles(VSHADER, vertices, &tex);
 }
 
-void Renderer::BackFaceCullHelper(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& RASTER_TRIANGLES) {
+void Renderer::BackFaceCullHelper(const std::vector<VERTEX>& vertices, std::vector<VERTEX>& raster_triangles) {
     if (vertices.size() < 3) return;
 
     for (size_t i = 0; i < vertices.size(); i += 3) {
@@ -82,9 +84,9 @@ void Renderer::BackFaceCullHelper(const std::vector<VERTEX>& vertices, std::vect
             // This triangle is back-facing, so we can cull it
             continue;
         }
-        RASTER_TRIANGLES.push_back(vertices[i]);
-        RASTER_TRIANGLES.push_back(vertices[i + 1]);
-        RASTER_TRIANGLES.push_back(vertices[i + 2]);
+        raster_triangles.push_back(vertices[i]);
+        raster_triangles.push_back(vertices[i + 1]);
+        raster_triangles.push_back(vertices[i + 2]);
     }
 }
 
@@ -107,33 +109,21 @@ void Renderer::RenderTriangles(const VERTEX_SHADER& VSHADER, const std::vector<V
     }
 
     // Remove back-face culled triangles before rasterization
-    std::vector<VERTEX> RASTER_TRIANGLES;
-    BackFaceCullHelper(CLIPPED_COORDS, RASTER_TRIANGLES);
+    std::vector<VERTEX> raster_triangles;
+    BackFaceCullHelper(CLIPPED_COORDS, raster_triangles);
 
     std::vector<Tile> tiles(Screen::GetInstance().GetTileCountX() * Screen::GetInstance().GetTileCountY());
     Renderer::InitializeTiles(tiles);
-
-    for (int i = 0; i < static_cast<int>(RASTER_TRIANGLES.size()); i += 3) {
-        const auto [minTriPt, maxTriPt] = MathUtil::ComputeBoundingBox(
-            RASTER_TRIANGLES[i].GetXY(),
-            RASTER_TRIANGLES[i + 1].GetXY(),
-            RASTER_TRIANGLES[i + 2].GetXY()
-        );
-
-        for (int i = 0; i < tiles.size(); i++) {
-            if (CollisionUtil::AABBCol2D(minTriPt, maxTriPt, tiles[i].GetBoundingBox())) {
-                // Handle collision
+    Renderer::BinTrianglesToTiles(tiles, raster_triangles);
+    
+    std::for_each(std::execution::par, tiles.begin(), tiles.end(), [&](Tile& tile) {
+            if (WIREFRAME || tex == nullptr) {
+                // DrawTileWireframe(tile, raster_triangles);
+            } else {
+                DrawTileTextured(tile, raster_triangles, tex);
             }
         }
-    }
-
-    for (int i = 0; i < static_cast<int>(RASTER_TRIANGLES.size()); i += 3) {
-        if (WIREFRAME || tex == nullptr) {
-            DrawTriangleWireFrame(RASTER_TRIANGLES[i], RASTER_TRIANGLES[i + 1], RASTER_TRIANGLES[i + 2], PIXEL_FULL, FG_WHITE);
-        } else {
-            DrawTriangleTextured(RASTER_TRIANGLES[i], RASTER_TRIANGLES[i + 1], RASTER_TRIANGLES[i + 2], tex);
-        }
-    }
+    );
 }
 
 void Renderer::ViewPortTransform(VERTEX& vertice) {
@@ -178,11 +168,11 @@ void Renderer::DrawLine(const int x1, const int y1, const int x2, const int y2, 
     }
 }
 
-void Renderer::DrawTriangleWireFrame(const VERTEX& v1, const VERTEX& v2, const VERTEX& v3, CHAR pixel_type, short col) {
+void Renderer::DrawTriangleWireFrame(const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, CHAR pixel_type, short col) {
 	// RENDERING LINES BETWEEN VERTICES
-	DrawLine((int) v1.X(), (int) v1.Y(), (int) v2.X(), (int) v2.Y(), pixel_type, col);
-	DrawLine((int) v2.X(), (int) v2.Y(), (int) v3.X(), (int) v3.Y(), pixel_type, col);
-	DrawLine((int) v3.X(), (int) v3.Y(), (int) v1.X(), (int) v1.Y(), pixel_type, col);
+	DrawLine((int) vert1.X(), (int) vert1.Y(), (int) vert2.X(), (int) vert2.Y(), pixel_type, col);
+	DrawLine((int) vert2.X(), (int) vert2.Y(), (int) vert3.X(), (int) vert3.Y(), pixel_type, col);
+	DrawLine((int) vert3.X(), (int) vert3.Y(), (int) vert1.X(), (int) vert1.Y(), pixel_type, col);
 }
 
 void Renderer::DrawTriangleTextured(const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, const Texture* tex) {
@@ -404,11 +394,11 @@ float Renderer::GrayScaleRGB(const glm::vec3 rgb)
 	return (0.3f * rgb.x + 0.6f * rgb.y + 0.1f * rgb.z); // grayscales based on how much we see that wavelength of light instead of just averaging
 }
 
-bool Renderer::BackFaceCull(const VERTEX& v1, const VERTEX& v2, const VERTEX& v3, bool CCW) { // determines if the triangle is in the correct winding order or not
+bool Renderer::BackFaceCull(const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, bool CCW) { // determines if the triangle is in the correct winding order or not
 
 	// it calculates it based on glm cross because if the perpendicular z is less than 0, the triangle is pointing away
-	glm::vec3 U = v2.GetXYZ() - v1.GetXYZ();
-	glm::vec3 V = v3.GetXYZ() - v1.GetXYZ();
+	glm::vec3 U = vert2.GetXYZ() - vert1.GetXYZ();
+	glm::vec3 V = vert3.GetXYZ() - vert1.GetXYZ();
 
 	float crossZ;
 
@@ -432,17 +422,17 @@ void Renderer::PerspectiveDivision(VERTEX& clipCoord) {
     clipCoord.SetUVW(glm::vec3(uvw.x / w, uvw.y / w, 1.0f / w));
 }
 
-VERTEX Renderer::HomogenousPlaneIntersect(const VERTEX& v2, const VERTEX& v1, const int component, const bool Near) {
+VERTEX Renderer::HomogenousPlaneIntersect(const VERTEX& vert2, const VERTEX& vert1, const int component, const bool Near) {
     // Interpolates on the line between both vertices to get a new point on the line between them
     // v2 is the vertex that is actually visible, v1 is behind the near plane
 
-    VERTEX newVert = v1;
-    VERTEX v = v1;
+    VERTEX newVert = vert1;
+    VERTEX v = vert1;
 
-    v.SetXYZW(v1.GetXYZW() - v2.GetXYZW());
+    v.SetXYZW(vert1.GetXYZW() - vert2.GetXYZW());
 
-    float i0 = v1.data[component];
-    float w0 = v1.data[3]; // w is at index 3
+    float i0 = vert1.data[component];
+    float w0 = vert1.data[3]; // w is at index 3
 
     float vi = v.data[component];
     float vw = v.data[3];
@@ -454,7 +444,7 @@ VERTEX Renderer::HomogenousPlaneIntersect(const VERTEX& v2, const VERTEX& v1, co
         t = (i0 - w0) / (vi - vw); // far clipping
 
     for (int i = 0; i < 6; i++)
-        newVert.data[i] = glm::mix(v1.data[i], v2.data[i], t); // interpolate attributes
+        newVert.data[i] = glm::mix(vert1.data[i], vert2.data[i], t); // interpolate attributes
 
     return newVert;
 }
@@ -484,6 +474,185 @@ void Renderer::InitializeTiles(std::vector<Tile>& tiles) {
 
             tiles[tileIndex].position = glm::ivec2(posX, posY);
             tiles[tileIndex].size = glm::ivec2(sizeX, sizeY);
+        }
+    }
+}
+
+void Renderer::BinTrianglesToTiles(std::vector<Tile>& tiles, const std::vector<VERTEX>& raster_triangles) {
+    int tileSizeX = Screen::GetInstance().TILE_SIZE_X;
+    int tileSizeY = Screen::GetInstance().TILE_SIZE_Y;
+    int tileCountX = Screen::GetInstance().GetTileCountX();
+    int tileCountY = Screen::GetInstance().GetTileCountY();
+
+    for (int i = 0; i < static_cast<int>(raster_triangles.size()); i += 3) {
+        const auto [minTriPt, maxTriPt] = MathUtil::ComputeBoundingBox(
+            raster_triangles[i].GetXY(),
+            raster_triangles[i + 1].GetXY(),
+            raster_triangles[i + 2].GetXY()
+        );
+
+        // Clamp to screen bounds
+        int minTileX = std::max(0, int(minTriPt.x) / tileSizeX);
+        int maxTileX = std::min(tileCountX - 1, int(maxTriPt.x) / tileSizeX);
+        int minTileY = std::max(0, int(minTriPt.y) / tileSizeY);
+        int maxTileY = std::min(tileCountY - 1, int(maxTriPt.y) / tileSizeY);
+
+        for (int ty = minTileY; ty <= maxTileY; ++ty) {
+            for (int tx = minTileX; tx <= maxTileX; ++tx) {
+                int tileIndex = ty * tileCountX + tx;
+                Tile& tile = tiles[tileIndex];
+
+                // Check if tile fully encapsulates the triangle
+                if (DoesTileEncapsulate(tile, raster_triangles[i], raster_triangles[i + 1], raster_triangles[i + 2])) {
+                    tile.tri_indices_encapsulated.push_back(i);
+                } else {
+                    // Otherwise, it's partially inside
+                    tile.tri_indices_partial.push_back(i);
+                }
+            }
+        }
+    }
+}
+
+bool Renderer::DoesTileEncapsulate(const Tile& tile, const VERTEX& v1, const VERTEX& v2, const VERTEX& v3)
+{
+    // Get triangle bounding box
+    const auto [minTriPt, maxTriPt] = MathUtil::ComputeBoundingBox(
+        v1.GetXY(),
+        v2.GetXY(),
+        v3.GetXY()
+    );
+
+    // Get tile bounding box
+    glm::vec2 tileMin = tile.position;
+    glm::vec2 tileMax = tile.position + tile.size;
+
+    // Check if triangle bounding box is fully inside tile bounding box
+    bool fullyInside =
+        (minTriPt.x >= tileMin.x) && (maxTriPt.x <= tileMax.x) &&
+        (minTriPt.y >= tileMin.y) && (maxTriPt.y <= tileMax.y);
+
+    return fullyInside;
+}
+
+void Renderer::DrawTileTextured(const Tile& tile, const std::vector<VERTEX>& raster_triangles, const Texture* tex) {
+    for (int triIndex : tile.tri_indices_encapsulated) {
+        DrawTriangleTextured(raster_triangles[triIndex], raster_triangles[triIndex + 1], raster_triangles[triIndex + 2], tex);
+    }
+
+    for (int triIndex : tile.tri_indices_partial) {
+        DrawTriangleTexturedPartial(tile, raster_triangles[triIndex], raster_triangles[triIndex + 1], raster_triangles[triIndex + 2], tex);
+    }
+}
+
+void Renderer::DrawTriangleTexturedPartial(const Tile& tile, const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, const Texture* tex) {
+    int texWidth = tex->GetWidth();
+    int texHeight = tex->GetHeight();
+    if (texWidth == 0 || texHeight == 0) {
+        Logger::Error("Invalid texture size. Width: " + std::to_string(texWidth) + ", Height: " + std::to_string(texHeight));
+        return;
+    }
+
+    int x1 = vert1.X(), x2 = vert2.X(), x3 = vert3.X();
+    int y1 = vert1.Y(), y2 = vert2.Y(), y3 = vert3.Y();
+    float w1 = vert1.UVW(), w2 = vert2.UVW(), w3 = vert3.UVW();
+    float u1 = vert1.U(), u2 = vert2.U(), u3 = vert3.U();
+    float v1 = vert1.V(), v2 = vert2.V(), v3 = vert3.V();
+
+    // Sort vertices by y
+    if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
+    if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
+    if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
+
+    // Tile bounds
+    int minX = int(tile.position.x);
+    int maxX = int(tile.position.x + tile.size.x);
+    int minY = int(tile.position.y);
+    int maxY = int(tile.position.y + tile.size.y);
+
+    // Precompute steps
+    int dy1 = y2 - y1, dx1 = x2 - x1;
+    int dy2 = y3 - y1, dx2 = x3 - x1;
+    float du1 = u2 - u1, dv1 = v2 - v1, dw1 = w2 - w1;
+    float du2 = u3 - u1, dv2 = v3 - v1, dw2 = w3 - w1;
+
+    float dax_step = dy1 ? dx1 / (float)abs(dy1) : 0;
+    float dbx_step = dy2 ? dx2 / (float)abs(dy2) : 0;
+    float du1_step = dy1 ? du1 / (float)abs(dy1) : 0;
+    float dv1_step = dy1 ? dv1 / (float)abs(dy1) : 0;
+    float dw1_step = dy1 ? dw1 / (float)abs(dy1) : 0;
+    float du2_step = dy2 ? du2 / (float)abs(dy2) : 0;
+    float dv2_step = dy2 ? dv2 / (float)abs(dy2) : 0;
+    float dw2_step = dy2 ? dw2 / (float)abs(dy2) : 0;
+
+    // Upper part
+    if (dy1) {
+        for (int i = std::max(y1, minY); i <= std::min(y2, maxY - 1) && i < Screen::GetInstance().GetHeight(); i++) {
+            int ax = x1 + (float)(i - y1) * dax_step;
+            int bx = x1 + (float)(i - y1) * dbx_step;
+            float tex_su = u1 + (float)(i - y1) * du1_step;
+            float tex_sv = v1 + (float)(i - y1) * dv1_step;
+            float tex_sw = w1 + (float)(i - y1) * dw1_step;
+            float tex_eu = u1 + (float)(i - y1) * du2_step;
+            float tex_ev = v1 + (float)(i - y1) * dv2_step;
+            float tex_ew = w1 + (float)(i - y1) * dw2_step;
+            if (ax > bx) { std::swap(ax, bx); std::swap(tex_su, tex_eu); std::swap(tex_sv, tex_ev); std::swap(tex_sw, tex_ew); }
+            float tstep = (bx != ax) ? 1.0f / ((float)(bx - ax)) : 0.0f;
+            float t = 0.0f;
+            for (int j = std::max(ax, minX); j < std::min(bx, maxX) && j < Screen::GetInstance().GetWidth(); j++) {
+                float tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+                if (tex_w > Screen::GetInstance().depthBuffer[i * Screen::GetInstance().GetWidth() + j]) {
+                    float tex_uw = ((1.0f - t) * tex_su + t * tex_eu) / tex_w;
+                    float tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
+                    float texWidthProd = tex_uw * texWidth;
+                    float texHeightProd = tex_vw * texHeight;
+                    if (tex_uw < 1 && tex_vw < 1) {
+                        float blendedGrayScale = tex->GetPixelCol(texWidthProd, texHeightProd);
+                        Screen::GetInstance().PlotPixel(glm::vec2(j, i), GetColGlyph(blendedGrayScale));
+                        Screen::GetInstance().depthBuffer[i * Screen::GetInstance().GetWidth() + j] = tex_w;
+                    }
+                }
+                t += tstep;
+            }
+        }
+    }
+
+    // Lower part
+    dy1 = y3 - y2; dx1 = x3 - x2;
+    du1 = u3 - u2; dv1 = v3 - v2; dw1 = w3 - w2;
+    dax_step = dy1 ? dx1 / (float)abs(dy1) : 0;
+    dbx_step = dy2 ? dx2 / (float)abs(dy2) : 0;
+    du1_step = dy1 ? du1 / (float)abs(dy1) : 0;
+    dv1_step = dy1 ? dv1 / (float)abs(dy1) : 0;
+    dw1_step = dy1 ? dw1 / (float)abs(dy1) : 0;
+    if (dy1) {
+        for (int i = std::max(y2, minY); i <= std::min(y3, maxY - 1) && i < Screen::GetInstance().GetHeight(); i++) {
+            int ax = x2 + (float)(i - y2) * dax_step;
+            int bx = x1 + (float)(i - y1) * dbx_step;
+            float tex_su = u2 + (float)(i - y2) * du1_step;
+            float tex_sv = v2 + (float)(i - y2) * dv1_step;
+            float tex_sw = w2 + (float)(i - y2) * dw1_step;
+            float tex_eu = u1 + (float)(i - y1) * du2_step;
+            float tex_ev = v1 + (float)(i - y1) * dv2_step;
+            float tex_ew = w1 + (float)(i - y1) * dw2_step;
+            if (ax > bx) { std::swap(ax, bx); std::swap(tex_su, tex_eu); std::swap(tex_sv, tex_ev); std::swap(tex_sw, tex_ew); }
+            float tstep = (bx != ax) ? 1.0f / ((float)(bx - ax)) : 0.0f;
+            float t = 0.0f;
+            for (int j = std::max(ax, minX); j < std::min(bx, maxX) && j < Screen::GetInstance().GetWidth(); j++) {
+                float tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+                if (tex_w > Screen::GetInstance().depthBuffer[i * Screen::GetInstance().GetWidth() + j]) {
+                    float tex_uw = ((1.0f - t) * tex_su + t * tex_eu) / tex_w;
+                    float tex_vw = ((1.0f - t) * tex_sv + t * tex_ev) / tex_w;
+                    float texWidthProd = tex_uw * texWidth;
+                    float texHeightProd = tex_vw * texHeight;
+                    if (tex_uw < 1 && tex_vw < 1) {
+                        float blendedGrayScale = tex->GetPixelCol(texWidthProd, texHeightProd);
+                        Screen::GetInstance().PlotPixel(glm::vec2(j, i), GetColGlyph(blendedGrayScale));
+                        Screen::GetInstance().depthBuffer[i * Screen::GetInstance().GetWidth() + j] = tex_w;
+                    }
+                }
+                t += tstep;
+            }
         }
     }
 }

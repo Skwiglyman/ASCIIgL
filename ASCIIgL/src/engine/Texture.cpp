@@ -1,6 +1,6 @@
-#include "Texture.hpp"
+#include <ASCIIgL/engine/Texture.hpp>
 
-#include "Logger.hpp"
+#include <ASCIIgL/engine/Logger.hpp>
 
 Texture::Texture(const std::string& path, const std::string type)
 	: FilePath(path), m_LocalBuffer(nullptr), m_Width(0), m_Height(0), m_BPP(0), texType(type)

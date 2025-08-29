@@ -1,8 +1,8 @@
 #pragma once
 
 // External libraries
-#include "../../vendor/glm/glm.hpp"
-#include "../../vendor/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // Windows API
 #ifndef WIN32_LEAN_AND_MEAN
@@ -16,11 +16,10 @@
 // STL
 #include <deque>
 #include <chrono>
-#include <thread>
 
 // Engine includes
-#include "../engine/Logger.hpp"
-#include "../renderer/RenderEnums.hpp"
+#include <ASCIIgL/engine/Logger.hpp>
+#include <ASCIIgL/renderer/RenderEnums.hpp>
 
 // Error codes
 enum ScreenError {
@@ -32,9 +31,6 @@ enum ScreenError {
 
 class Screen {
 private:
-    // parallel processing
-    static inline unsigned int coreCount = std::thread::hardware_concurrency();
-
     static inline unsigned int TILE_COUNT_X = 0;
     static inline unsigned int TILE_COUNT_Y = 0;
 

@@ -1,11 +1,9 @@
 #pragma once
 
-// includes from downloaded libraries
-#include "../../../vendor/stb_image/stb_image.h"
-#include "../../../vendor/glm/glm.hpp"
-#include "../../../vendor/glm/gtc/matrix_transform.hpp"
+#include <stb_image/stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-// includes from default C++ libraries
 #include <iostream>
 #include <string>
 

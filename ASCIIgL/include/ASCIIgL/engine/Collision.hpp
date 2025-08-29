@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-namespace CollisionUtil {
+namespace Collision {
 	bool DoesPointLineCol(glm::vec2 p, glm::vec2 lineStart, glm::vec2 lineEnd); // gets if a point is colliding with a line
 	bool DoesPointCircleCol(glm::vec2 p, glm::vec2 c, float r); // gets if a point is colliding with a circle
 	bool DoesAABBCol(const glm::vec2& minA, const glm::vec2& maxA, const glm::vec2& minB, const glm::vec2& maxB); // gets if two axis-aligned bounding boxes are colliding

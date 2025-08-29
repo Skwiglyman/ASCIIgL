@@ -1,18 +1,17 @@
 #pragma once
 
 // includes from downloaded libraries
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
-#include "../vendor/glm/gtx/string_cast.hpp" // for glm::to_string
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp> // for glm::to_string
 
 // includes from default c++ libraries
 #include <vector>
 #include <iostream>
 
-// includes from the rendering engine
-#include "Vertex.hpp"
+#include <ASCIIgL/renderer/Vertex.hpp>
 
-#include "../engine/Logger.hpp"
+#include <ASCIIgL/engine/Logger.hpp>
 
 typedef struct Vertex_Shader {
     glm::mat4 GLmodel = glm::mat4(1.0f);
