@@ -4,6 +4,8 @@
 #include <mutex>
 #include <codecvt>
 #include <locale>
+#include <iomanip>
+#include <chrono>
 
 #ifdef _WIN32
     #include <direct.h>
@@ -56,6 +58,10 @@ void Logger::LogInternal(LogLevel level, const std::string& message) {
     std::lock_guard<std::mutex> lock(logMutex);
     if (static_cast<int>(level) > static_cast<int>(currentLevel)) return;
     if (logFile.is_open()) {
+        auto now = std::chrono::system_clock::now();
+        auto time_t = std::chrono::system_clock::to_time_t(now);
+        logFile << "[" << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S") << "] ";
+        
         switch (level) {
             case LogLevel::Error: logFile << "[ERROR] "; break;
             case LogLevel::Info:  logFile << "[INFO] "; break;
@@ -69,6 +75,10 @@ void Logger::LogInternal(LogLevel level, const std::wstring& message) {
     std::lock_guard<std::mutex> lock(logMutex);
     if (static_cast<int>(level) > static_cast<int>(currentLevel)) return;
     if (logFile.is_open()) {
+        auto now = std::chrono::system_clock::now();
+        auto time_t = std::chrono::system_clock::to_time_t(now);
+        logFile << "[" << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S") << "] ";
+
         switch (level) {
             case LogLevel::Error: logFile << "[ERROR] "; break;
             case LogLevel::Info:  logFile << "[INFO] "; break;

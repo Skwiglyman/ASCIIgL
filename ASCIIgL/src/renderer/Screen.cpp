@@ -16,7 +16,7 @@ int Screen::InitializeScreen(
     const float fpsWindowSec, 
     const unsigned short backgroundCol
 ) {
-    Logger::Debug(L"CPU has max" + std::to_wstring(std::thread::hardware_concurrency()) + L" threads.");
+    Logger::Debug(L"CPU has max " + std::to_wstring(std::thread::hardware_concurrency()) + L" threads.");
 
     Logger::Debug(L"Setting _fpsCap= " + std::to_wstring(fpsCap) + L" and fpsWindow=" + std::to_wstring(fpsWindowSec));
     _fpsCap = fpsCap;
@@ -144,7 +144,7 @@ void Screen::RenderTitle(bool showFps) {
 void Screen::ClearBuffer() {
 	// clears the buffer by setting the entire buffer to spaces (ascii code 32)
 	std::fill(pixelBuffer, pixelBuffer + SCR_WIDTH * SCR_HEIGHT, CHAR_INFO{' ', _backgroundCol });
-	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, 0.0f);
+	std::fill(depthBuffer, depthBuffer + SCR_WIDTH * SCR_HEIGHT, -1.0f);
 }
 
 void Screen::OutputBuffer() {

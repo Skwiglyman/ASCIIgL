@@ -38,7 +38,6 @@ private:
 	// game starts at the main menu
 	unsigned int gameState = MAIN_MENU;
 
-	// dimensions over 900x500 are prone to crash, don't use them
 	unsigned int SCR_WIDTH = 450;
 	unsigned int SCR_HEIGHT = 300;
 

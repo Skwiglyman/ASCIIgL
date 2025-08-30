@@ -1,6 +1,25 @@
 #include <ASCIIgL/engine/Model.hpp>
 
-void Model::loadModel(std::string path)
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <iostream>
+#include <string>
+
+// PIMPL Implementation class that contains all Assimp-related code
+class Model::Impl
+{
+public:
+    std::string directory;
+    std::vector<Texture*> textures_loaded;
+
+    void loadModel(std::string path, std::vector<Mesh*>& meshes);
+    void processNode(aiNode* node, const aiScene* scene, std::vector<Mesh*>& meshes);
+    Mesh* processMesh(aiMesh* mesh, const aiScene* scene);
+    std::vector<Texture*> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+};
+
+void Model::Impl::loadModel(std::string path, std::vector<Mesh*>& meshes)
 {
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_OptimizeMeshes);
@@ -12,10 +31,10 @@ void Model::loadModel(std::string path)
     }
     directory = path.substr(0, path.find_last_of('/'));
     
-    processNode(scene->mRootNode, scene);
+    processNode(scene->mRootNode, scene, meshes);
 }
 
-void Model::processNode(aiNode* node, const aiScene* scene)
+void Model::Impl::processNode(aiNode* node, const aiScene* scene, std::vector<Mesh*>& meshes)
 {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -27,11 +46,11 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        processNode(node->mChildren[i], scene);
+        processNode(node->mChildren[i], scene, meshes);
     }
 }
 
-Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Mesh* Model::Impl::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     // data to fill
     std::vector<VERTEX> vertices;
@@ -79,7 +98,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     return returnMesh;
 }
 
-std::vector<Texture*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+std::vector<Texture*> Model::Impl::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
     std::vector<Texture*> textures;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
@@ -107,7 +126,29 @@ std::vector<Texture*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType
     return textures;
 }
 
-Model::~Model()
+// Model public interface implementation
+Model::Model(std::string path) : pImpl(std::make_unique<Impl>())
 {
+    pImpl->loadModel(path, meshes);
+}
 
+Model::Model(std::vector<VERTEX> vertices, std::vector<Texture*> textures) : pImpl(std::make_unique<Impl>())
+{
+    meshes.push_back(new Mesh(vertices, textures));
+}
+
+Model::~Model() = default;
+
+Model::Model(Model&& other) noexcept : meshes(std::move(other.meshes)), pImpl(std::move(other.pImpl))
+{
+}
+
+Model& Model::operator=(Model&& other) noexcept
+{
+    if (this != &other)
+    {
+        meshes = std::move(other.meshes);
+        pImpl = std::move(other.pImpl);
+    }
+    return *this;
 }

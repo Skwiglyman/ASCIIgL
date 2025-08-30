@@ -19,18 +19,3 @@ I_Dont_Wanna_Run_For_Christmas
 
     Build Debug
     ./scripts/build_debug.ps1
-
-Stress_Test
-    Run Debug Command
-    cd "C:\Users\Skwig\Desktop\Development\dev\ASCIIgL\I_Dont_Wanna_Run_For_Christmas\build\bin\Debug"
-    .\Stress_Test.exe
-
-    Run Release Command
-    cd "C:\Users\Skwig\Desktop\Development\dev\ASCIIgL\I_Dont_Wanna_Run_For_Christmas\build\bin\Release"
-    .\Stress_Test.exe
-
-    Build Release
-    ./scripts/build_release.ps1
-
-    Build Debug
-    ./scripts/build_debug.ps1

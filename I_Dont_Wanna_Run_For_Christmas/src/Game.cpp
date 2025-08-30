@@ -64,12 +64,14 @@ Game* Game::GetInstance()
 void Game::Run()
 {
     Logger::Info("Game loop starting.");
-    const int screenInitResult = Screen::GetInstance().InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2, 60, 1.0f, BG_BLACK);
+    const int screenInitResult = Screen::GetInstance().InitializeScreen(SCR_WIDTH, SCR_HEIGHT, L"I Don't Wanna Run For Christmas", 2, 2, 1000, 1.0f, BG_BLACK);
 
     Logger::Debug("Screen::InitializeScreen returned: " + std::to_string(screenInitResult));
-    Renderer::GetInstance().WIREFRAME = false;
-    Renderer::GetInstance().BACKFACECULLING = true;
-    Renderer::GetInstance().CCW = false;
+    Renderer::GetInstance().SetWireframe(false);
+    Renderer::GetInstance().SetBackfaceCulling(true);
+    Renderer::GetInstance().SetCCW(true);
+	Renderer::GetInstance().SetAntialiasing(true);
+	Renderer::GetInstance().SetAntialiasingsamples(4);
 
     // Logger::Info("Playing background music.");
 	// BOOL soundResult = PlaySound(TEXT(".\\res\\audio\\Man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
@@ -267,20 +269,6 @@ void Game::RunMaze()
 		gameState = WIN;
 	}
 
-	// Logger::Debug("Level->model has " + std::to_string(Level->model->meshes.size()) + " meshes.");
-	// for (size_t m = 0; m < Level->model->meshes.size(); ++m) {
-	// 	const auto& mesh = Level->model->meshes[m];
-	// 	Logger::Debug("Mesh " + std::to_string(m) + " has " + std::to_string(mesh->vertices.size()) + " vertices:");
-	// 	for (size_t v = 0; v < mesh->vertices.size(); ++v) {
-	// 		const auto& vert = mesh->vertices[v];
-	// 		Logger::Debug("Vertex " + std::to_string(v) +
-	// 			": X=" + std::to_string(vert.X()) +
-	// 			", Y=" + std::to_string(vert.Y()) +
-	// 			", Z=" + std::to_string(vert.Z()) +
-	// 			", W=" + std::to_string(vert.W()));
-	// 	}
-	// }
-
 	Renderer::DrawModel(vertexShader, *Level->model, Level->position, Level->rotation, Level->size, player->GetCamera());
 }
 
@@ -315,8 +303,11 @@ void Game::RunLost()
 
 void Game::MariahAI()
 {
-	float chaseSpeed = 40.0f;
-	float patrolSpeed = 80.0f;
+	// float chaseSpeed = 40.0f;
+	// float patrolSpeed = 80.0f;
+	float chaseSpeed = 0.0f;
+	float patrolSpeed = 0.0f;
+	
 	for (int i = 0; i < enemies.size(); i++)
 	{
 		if (enemies[i]->aiState == Enemy::CHASE)

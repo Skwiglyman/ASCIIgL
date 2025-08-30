@@ -27,6 +27,12 @@ private:
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
+    static inline int _antialiasing_samples = 4;
+    static inline bool _wireframe = false;
+    static inline bool _backface_culling = true;
+    static inline bool _ccw = false;
+    static inline bool _antialiasing = false;
+
     static VERTEX HomogenousPlaneIntersect(const VERTEX& vert2, const VERTEX& vert1, const int component, const bool Near);
     static std::vector<VERTEX> Clipping(const std::vector<VERTEX>& vertices, const int component, const bool Near);
     static void PerspectiveDivision(VERTEX& clipCoord);
@@ -38,7 +44,13 @@ private:
     static void InitializeTiles(std::vector<Tile>& tiles);
     static void BinTrianglesToTiles(std::vector<Tile>& tiles, const std::vector<VERTEX>& raster_triangles);
     static bool DoesTileEncapsulate(const Tile& tile, const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3);
+    
     static void DrawTriangleTexturedPartial(const Tile& tile, const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, const Texture* tex);
+
+    static void DrawTriangleTexturedAntialiased(const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, const Texture* tex);
+    static void DrawTriangleTexturedPartialAntialiased(const Tile& tile, const VERTEX& vert1, const VERTEX& vert2, const VERTEX& vert3, const Texture* tex);
+
+    static std::vector<std::pair<float, float>> GenerateSubPixelOffsets(int sampleCount);
 
     static void DrawTileTextured(const Tile& tile, const std::vector<VERTEX>& raster_triangles, const Texture* tex);
     // static void DrawTileWireframe(const Tile& tile, const std::vector<VERTEX>& raster_triangles);
@@ -65,9 +77,23 @@ private:
 
     static glm::mat4 CalcModelMatrix(const glm::vec3 position, const glm::vec2 rotation, const glm::vec3 size);
     static float GrayScaleRGB(const glm::vec3 rgb);
+    static float CalculateTriangleCoverage(float x, float y, const VERTEX& v1, const VERTEX& v2, const VERTEX& v3);
     static CHAR_INFO GetColGlyph(const float GreyScale);
 
-    inline static bool WIREFRAME = false;
-    inline static bool BACKFACECULLING = true;
-    inline static bool CCW = false;
+    // Antialiasing configuration
+    static void SetAntialiasingsamples(int samples);
+    static int GetAntialiasingsamples();
+
+    // Rendering configuration getters and setters
+    static void SetWireframe(bool wireframe);
+    static bool GetWireframe();
+    
+    static void SetBackfaceCulling(bool backfaceCulling);
+    static bool GetBackfaceCulling();
+    
+    static void SetCCW(bool ccw);
+    static bool GetCCW();
+    
+    static void SetAntialiasing(bool antialiasing);
+    static bool GetAntialiasing();
 };
